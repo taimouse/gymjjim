@@ -19,6 +19,8 @@ import {
   memberCreateSchema,
   memberFormSchema,
   type MemberFormInput,
+  mySettingsSchema,
+  type MySettingsInput,
 } from './schema';
 
 const id = z.uuid();
@@ -154,6 +156,20 @@ export async function withdrawMember(memberId: string): Promise<Result<null>> {
   if (!id.safeParse(memberId).success) return fail('VALIDATION');
   const supabase = await createClient();
   const { error } = await supabase.rpc('withdraw_member', { p_member_id: memberId });
+  if (error) return fail(toAppErrorCode(error));
+  return ok(null);
+}
+
+/** 회원 본인의 알림 설정 */
+export async function updateMySettings(input: MySettingsInput): Promise<Result<null>> {
+  const parsed = mySettingsSchema.safeParse(input);
+  if (!parsed.success) return fail('VALIDATION');
+  const supabase = await createClient();
+  const { error } = await supabase.rpc('update_my_settings', {
+    p_center_id: parsed.data.centerId,
+    p_notify_enabled: parsed.data.notifyEnabled,
+    p_marketing_agreed: parsed.data.marketingAgreed,
+  });
   if (error) return fail(toAppErrorCode(error));
   return ok(null);
 }

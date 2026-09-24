@@ -10,6 +10,9 @@ export const bookSessionInput = z.object({
 });
 export type BookSessionInput = z.infer<typeof bookSessionInput>;
 
+/** "지난주와 같은 수업" 일괄 예약: 한 번에 최대 20개 */
+export const bookManyInput = z.array(z.uuid()).min(1).max(20);
+
 export const cancelBookingInput = z.object({
   bookingId: z.uuid(),
   waivePenalty: z.boolean().default(false),

@@ -873,6 +873,43 @@ export type Database = {
         Args: { p_center_id: string; p_rows: Json }
         Returns: Json
       }
+      member_bookings: {
+        Args: { p_center_id: string; p_limit?: number; p_upcoming: boolean }
+        Returns: {
+          booking_id: string
+          cancel_reason: string
+          ends_at: string
+          instructor_name: string
+          pass_name: string
+          pass_type: Database["public"]["Enums"]["pass_type"]
+          program_color: string
+          program_name: string
+          session_id: string
+          session_status: Database["public"]["Enums"]["session_status"]
+          starts_at: string
+          status: Database["public"]["Enums"]["booking_status"]
+          waitlist_position: number
+        }[]
+      }
+      member_schedule: {
+        Args: { p_center_id: string; p_from: string; p_to: string }
+        Returns: {
+          booked_count: number
+          capacity: number
+          ends_at: string
+          instructor_name: string
+          my_booking_id: string
+          my_pass_type: Database["public"]["Enums"]["pass_type"]
+          my_status: Database["public"]["Enums"]["booking_status"]
+          my_waitlist_position: number
+          program_color: string
+          program_id: string
+          program_name: string
+          session_id: string
+          starts_at: string
+          waitlist_count: number
+        }[]
+      }
       my_memberships: {
         Args: Record<PropertyKey, never>
         Returns: {
@@ -884,6 +921,22 @@ export type Database = {
           name: string
           notify_enabled: boolean
           onboarded_at: string
+        }[]
+      }
+      preview_booking: { Args: { p_session_id: string }; Returns: Json }
+      repeat_last_week_candidates: {
+        Args: { p_center_id: string }
+        Returns: {
+          bookable: boolean
+          booked_count: number
+          capacity: number
+          ends_at: string
+          instructor_name: string
+          program_color: string
+          program_name: string
+          session_id: string
+          starts_at: string
+          waitlist_count: number
         }[]
       }
       save_program: {
@@ -944,6 +997,14 @@ export type Database = {
           p_waitlist?: boolean
         }
         Returns: Json
+      }
+      update_my_settings: {
+        Args: {
+          p_center_id: string
+          p_marketing_agreed: boolean
+          p_notify_enabled: boolean
+        }
+        Returns: undefined
       }
       update_session: {
         Args: {

@@ -61,7 +61,8 @@ function DrawerHeader({ className, ...props }: React.ComponentProps<'div'>) {
     <div
       data-slot="drawer-header"
       className={cn(
-        'flex flex-col gap-0.5 p-4 group-data-[vaul-drawer-direction=bottom]/drawer-content:text-center group-data-[vaul-drawer-direction=top]/drawer-content:text-center md:gap-0.5 md:text-left',
+        // 회원 바텀시트는 왼쪽 정렬로 통일한다
+        'flex flex-col gap-0.5 p-4 text-left',
         className,
       )}
       {...props}

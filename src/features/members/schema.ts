@@ -72,6 +72,14 @@ export const grantPassSchema = z.object({
 });
 export type GrantPassValues = z.infer<typeof grantPassSchema>;
 
+/** 회원 본인 알림 설정 (회원 앱 > 내 정보) */
+export const mySettingsSchema = z.object({
+  centerId: z.uuid(),
+  notifyEnabled: z.boolean(),
+  marketingAgreed: z.boolean(),
+});
+export type MySettingsInput = z.infer<typeof mySettingsSchema>;
+
 export const MEMBER_FILTERS = ['all', 'active', 'expiring', 'low', 'expired', 'hold', 'none'] as const;
 export type MemberFilter = (typeof MEMBER_FILTERS)[number];
 export const MEMBER_SORTS = ['name', 'recent', 'expiry'] as const;

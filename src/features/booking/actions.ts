@@ -1,14 +1,16 @@
 'use server';
 
+import { fail, ok } from '@/lib/result';
 import { createClient } from '@/lib/supabase/server';
 
 import * as rpc from './rpc';
-import type {
-  BookSessionInput,
-  CancelBookingInput,
-  CancelSessionInput,
-  SetAttendanceInput,
-  StaffBookInput,
+import {
+  type BookSessionInput,
+  bookManyInput,
+  type CancelBookingInput,
+  type CancelSessionInput,
+  type SetAttendanceInput,
+  type StaffBookInput,
 } from './schema';
 
 /**
@@ -18,6 +20,18 @@ import type {
 
 export async function bookSessionAction(input: BookSessionInput) {
   return rpc.bookSession(await createClient(), input);
+}
+
+/** "지난주와 같은 수업" 일괄 예약: 하나씩 차례로 예약하고 결과를 모아 돌려준다 */
+export async function bookManyAction(sessionIds: string[]) {
+  const parsed = bookManyInput.safeParse(sessionIds);
+  if (!parsed.success) return fail('VALIDATION');
+  const supabase = await createClient();
+  const results = [];
+  for (const sessionId of parsed.data) {
+    results.push({ sessionId, result: await rpc.bookSession(supabase, { sessionId }) });
+  }
+  return ok(results);
 }
 
 export async function cancelBookingAction(input: CancelBookingInput) {
