@@ -676,6 +676,7 @@ export type Database = {
       sessions: {
         Row: {
           booked_count: number
+          cancel_reason: string | null
           cancelled_at: string | null
           capacity: number
           center_id: string
@@ -695,6 +696,7 @@ export type Database = {
         }
         Insert: {
           booked_count?: number
+          cancel_reason?: string | null
           cancelled_at?: string | null
           capacity: number
           center_id: string
@@ -714,6 +716,7 @@ export type Database = {
         }
         Update: {
           booked_count?: number
+          cancel_reason?: string | null
           cancelled_at?: string | null
           capacity?: number
           center_id?: string
@@ -820,7 +823,45 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      book_session: {
+        Args: { p_member_pass_id?: string; p_session_id: string }
+        Returns: Json
+      }
+      cancel_booking: {
+        Args: { p_booking_id: string; p_waive_penalty?: boolean }
+        Returns: Json
+      }
+      cancel_session: {
+        Args: { p_reason?: string; p_session_id: string }
+        Returns: Json
+      }
+      create_hold: {
+        Args: {
+          p_end_date: string
+          p_member_pass_id: string
+          p_reason?: string
+          p_start_date: string
+        }
+        Returns: Json
+      }
+      set_attendance: {
+        Args: {
+          p_booking_id: string
+          p_status: Database["public"]["Enums"]["booking_status"]
+        }
+        Returns: Json
+      }
+      staff_book_for_member: {
+        Args: {
+          p_allow_over_capacity?: boolean
+          p_member_id: string
+          p_member_pass_id?: string
+          p_override_rules?: boolean
+          p_session_id: string
+          p_waitlist?: boolean
+        }
+        Returns: Json
+      }
     }
     Enums: {
       booked_by: "member" | "staff"
