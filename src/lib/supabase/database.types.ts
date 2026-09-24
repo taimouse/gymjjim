@@ -858,6 +858,21 @@ export type Database = {
         Returns: Json
       }
       get_invite: { Args: { p_token: string }; Returns: Json }
+      grant_member_pass: {
+        Args: {
+          p_member_id: string
+          p_memo?: string
+          p_paid_amount: number
+          p_paid_at?: string
+          p_product_id: string
+          p_start_date: string
+        }
+        Returns: Json
+      }
+      import_members: {
+        Args: { p_center_id: string; p_rows: Json }
+        Returns: Json
+      }
       my_memberships: {
         Args: Record<PropertyKey, never>
         Returns: {
@@ -886,6 +901,32 @@ export type Database = {
         }
         Returns: string
       }
+      search_members: {
+        Args: {
+          p_center_id: string
+          p_filter?: string
+          p_limit?: number
+          p_offset?: number
+          p_query?: string
+          p_sort?: string
+        }
+        Returns: {
+          id: string
+          joined_at: string
+          linked: boolean
+          name: string
+          pass_days_left: number
+          pass_end_date: string
+          pass_id: string
+          pass_name: string
+          pass_remaining: number
+          pass_state: string
+          pass_type: Database["public"]["Enums"]["pass_type"]
+          phone: string
+          tags: string[]
+          total_count: number
+        }[]
+      }
       set_attendance: {
         Args: {
           p_booking_id: string
@@ -904,6 +945,7 @@ export type Database = {
         }
         Returns: Json
       }
+      withdraw_member: { Args: { p_member_id: string }; Returns: Json }
     }
     Enums: {
       booked_by: "member" | "staff"

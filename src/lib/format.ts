@@ -5,7 +5,7 @@
  * - 금액: `150,000원`
  */
 import { tz } from '@date-fns/tz';
-import { differenceInCalendarDays, format, parseISO } from 'date-fns';
+import { addDays, differenceInCalendarDays, format, parseISO } from 'date-fns';
 import { ko } from 'date-fns/locale/ko';
 
 export const DEFAULT_TIME_ZONE = 'Asia/Seoul';
@@ -64,6 +64,20 @@ export function todayKey(timeZone = DEFAULT_TIME_ZONE, now: DateInput = new Date
  */
 export function daysUntil(endDateKey: string, todayDateKey: string): number {
   return differenceInCalendarDays(parseISO(endDateKey), parseISO(todayDateKey));
+}
+
+/**
+ * 날짜 키(`yyyy-MM-dd`, DB date 컬럼) 표시. 시간대 변환 없이 달력 날짜 그대로 보여준다.
+ * 예) `9월 24일`, `2026년 9월 24일`, `9월 24일 (목)`
+ */
+export function formatDateKey(key: string, options: { year?: boolean; weekday?: boolean } = {}): string {
+  const pattern = `${options.year ? 'yyyy년 ' : ''}M월 d일${options.weekday ? ' (EEE)' : ''}`;
+  return format(parseISO(key), pattern, { locale: ko });
+}
+
+/** 날짜 키에 일수를 더한다 */
+export function addDaysToKey(key: string, days: number): string {
+  return format(addDays(parseISO(key), days), 'yyyy-MM-dd');
 }
 
 /** `D-12`, `D-day`, `D+3` */

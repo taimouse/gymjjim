@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
-import { type ReactNode, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import {
   CommandDialog,
@@ -14,18 +14,14 @@ import {
 } from '@/components/ui/command';
 
 import { useAdmin } from './admin-context';
+import { MemberCommandResults } from './members/member-command-results';
+import { useMemberDrawer } from './members/use-member-drawer';
 import { ADMIN_NAV } from './admin-nav';
 
-/**
- * ⌘K / Ctrl+K 빠른 검색. 어느 관리자 화면에서든 열린다.
- * children 에 검색어를 받아 결과 그룹을 그리는 함수를 넘길 수 있다 (회원 검색).
- */
-export function CommandPalette({
-  renderResults,
-}: {
-  renderResults?: (query: string, close: () => void) => ReactNode;
-}) {
+/** ⌘K / Ctrl+K 빠른 검색: 회원(이름·뒷 4자리) → 선택하면 어느 화면에서든 회원 드로어, 그리고 메뉴 이동 */
+export function CommandPalette() {
   const t = useTranslations('admin');
+  const memberDrawer = useMemberDrawer();
   const router = useRouter();
   const { commandOpen, setCommandOpen } = useAdmin();
   const [query, setQuery] = useState('');
@@ -57,7 +53,13 @@ export function CommandPalette({
       <CommandInput value={query} onValueChange={setQuery} placeholder={t('command.placeholder')} />
       <CommandList className="max-h-[60vh]">
         <CommandEmpty>{t('command.empty')}</CommandEmpty>
-        {renderResults?.(query, close)}
+        <MemberCommandResults
+          query={query}
+          onSelect={(memberId) => {
+            close();
+            memberDrawer.open(memberId);
+          }}
+        />
         <CommandGroup heading={t('command.menus')}>
           {ADMIN_NAV.map(({ href, key, icon: Icon }) => (
             <CommandItem
