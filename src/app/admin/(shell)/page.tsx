@@ -1,17 +1,22 @@
+import type { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
+import { Suspense } from 'react';
 
-import { SignOutButton } from '@/components/sign-out-button';
+import { TodayView } from '@/components/admin/today/today-view';
 import { requireStaff } from '@/lib/auth/session';
+import { todayKey } from '@/lib/format';
 
-// STEP 9 에서 "오늘" 화면으로 바뀐다.
-export default async function AdminHomePage() {
-  const { center, staff } = await requireStaff();
-  const t = await getTranslations('admin.placeholder');
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations('today');
+  return { title: t('title') };
+}
+
+/** 관리자 첫 화면 "오늘" */
+export default async function TodayPage() {
+  const { center } = await requireStaff();
   return (
-    <main className="space-y-4 p-6">
-      <h1 className="text-2xl font-bold">{t('title', { center: center.name })}</h1>
-      <p className="text-muted-foreground">{t('greeting', { name: staff.name })}</p>
-      <SignOutButton to="admin" variant="outline" />
-    </main>
+    <Suspense>
+      <TodayView today={todayKey(center.timezone)} />
+    </Suspense>
   );
 }

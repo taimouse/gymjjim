@@ -4,7 +4,7 @@
  * - 전화번호: 숫자만 저장, 표시는 `010-1234-5678`, 목록 마스킹은 `010-****-5678`
  * - 금액: `150,000원`
  */
-import { tz } from '@date-fns/tz';
+import { tz, TZDate } from '@date-fns/tz';
 import { addDays, differenceInCalendarDays, format, parseISO } from 'date-fns';
 import { ko } from 'date-fns/locale/ko';
 
@@ -83,6 +83,26 @@ export function formatDateKey(key: string, options: { year?: boolean; weekday?: 
 /** 날짜 키에 일수를 더한다 */
 export function addDaysToKey(key: string, days: number): string {
   return format(addDays(parseISO(key), days), 'yyyy-MM-dd');
+}
+
+/** `9/24 (목)` — 차트 축처럼 좁은 곳 */
+export function formatShortDateKey(key: string): string {
+  return format(parseISO(key), 'M/d (EEE)', { locale: ko });
+}
+
+/** 월 키(`2026-09-01`) → `9월`, year 옵션이면 `2026년 9월` */
+export function formatMonthKey(key: string, options: { year?: boolean } = {}): string {
+  return format(parseISO(key), options.year ? 'yyyy년 M월' : 'M월', { locale: ko });
+}
+
+/** 센터 시간대의 하루(날짜 키)를 UTC ISO 구간 [from, to) 로 바꾼다 (그날 수업 조회용) */
+export function dayRangeUtc(key: string, timeZone = DEFAULT_TIME_ZONE): { from: string; to: string } {
+  const startOf = (dateKey: string) => {
+    const [year, month, day] = dateKey.split('-').map(Number) as [number, number, number];
+    // TZDate.toISOString() 은 현지 오프셋을 붙이므로 UTC(Z) 문자열로 바꾼다
+    return new Date(new TZDate(year, month - 1, day, timeZone).getTime()).toISOString();
+  };
+  return { from: startOf(key), to: startOf(addDaysToKey(key, 1)) };
 }
 
 /** `D-12`, `D-day`, `D+3` */

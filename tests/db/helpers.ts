@@ -1,6 +1,9 @@
 import pg from 'pg';
 import { inject } from 'vitest';
 
+// PostgREST 처럼 date 컬럼은 'yyyy-MM-dd' 문자열 그대로 받는다
+pg.types.setTypeParser(pg.types.builtins.DATE, (value) => value);
+
 // 테스트 DB 연결 (superuser). 사용자 권한이 필요하면 withUser / rpc 를 쓴다.
 export const db = new pg.Pool({ connectionString: inject('dbUrl'), max: 40 });
 

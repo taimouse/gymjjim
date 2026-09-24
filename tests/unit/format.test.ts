@@ -1,13 +1,16 @@
 import { describe, expect, it } from 'vitest';
 
 import {
+  dayRangeUtc,
   daysUntil,
   formatDate,
   formatDateTime,
   formatDateWithYear,
   formatDDay,
+  formatMonthKey,
   formatNumber,
   formatPhone,
+  formatShortDateKey,
   formatTime,
   formatTimeRange,
   formatWon,
@@ -55,6 +58,26 @@ describe('날짜 포맷', () => {
 
   it('오늘 날짜 키는 센터 시간대 기준', () => {
     expect(todayKey('Asia/Seoul', new Date('2026-09-24T16:00:00Z'))).toBe('2026-09-25');
+  });
+});
+
+describe('날짜 키', () => {
+  it('차트용 짧은 날짜와 월 표기', () => {
+    expect(formatShortDateKey('2026-09-24')).toBe('9/24 (목)');
+    expect(formatMonthKey('2026-09-01')).toBe('9월');
+    expect(formatMonthKey('2026-09-01', { year: true })).toBe('2026년 9월');
+  });
+
+  it('센터 시간대의 하루를 UTC 구간으로 바꾼다', () => {
+    expect(dayRangeUtc('2026-09-24', 'Asia/Seoul')).toEqual({
+      from: '2026-09-23T15:00:00.000Z',
+      to: '2026-09-24T15:00:00.000Z',
+    });
+    // 서머타임이 바뀌는 날은 23시간
+    expect(dayRangeUtc('2026-03-08', 'America/New_York')).toEqual({
+      from: '2026-03-08T05:00:00.000Z',
+      to: '2026-03-09T04:00:00.000Z',
+    });
   });
 });
 

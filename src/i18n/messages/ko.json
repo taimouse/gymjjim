@@ -109,10 +109,6 @@
     "submit": "동의하고 시작하기"
   },
   "admin": {
-    "placeholder": {
-      "title": "{center}",
-      "greeting": "{name} 님, 안녕하세요."
-    },
     "nav": {
       "label": "관리자 메뉴",
       "today": "오늘",
@@ -141,6 +137,70 @@
       "typeMore": "이름 1자 이상 또는 번호 4자리를 입력해 주세요"
     },
     "readOnly": "대표만 수정할 수 있어요. 지금은 보기만 가능해요."
+  },
+  "today": {
+    "title": "오늘",
+    "tabs": {
+      "label": "보기",
+      "today": "오늘",
+      "week": "주간 통계",
+      "month": "월간 통계"
+    },
+    "numbers": {
+      "bookings": "오늘 예약",
+      "attendance": "오늘 출석률",
+      "newMembers": "이번 달 신규 회원",
+      "renewals": "이번 달 재등록",
+      "countUnit": "건",
+      "peopleUnit": "명",
+      "percentUnit": "%",
+      "attendanceDetail": "출석 {attended}명 / 시작한 수업 예약 {base}명",
+      "attendanceWaiting": "아직 시작한 수업이 없어요",
+      "bookingsDetail": "오늘 수업 {count}개",
+      "monthDetail": "{month} 1일부터"
+    },
+    "timeline": {
+      "title": "오늘의 수업",
+      "empty": "오늘은 수업이 없어요",
+      "emptyHint": "캘린더에서 수업을 만들 수 있어요.",
+      "goCalendar": "캘린더로 가기",
+      "inProgress": "진행 중",
+      "ended": "종료",
+      "upcoming": "예정",
+      "cancelled": "폐강",
+      "bookedLabel": "예약",
+      "waitlist": "대기 {count}명",
+      "noInstructor": "강사 미정"
+    },
+    "followups": {
+      "title": "챙겨야 할 회원",
+      "description": "재등록 안내나 안부 연락이 필요한 회원이에요.",
+      "expiring": "만료 임박",
+      "low": "잔여 1~2회",
+      "inactive": "2주 미출석",
+      "emptyExpiring": "7일 안에 만료되는 회원이 없어요",
+      "emptyLow": "잔여 1~2회인 회원이 없어요",
+      "emptyInactive": "2주 넘게 출석하지 않은 회원이 없어요",
+      "expiresIn": "{dday} 만료",
+      "remaining": "잔여 {count}회",
+      "lastAttended": "마지막 출석 {date}",
+      "neverAttended": "출석 기록 없음",
+      "grant": "이용권 부여"
+    },
+    "stats": {
+      "weekDescription": "최근 7일, 일별",
+      "monthDescription": "최근 6개월, 월별",
+      "bookingsChart": "예약·출석",
+      "membersChart": "신규 회원·재등록",
+      "bookings": "예약",
+      "attended": "출석",
+      "newMembers": "신규 회원",
+      "renewals": "재등록",
+      "attendanceRate": "출석률 {rate}%",
+      "noRate": "출석률 -",
+      "totalBookings": "예약 {count, number}건",
+      "totalMembers": "신규 {newMembers, number}명 · 재등록 {renewals, number}명"
+    }
   },
   "programs": {
     "title": "프로그램·이용권",

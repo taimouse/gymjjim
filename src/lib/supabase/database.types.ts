@@ -840,6 +840,16 @@ export type Database = {
         Args: { p_reason?: string; p_session_id: string }
         Returns: Json
       }
+      center_stats: {
+        Args: { p_center_id: string; p_count?: number; p_unit: string }
+        Returns: {
+          attended: number
+          bookings: number
+          bucket: string
+          new_members: number
+          renewals: number
+        }[]
+      }
       complete_onboarding: {
         Args: { p_marketing_agreed?: boolean }
         Returns: Json
@@ -996,6 +1006,24 @@ export type Database = {
           p_session_id: string
           p_waitlist?: boolean
         }
+        Returns: Json
+      }
+      today_followups: {
+        Args: { p_center_id: string; p_limit?: number }
+        Returns: {
+          days_left: number
+          last_attended_at: string
+          member_id: string
+          name: string
+          pass_id: string
+          pass_name: string
+          phone: string
+          reason: string
+          remaining: number
+        }[]
+      }
+      today_summary: {
+        Args: { p_center_id: string; p_date?: string }
         Returns: Json
       }
       update_my_settings: {

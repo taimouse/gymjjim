@@ -3,6 +3,7 @@
 import { useQueryClient } from '@tanstack/react-query';
 import { useEffect } from 'react';
 
+import { dashboardKeys } from '@/features/dashboard/queries';
 import { memberKeys } from '@/features/members/queries';
 import { sessionKeys } from '@/features/sessions/queries';
 import { createClient } from '@/lib/supabase/client';
@@ -11,7 +12,7 @@ import { useAdmin } from './admin-context';
 
 /**
  * Supabase Realtime: 다른 기기(회원 앱·다른 직원)에서 예약이 들어오면
- * 캘린더 숫자·명단을 새로 불러온다. 짧은 시간에 몰리는 변경은 0.4초 모아서 한 번에 반영.
+ * 캘린더 숫자·명단·오늘 화면을 새로 불러온다. 짧은 시간에 몰리는 변경은 0.4초 모아서 한 번에 반영.
  */
 export function RealtimeSync() {
   const { centerId } = useAdmin();
@@ -28,6 +29,7 @@ export function RealtimeSync() {
         void queryClient.invalidateQueries({ queryKey: sessionKeys.roster(id) });
       touchedSessions.clear();
       void queryClient.invalidateQueries({ queryKey: memberKeys.all });
+      void queryClient.invalidateQueries({ queryKey: dashboardKeys.all });
     };
     const schedule = (sessionId?: unknown) => {
       if (typeof sessionId === 'string') touchedSessions.add(sessionId);

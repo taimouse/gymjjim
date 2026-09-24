@@ -5,6 +5,7 @@ import { z } from 'zod';
 
 import { createClient } from '@/lib/supabase/client';
 import type { Database } from '@/lib/supabase/database.types';
+import type { WithNullable } from '@/lib/types';
 
 /** 회원 앱 조회 (member_schedule / preview_booking / member_bookings / repeat_last_week_candidates) */
 export const memberBookingKeys = {
@@ -16,8 +17,6 @@ export const memberBookingKeys = {
 };
 
 type Functions = Database['public']['Functions'];
-/** 타입 생성기는 RPC 의 returns table 컬럼을 모두 non-null 로 만든다. 실제로 null 이 올 수 있는 컬럼을 바로잡는다. */
-type WithNullable<T, K extends keyof T> = Omit<T, K> & { [P in K]: T[P] | null };
 
 export type ScheduleRow = WithNullable<
   Functions['member_schedule']['Returns'][number],
