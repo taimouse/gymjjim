@@ -117,6 +117,7 @@ export type Database = {
           deleted_at: string | null
           id: string
           name: string
+          notify_sms_fallback: boolean
           phone: string | null
           timezone: string
           updated_at: string
@@ -128,6 +129,7 @@ export type Database = {
           deleted_at?: string | null
           id?: string
           name: string
+          notify_sms_fallback?: boolean
           phone?: string | null
           timezone?: string
           updated_at?: string
@@ -139,6 +141,7 @@ export type Database = {
           deleted_at?: string | null
           id?: string
           name?: string
+          notify_sms_fallback?: boolean
           phone?: string | null
           timezone?: string
           updated_at?: string
@@ -391,8 +394,10 @@ export type Database = {
           error: string | null
           fallback_used: boolean
           id: string
+          locked_at: string | null
           member_id: string | null
           payload: NonNullable<Json>
+          provider: string | null
           scheduled_at: string
           sent_at: string | null
           status: Database["public"]["Enums"]["notification_status"]
@@ -408,8 +413,10 @@ export type Database = {
           error?: string | null
           fallback_used?: boolean
           id?: string
+          locked_at?: string | null
           member_id?: string | null
           payload?: NonNullable<Json>
+          provider?: string | null
           scheduled_at?: string
           sent_at?: string | null
           status?: Database["public"]["Enums"]["notification_status"]
@@ -425,8 +432,10 @@ export type Database = {
           error?: string | null
           fallback_used?: boolean
           id?: string
+          locked_at?: string | null
           member_id?: string | null
           payload?: NonNullable<Json>
+          provider?: string | null
           scheduled_at?: string
           sent_at?: string | null
           status?: Database["public"]["Enums"]["notification_status"]
@@ -850,6 +859,23 @@ export type Database = {
           renewals: number
         }[]
       }
+      claim_notifications: {
+        Args: { p_center_id?: string; p_limit?: number }
+        Returns: {
+          attempts: number
+          center_id: string
+          center_name: string
+          center_timezone: string
+          id: string
+          member_id: string
+          member_name: string
+          payload: Json
+          phone: string
+          sms_fallback: boolean
+          template_code: string
+          type: string
+        }[]
+      }
       complete_onboarding: {
         Args: { p_marketing_agreed?: boolean }
         Returns: Json
@@ -866,6 +892,21 @@ export type Database = {
       create_member_invite: {
         Args: { p_invite_url_base?: string; p_member_id: string }
         Returns: Json
+      }
+      enqueue_scheduled_notifications: {
+        Args: { p_center_id?: string; p_now?: string }
+        Returns: number
+      }
+      finish_notification: {
+        Args: {
+          p_error?: string
+          p_fallback_used?: boolean
+          p_id: string
+          p_ok: boolean
+          p_provider?: string
+          p_retry?: boolean
+        }
+        Returns: Database["public"]["Enums"]["notification_status"]
       }
       get_invite: { Args: { p_token: string }; Returns: Json }
       grant_member_pass: {

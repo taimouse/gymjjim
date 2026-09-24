@@ -11,6 +11,8 @@ import {
   type BookingSettings,
   centerInfoFormSchema,
   type CenterInfoFormValues,
+  notificationSettingsSchema,
+  type NotificationSettingsValues,
 } from './schema';
 
 /** 센터 정보·시간대 (대표) */
@@ -52,6 +54,21 @@ export async function updateBookingRules(values: BookingRulesFormValues): Promis
   const { error, count } = await supabase
     .from('centers')
     .update({ booking_settings: settings }, { count: 'exact' })
+    .eq('id', context.center.id);
+  if (error) return fail(toAppErrorCode(error));
+  return count ? ok(null) : fail('FORBIDDEN');
+}
+
+/** 알림 설정 (대표) */
+export async function updateNotificationSettings(values: NotificationSettingsValues): Promise<Result<null>> {
+  const parsed = notificationSettingsSchema.safeParse(values);
+  if (!parsed.success) return fail('VALIDATION');
+  const context = await staffActionContext({ owner: true });
+  if (!context) return fail('FORBIDDEN');
+  const supabase = await createClient();
+  const { error, count } = await supabase
+    .from('centers')
+    .update({ notify_sms_fallback: parsed.data.smsFallback }, { count: 'exact' })
     .eq('id', context.center.id);
   if (error) return fail(toAppErrorCode(error));
   return count ? ok(null) : fail('FORBIDDEN');

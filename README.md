@@ -90,6 +90,38 @@ http://localhost:3000 에서 확인합니다.
 
 `supabase/templates/*.html` 은 `{{ .RedirectTo }}&token_hash=…` 형식이라 **Redirect URL 허용 목록**(`additional_redirect_urls`, 운영은 대시보드 URL Configuration)에 `https://<도메인>/**` 가 있어야 합니다.
 
+## 알림 (카카오 알림톡)
+
+예약 확정·대기 승격·수업 변경·폐강·전날/2시간 전 리마인드·만료 D-7·잔여 1회·앱 연결 초대, 모두 **정보성 템플릿 9종**만 보냅니다. 자유 문구 발송 기능은 없습니다.
+
+```
+RPC(예약·취소·폐강…) ─┐
+Cron → Edge Function ─┼─ notification_logs (pending) ─ claim → 템플릿 → 알림톡 어댑터 → finish (sent/failed/skipped)
+  (리마인드·D-7 예약) ─┘
+```
+
+- 템플릿 원문·변수: `src/features/notifications/templates.ts` (관리자 **설정 > 알림**에서 미리보기)
+- 어댑터: `src/features/notifications/channels.ts` — `mock`(기본, 보내지 않고 기록만) · `solapi`. 대행사를 바꿀 때는 어댑터만 추가합니다.
+- 발송기: `supabase/functions/send-notifications` (1분마다 Cron 이 호출, `x-cron-secret` 헤더로 확인)
+- 규칙: 2시간 전 리마인드는 발송 시각이 21시~08시면 보내지 않습니다(새벽 수업은 전날 20시 리마인드로 대체). 회원이 알림을 끄면 건너뛰지만 폐강·시간 변경은 보냅니다. 보내기 직전에 예약이 취소됐거나 시간이 바뀌었으면 건너뜁니다. 실패하면 5분·10분 뒤 다시 보내고 3번째에 실패로 둡니다.
+- SMS 대체발송: 대표가 **설정 > 알림**에서 켭니다(문자 비용 발생).
+
+### 실제 발송 연결 (Solapi)
+
+1. 카카오 비즈니스 채널을 만들고 Solapi 에 연동해 **pfId** 를 받습니다. 발신번호도 등록합니다.
+2. 설정 > 알림의 템플릿 원문 9종을 그대로 알림톡 템플릿으로 등록해 검수를 받습니다(원문이 한 글자라도 다르면 발송이 거절됩니다).
+3. `supabase/functions/.env.example` 을 참고해 시크릿을 넣습니다. 검수받은 템플릿 ID 는 `SOLAPI_TEMPLATE_IDS` 에 코드별로 적습니다(빈 값인 템플릿은 보내지 않고 `TEMPLATE_NOT_REGISTERED` 로 남습니다).
+   ```bash
+   pnpm supabase secrets set --env-file supabase/functions/.env
+   pnpm supabase functions deploy send-notifications
+   ```
+4. Cron 작업(`gymjjim-send-notifications`, 1분마다)은 마이그레이션이 등록합니다. SQL Editor 에서 Vault 에 호출 주소와 비밀값을 넣으면 동작을 시작합니다.
+   ```sql
+   select vault.create_secret('https://<project-ref>.supabase.co/functions/v1', 'gymjjim_functions_url');
+   select vault.create_secret('<NOTIFY_CRON_SECRET 과 같은 값>', 'gymjjim_cron_secret');
+   ```
+   로컬 Supabase 에서는 주소로 `http://host.docker.internal:54321/functions/v1` 을 넣고 `pnpm supabase functions serve` 를 켜 둡니다.
+
 ## 스크립트
 
 | 명령                        | 설명                                                                              |

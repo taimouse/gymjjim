@@ -8,6 +8,8 @@
     "noFallthroughCasesInSwitch": true,
     "noImplicitOverride": true,
     "noEmit": true,
+    // src/features/notifications 는 Supabase Edge Function(Deno)도 가져다 쓰므로 .ts 확장자 import 를 허용한다
+    "allowImportingTsExtensions": true,
     "esModuleInterop": true,
     "module": "esnext",
     "moduleResolution": "bundler",

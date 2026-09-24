@@ -57,3 +57,9 @@ export const centerInfoFormSchema = z.object({
   timezone: z.string().min(1, { error: 'required' }),
 });
 export type CenterInfoFormValues = z.input<typeof centerInfoFormSchema>;
+
+/** 알림 설정 (대표): 알림톡 실패 시 SMS 대체발송 */
+export const notificationSettingsSchema = z.object({
+  smsFallback: z.boolean(),
+});
+export type NotificationSettingsValues = z.infer<typeof notificationSettingsSchema>;

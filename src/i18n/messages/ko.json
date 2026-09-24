@@ -652,7 +652,7 @@
   },
   "settings": {
     "title": "설정",
-    "description": "센터 정보, 예약 규칙, 직원을 관리해요.",
+    "description": "센터 정보, 예약 규칙, 직원, 알림을 관리해요.",
     "center": {
       "title": "센터 정보",
       "name": "센터 이름",
@@ -702,6 +702,84 @@
         "description": "더 이상 관리자 화면에 로그인할 수 없어요. 담당했던 수업 기록은 남아요."
       },
       "empty": "등록된 직원이 없어요"
+    },
+    "tabs": {
+      "label": "설정 메뉴",
+      "general": "센터·예약 규칙",
+      "staff": "직원",
+      "notifications": "알림"
+    },
+    "notifications": {
+      "title": "알림 발송",
+      "description": "예약 확정·리마인드·폐강 같은 안내를 카카오 알림톡으로 보내요. 광고성 메시지는 보내지 않아요.",
+      "smsFallback": "알림톡 실패 시 문자로 대신 보내기",
+      "smsFallbackHint": "카카오톡을 쓰지 않는 회원에게도 안내가 가요. 문자 발송 비용이 들어요.",
+      "saved": "알림 설정을 저장했어요",
+      "rules": {
+        "title": "보내는 때",
+        "items": [
+          "예약 확정·대기 승격·잔여 1회: 바로",
+          "전날 리마인드: 수업 전날 오후 8시",
+          "2시간 전 리마인드: 발송 시각이 오후 9시~오전 8시면 보내지 않아요",
+          "이용권 만료 7일 전: 오전 10시~오후 9시 사이",
+          "수업 폐강·시간 변경: 회원이 알림을 꺼도 보내요"
+        ]
+      },
+      "logs": {
+        "title": "최근 발송 내역",
+        "description": "최근 50건이에요. 실패한 알림은 5분·10분 뒤 다시 보내요.",
+        "empty": "발송 내역이 없어요",
+        "filterLabel": "상태",
+        "all": "전체",
+        "time": "시각",
+        "member": "회원",
+        "type": "알림",
+        "status": "상태",
+        "note": "비고",
+        "mock": "테스트 발송 (실제로 보내지 않음)",
+        "fallback": "문자로 대체 발송",
+        "attempts": "{count}회 시도",
+        "scheduled": "{time} 발송 예정",
+        "unknownMember": "(삭제된 회원)"
+      },
+      "templates": {
+        "title": "알림톡 템플릿",
+        "description": "카카오 검수를 받은 문구와 똑같아야 발송돼요. 발송대행사에 아래 원문으로 등록해 주세요.",
+        "code": "템플릿 코드",
+        "variables": "변수",
+        "preview": "미리보기"
+      }
+    }
+  },
+  "notifications": {
+    "types": {
+      "booking_confirmed": "예약 확정",
+      "waitlist_promoted": "대기 → 확정",
+      "session_changed": "수업 시간 변경",
+      "session_cancelled": "수업 폐강",
+      "reminder_day_before": "전날 리마인드",
+      "reminder_2h": "2시간 전 리마인드",
+      "pass_expiring_d7": "이용권 만료 7일 전",
+      "pass_remaining_one": "잔여 1회",
+      "member_invite": "앱 연결 초대"
+    },
+    "status": {
+      "pending": "대기",
+      "sending": "보내는 중",
+      "sent": "발송",
+      "failed": "실패",
+      "skipped": "건너뜀"
+    },
+    "reasons": {
+      "NOTIFY_DISABLED": "회원이 알림을 껐어요",
+      "BOOKING_CHANGED": "예약이 취소·변경됐어요",
+      "SESSION_CANCELLED": "수업이 폐강됐어요",
+      "SESSION_CHANGED": "수업 시간이 바뀌었어요",
+      "SESSION_STARTED": "수업이 이미 시작했어요",
+      "PASS_CHANGED": "이용권이 바뀌었어요",
+      "INVITE_CHANGED": "새 초대 링크가 나갔거나 이미 연결됐어요",
+      "NO_RECIPIENT": "받을 전화번호가 없어요",
+      "TIMEOUT": "발송 중 시간이 초과됐어요"
     }
   },
   "member": {

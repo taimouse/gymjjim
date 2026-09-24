@@ -133,3 +133,4 @@ scripts/             DB 도구 (타입 생성 등)
 - 모르는 라이브러리 API는 추측하지 말고 최신 문서를 확인
   - Next.js 16 문서는 `node_modules/next/dist/docs/`에 번들되어 있다 (`AGENTS.md` 참고). `middleware`는 `proxy.ts`로 이름이 바뀌었다
 - Docker 없이도 `pnpm test:db`(embedded PostgreSQL)로 마이그레이션·RPC·RLS를 검증할 수 있다
+- `src/features/notifications`의 templates·solapi·channels·dispatch는 Edge Function(Deno)도 가져다 쓴다. 상대 경로 + `.ts` 확장자로만 import 하고 `@/` 경로·Next 전용 모듈은 쓰지 않는다 (zod 는 함수의 `deno.json`이 연결)
