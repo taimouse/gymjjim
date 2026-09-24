@@ -871,6 +871,21 @@ export type Database = {
           onboarded_at: string
         }[]
       }
+      save_program: {
+        Args: {
+          p_allowed_product_ids: string[]
+          p_center_id: string
+          p_color: string
+          p_default_capacity: number
+          p_default_instructor_id?: string
+          p_description?: string
+          p_duration_min: number
+          p_id?: string
+          p_name: string
+          p_type: Database["public"]["Enums"]["program_type"]
+        }
+        Returns: string
+      }
       set_attendance: {
         Args: {
           p_booking_id: string

@@ -1,6 +1,7 @@
 'use client';
 
 import * as React from 'react';
+import { useTranslations } from 'next-intl';
 import { cn } from 'cn';
 import { Dialog as SheetPrimitive } from 'radix-ui';
 
@@ -63,7 +64,7 @@ function SheetContent({
           <SheetPrimitive.Close data-slot="sheet-close" asChild>
             <Button variant="ghost" className="absolute top-3 right-3" size="icon-sm">
               <XIcon />
-              <span className="sr-only">Close</span>
+              <CloseLabel />
             </Button>
           </SheetPrimitive.Close>
         )}
@@ -112,3 +113,9 @@ export {
   SheetTitle,
   SheetDescription,
 };
+
+/** 스크린 리더용 닫기 라벨 (i18n) */
+function CloseLabel() {
+  const t = useTranslations('common');
+  return <span className="sr-only">{t('close')}</span>;
+}
