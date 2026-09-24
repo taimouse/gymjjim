@@ -21,6 +21,17 @@ export default defineConfig({
           environment: 'node',
         },
       },
+      {
+        // embedded PostgreSQL 에 마이그레이션·시드를 적용하고 RPC·RLS 를 검증한다 (Docker 불필요)
+        test: {
+          name: 'db',
+          include: ['tests/db/**/*.test.ts'],
+          environment: 'node',
+          globalSetup: ['tests/db/global-setup.ts'],
+          testTimeout: 60_000,
+          hookTimeout: 180_000,
+        },
+      },
     ],
   },
 });

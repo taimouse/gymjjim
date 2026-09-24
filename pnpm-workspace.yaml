@@ -1,6 +1,7 @@
 allowBuilds:
   '@embedded-postgres/windows-x64': true
   '@parcel/watcher': false
+  '@sentry-internal/node-cpu-profiler': false
   '@swc/core': false
   unrs-resolver: false
 minimumReleaseAgeExclude:
