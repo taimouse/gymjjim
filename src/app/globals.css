@@ -1,0 +1,244 @@
+@import 'tailwindcss';
+@import 'tw-animate-css';
+@import 'shadcn/tailwind.css';
+
+/*
+ * gymjjim 디자인 토큰
+ * - 색은 모두 여기 CSS 변수로만 정의하고, 컴포넌트는 Tailwind 유틸리티(bg-primary, text-success 등)로만 사용한다.
+ * - 다크 모드는 OS 설정(prefers-color-scheme)을 따른다.
+ */
+@custom-variant dark (@media (prefers-color-scheme: dark));
+
+:root {
+  /* neutral 스케일 (살짝 차가운 회색) */
+  --gray-0: oklch(1 0 0);
+  --gray-50: oklch(0.985 0.002 270);
+  --gray-100: oklch(0.967 0.004 270);
+  --gray-200: oklch(0.925 0.006 270);
+  --gray-300: oklch(0.87 0.008 270);
+  --gray-400: oklch(0.71 0.012 270);
+  --gray-500: oklch(0.556 0.014 270);
+  --gray-600: oklch(0.446 0.014 270);
+  --gray-700: oklch(0.373 0.013 270);
+  --gray-800: oklch(0.279 0.011 270);
+  --gray-900: oklch(0.21 0.009 270);
+  --gray-950: oklch(0.155 0.007 270);
+
+  /* 포인트 색 (인디고) */
+  --brand: oklch(0.52 0.21 275);
+  --brand-foreground: oklch(0.99 0.005 275);
+  --brand-soft: oklch(0.95 0.03 275);
+  --brand-soft-foreground: oklch(0.42 0.19 275);
+
+  /* 상태색: solid(채움) + soft(연한 배경) + soft-foreground(연한 배경 위 글자) */
+  --success: oklch(0.56 0.14 155);
+  --success-foreground: oklch(0.99 0.01 155);
+  --success-soft: oklch(0.95 0.045 155);
+  --success-soft-foreground: oklch(0.4 0.1 155);
+
+  --warning: oklch(0.77 0.16 72);
+  --warning-foreground: oklch(0.25 0.05 60);
+  --warning-soft: oklch(0.96 0.06 88);
+  --warning-soft-foreground: oklch(0.45 0.11 58);
+
+  --danger: oklch(0.577 0.215 27);
+  --danger-foreground: oklch(0.99 0.01 27);
+  --danger-soft: oklch(0.95 0.035 25);
+  --danger-soft-foreground: oklch(0.47 0.17 27);
+
+  --info: oklch(0.58 0.14 240);
+  --info-foreground: oklch(0.99 0.01 240);
+  --info-soft: oklch(0.95 0.028 240);
+  --info-soft-foreground: oklch(0.43 0.11 245);
+
+  /* shadcn 시맨틱 토큰 */
+  --background: var(--gray-0);
+  --foreground: var(--gray-950);
+  --card: var(--gray-0);
+  --card-foreground: var(--gray-950);
+  --popover: var(--gray-0);
+  --popover-foreground: var(--gray-950);
+  --primary: var(--brand);
+  --primary-foreground: var(--brand-foreground);
+  --secondary: var(--gray-100);
+  --secondary-foreground: var(--gray-900);
+  --muted: var(--gray-100);
+  --muted-foreground: var(--gray-500);
+  --accent: var(--gray-100);
+  --accent-foreground: var(--gray-900);
+  --destructive: var(--danger);
+  --border: var(--gray-200);
+  --input: var(--gray-300);
+  --ring: oklch(0.52 0.21 275 / 55%);
+  --surface: var(--gray-50);
+
+  --chart-1: var(--brand);
+  --chart-2: oklch(0.7 0.13 275);
+  --chart-3: var(--info);
+  --chart-4: var(--success);
+  --chart-5: var(--warning);
+
+  --sidebar: var(--gray-50);
+  --sidebar-foreground: var(--gray-800);
+  --sidebar-primary: var(--brand);
+  --sidebar-primary-foreground: var(--brand-foreground);
+  --sidebar-accent: var(--brand-soft);
+  --sidebar-accent-foreground: var(--brand-soft-foreground);
+  --sidebar-border: var(--gray-200);
+  --sidebar-ring: var(--ring);
+
+  /* radius · 그림자 2단계 */
+  --radius: 0.75rem;
+  --elevation-1: 0 1px 2px oklch(0.2 0.01 270 / 6%), 0 1px 3px oklch(0.2 0.01 270 / 8%);
+  --elevation-2: 0 12px 32px oklch(0.2 0.01 270 / 14%), 0 2px 8px oklch(0.2 0.01 270 / 8%);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --brand: oklch(0.58 0.2 275);
+    --brand-foreground: oklch(0.99 0.005 275);
+    --brand-soft: oklch(0.3 0.08 275);
+    --brand-soft-foreground: oklch(0.85 0.08 275);
+
+    --success: oklch(0.62 0.14 155);
+    --success-soft: oklch(0.3 0.06 155);
+    --success-soft-foreground: oklch(0.86 0.1 155);
+
+    --warning: oklch(0.8 0.15 75);
+    --warning-soft: oklch(0.33 0.07 70);
+    --warning-soft-foreground: oklch(0.9 0.1 85);
+
+    --danger: oklch(0.64 0.2 25);
+    --danger-soft: oklch(0.31 0.08 25);
+    --danger-soft-foreground: oklch(0.87 0.08 25);
+
+    --info: oklch(0.64 0.13 240);
+    --info-soft: oklch(0.3 0.06 240);
+    --info-soft-foreground: oklch(0.86 0.07 240);
+
+    --background: var(--gray-950);
+    --foreground: var(--gray-50);
+    --card: var(--gray-900);
+    --card-foreground: var(--gray-50);
+    --popover: var(--gray-900);
+    --popover-foreground: var(--gray-50);
+    --secondary: var(--gray-800);
+    --secondary-foreground: var(--gray-50);
+    --muted: var(--gray-800);
+    --muted-foreground: var(--gray-400);
+    --accent: var(--gray-800);
+    --accent-foreground: var(--gray-50);
+    --border: oklch(1 0 0 / 10%);
+    --input: oklch(1 0 0 / 16%);
+    --ring: oklch(0.7 0.16 275 / 60%);
+    --surface: oklch(0.18 0.008 270);
+
+    --sidebar: var(--gray-900);
+    --sidebar-foreground: var(--gray-200);
+    --sidebar-border: oklch(1 0 0 / 8%);
+
+    --elevation-1: 0 1px 2px oklch(0 0 0 / 30%), 0 1px 3px oklch(0 0 0 / 25%);
+    --elevation-2: 0 12px 32px oklch(0 0 0 / 50%), 0 2px 8px oklch(0 0 0 / 30%);
+  }
+}
+
+@theme inline {
+  --font-sans:
+    'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont, system-ui, 'Apple SD Gothic Neo',
+    'Noto Sans KR', 'Malgun Gothic', 'Segoe UI', sans-serif;
+  --font-heading: var(--font-sans);
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-surface: var(--surface);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --color-brand: var(--brand);
+  --color-brand-foreground: var(--brand-foreground);
+  --color-brand-soft: var(--brand-soft);
+  --color-brand-soft-foreground: var(--brand-soft-foreground);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-success-soft: var(--success-soft);
+  --color-success-soft-foreground: var(--success-soft-foreground);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-warning-soft: var(--warning-soft);
+  --color-warning-soft-foreground: var(--warning-soft-foreground);
+  --color-danger: var(--danger);
+  --color-danger-foreground: var(--danger-foreground);
+  --color-danger-soft: var(--danger-soft);
+  --color-danger-soft-foreground: var(--danger-soft-foreground);
+  --color-info: var(--info);
+  --color-info-foreground: var(--info-foreground);
+  --color-info-soft: var(--info-soft);
+  --color-info-soft-foreground: var(--info-soft-foreground);
+
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+
+  /* 그림자는 2단계만 쓴다: xs/sm = 카드, md 이상 = 드로어·팝오버 */
+  --shadow-xs: var(--elevation-1);
+  --shadow-sm: var(--elevation-1);
+  --shadow-md: var(--elevation-2);
+  --shadow-lg: var(--elevation-2);
+  --shadow-xl: var(--elevation-2);
+  --shadow-2xl: var(--elevation-2);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  html {
+    @apply font-sans;
+    -webkit-text-size-adjust: 100%;
+  }
+  body {
+    @apply bg-background text-base text-foreground antialiased;
+    word-break: keep-all;
+  }
+  :focus-visible {
+    @apply outline-2 outline-offset-2 outline-ring;
+  }
+}
+
+@utility numeric {
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}

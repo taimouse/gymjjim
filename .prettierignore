@@ -1,0 +1,15 @@
+pnpm-lock.yaml
+pnpm-workspace.yaml
+.next
+node_modules
+.cache
+coverage
+playwright-report
+test-results
+public/sw.js
+supabase/.temp
+supabase/.branches
+src/lib/supabase/database.types.ts
+CLAUDE.md
+AGENTS.md
+PROMPTS.md

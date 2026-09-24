@@ -1,0 +1,47 @@
+# dependencies
+/node_modules
+/.pnp
+.pnp.*
+
+# next.js
+/.next/
+/out/
+next-env.d.ts
+*.tsbuildinfo
+
+# production
+/build
+
+# env
+.env
+.env.local
+.env.*.local
+
+# testing
+/coverage
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+/tests/e2e/.auth/
+
+# local tooling caches (embedded postgres data 등)
+/.cache/
+
+# PWA (Serwist 빌드 산출물)
+/public/sw.js
+/public/sw.js.map
+/public/swe-worker-*.js
+
+# misc
+.DS_Store
+Thumbs.db
+*.pem
+npm-debug.log*
+pnpm-debug.log*
+
+# vercel
+.vercel
+
+# Claude Code 개인 설정
+/.claude/settings.local.json
