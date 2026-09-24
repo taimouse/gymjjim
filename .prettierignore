@@ -6,7 +6,6 @@ node_modules
 coverage
 playwright-report
 test-results
-public/sw.js
 supabase/.temp
 supabase/.branches
 src/lib/supabase/database.types.ts

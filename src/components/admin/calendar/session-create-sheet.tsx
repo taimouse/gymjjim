@@ -117,12 +117,12 @@ export function SessionCreateSheet({ defaults, onClose }: { defaults: CreateDefa
       <form id="session-create-form" onSubmit={onSubmit} noValidate className="space-y-6">
         <FieldGroup>
           <Field data-invalid={!!errors.programId}>
-            <FieldLabel>{t('create.program')}</FieldLabel>
+            <FieldLabel htmlFor="create-program">{t('create.program')}</FieldLabel>
             {(programs.data ?? []).length === 0 && !programs.isPending ? (
               <p className="text-muted-foreground">{t('create.noPrograms')}</p>
             ) : (
               <Select value={values.programId || undefined} onValueChange={onProgram}>
-                <SelectTrigger className="w-full">
+                <SelectTrigger id="create-program" className="w-full">
                   <SelectValue placeholder={t('create.programPlaceholder')} />
                 </SelectTrigger>
                 <SelectContent>
@@ -168,7 +168,7 @@ export function SessionCreateSheet({ defaults, onClose }: { defaults: CreateDefa
             </Field>
           </div>
           <Field>
-            <FieldLabel>{t('create.instructor')}</FieldLabel>
+            <FieldLabel htmlFor="create-instructor">{t('create.instructor')}</FieldLabel>
             <Controller
               control={form.control}
               name="instructorId"
@@ -177,7 +177,7 @@ export function SessionCreateSheet({ defaults, onClose }: { defaults: CreateDefa
                   value={field.value ?? NO_INSTRUCTOR}
                   onValueChange={(value) => field.onChange(value === NO_INSTRUCTOR ? null : value)}
                 >
-                  <SelectTrigger className="w-full">
+                  <SelectTrigger id="create-instructor" className="w-full">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>

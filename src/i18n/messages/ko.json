@@ -1,7 +1,9 @@
 {
   "app": {
     "name": "gymjjim",
-    "description": "헬스장·PT샵·그룹운동 센터를 위한 예약 중심 회원관리"
+    "description": "헬스장·PT샵·그룹운동 센터를 위한 예약 중심 회원관리",
+    "pwaName": "gymjjim 수업 예약",
+    "skipToContent": "본문으로 건너뛰기"
   },
   "common": {
     "save": "저장",
@@ -891,7 +893,17 @@
       "center": "{center} 회원",
       "holdScheduled": "{start} ~ {end} 정지 예정",
       "greeting": "{name} 님",
-      "account": "계정"
+      "account": "계정",
+      "push": {
+        "label": "이 기기로 푸시 알림 받기",
+        "hint": "카카오 알림톡과 같은 안내를 이 휴대폰에도 알림으로 보내 드려요.",
+        "unsupported": "이 브라우저에서는 푸시 알림을 쓸 수 없어요.",
+        "needsInstall": "아이폰은 공유 버튼 → \"홈 화면에 추가\"로 앱을 설치한 뒤 켤 수 있어요.",
+        "denied": "알림 권한이 꺼져 있어요. 브라우저 설정에서 이 사이트의 알림을 허용해 주세요.",
+        "enabled": "이 기기에서 푸시 알림을 받아요",
+        "disabled": "이 기기의 푸시 알림을 껐어요",
+        "failed": "푸시 알림을 켜지 못했어요. 잠시 후 다시 시도해 주세요."
+      }
     }
   },
   "forbidden": {
@@ -902,6 +914,10 @@
     "default": "이 화면을 볼 수 있는 권한이 없어요.",
     "home": "처음으로",
     "switchAccount": "다른 계정으로 로그인"
+  },
+  "offline": {
+    "title": "인터넷에 연결되어 있지 않아요",
+    "description": "예약과 이용권 정보는 연결되면 다시 불러올 수 있어요. 와이파이나 모바일 데이터를 확인해 주세요."
   },
   "errors": {
     "NOT_AUTHENTICATED": "로그인이 필요해요.",

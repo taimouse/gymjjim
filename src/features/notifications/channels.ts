@@ -5,6 +5,14 @@
  * Supabase Edge Function(Deno)이 쓰는 모듈이라 import 경로에 .ts 확장자를 붙인다.
  */
 import { type AlimtalkMessage, parseSolapiConfig, sendSolapiAlimtalk, type SendResult } from './solapi.ts';
+import {
+  parsePushConfig,
+  type PushPayload,
+  type PushResult,
+  type PushSubscriptionKeys,
+  type SendNotification,
+  sendWebPush,
+} from './webpush.ts';
 
 export interface OutgoingAlimtalk extends AlimtalkMessage {
   /** 변수를 채운 문구 (mock 기록 · 웹 푸시 본문) */
@@ -43,4 +51,19 @@ export function createAlimtalkChannel(
     return config ? { provider, send: (message) => sendSolapiAlimtalk(config, message, fetchImpl) } : null;
   }
   return null;
+}
+
+/** 웹 푸시 채널 (보조). VAPID 키가 없으면 null → 푸시는 보내지 않는다 */
+export interface PushChannel {
+  send(subscriptions: PushSubscriptionKeys[], payload: PushPayload): Promise<PushResult>;
+}
+
+export function createPushChannel(
+  env: Record<string, string | undefined>,
+  send?: SendNotification,
+): PushChannel | null {
+  const config = parsePushConfig(env);
+  return config
+    ? { send: (subscriptions, payload) => sendWebPush(config, subscriptions, payload, send) }
+    : null;
 }

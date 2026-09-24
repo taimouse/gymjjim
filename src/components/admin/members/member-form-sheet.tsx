@@ -110,7 +110,7 @@ export function MemberFormSheet({
               <ValidationMessage error={errors.birth} />
             </Field>
             <Field>
-              <FieldLabel>{t('gender')}</FieldLabel>
+              <FieldLabel htmlFor="member-gender">{t('gender')}</FieldLabel>
               <Controller
                 control={form.control}
                 name="gender"
@@ -119,7 +119,7 @@ export function MemberFormSheet({
                     value={field.value ?? NO_GENDER}
                     onValueChange={(value) => field.onChange(value === NO_GENDER ? null : value)}
                   >
-                    <SelectTrigger className="w-full">
+                    <SelectTrigger id="member-gender" className="w-full">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>

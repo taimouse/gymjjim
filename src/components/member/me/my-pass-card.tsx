@@ -56,7 +56,7 @@ export function MyPassCard({ pass, today }: { pass: MyPass; today: string }) {
           <dd
             className={cn(
               'mt-1 text-3xl font-bold numeric',
-              daysLeft !== null && daysLeft >= 0 && daysLeft <= 7 && 'text-warning',
+              daysLeft !== null && daysLeft >= 0 && daysLeft <= 7 && 'text-warning-soft-foreground',
             )}
           >
             {daysLeft === null ? <span className="text-2xl">{t('noExpiry')}</span> : formatDDay(daysLeft)}

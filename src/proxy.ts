@@ -36,7 +36,7 @@ export async function proxy(request: NextRequest) {
 
 export const config = {
   matcher: [
-    // 정적 파일·이미지·PWA 파일·API(웹훅)는 제외
-    '/((?!_next/static|_next/image|api/|favicon.ico|sw.js|swe-worker|manifest.webmanifest|icons/|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|woff2?)$).*)',
+    // 정적 파일·이미지·PWA 파일(서비스 워커·매니페스트·아이콘·오프라인 안내)·API(웹훅)는 제외
+    '/((?!_next/static|_next/image|api/|favicon.ico|serwist/|manifest.webmanifest|icons/|offline|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|woff2?)$).*)',
   ],
 };

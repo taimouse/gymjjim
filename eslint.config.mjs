@@ -60,8 +60,6 @@ export default defineConfig([
     'coverage/**',
     'playwright-report/**',
     'test-results/**',
-    'public/sw.js',
-    'public/swe-worker-*.js',
     'supabase/functions/**',
   ]),
 ]);

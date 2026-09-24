@@ -1,6 +1,11 @@
 import { describe, expect, it, vi } from 'vitest';
 
-import { type AlimtalkChannel, createAlimtalkChannel, mockChannel } from '@/features/notifications/channels';
+import {
+  type AlimtalkChannel,
+  createAlimtalkChannel,
+  mockChannel,
+  type PushChannel,
+} from '@/features/notifications/channels';
 import { type ClaimedNotification, deliverAll, parseClaimed } from '@/features/notifications/dispatch';
 
 const row = (overrides: Partial<ClaimedNotification> = {}): ClaimedNotification => ({
@@ -13,13 +18,20 @@ const row = (overrides: Partial<ClaimedNotification> = {}): ClaimedNotification 
     center_name: '강남점',
     instructor_name: '이코치',
   },
+  attempts: 1,
   member_name: '홍길동',
   phone: '01012345678',
   center_name: '강남점',
   center_timezone: 'Asia/Seoul',
   sms_fallback: true,
+  push_subscriptions: [],
   ...overrides,
 });
+
+const okAlimtalk = () => {
+  const send = vi.fn<AlimtalkChannel['send']>().mockResolvedValue({ ok: true, retryable: false });
+  return { channel: { provider: 'test', send } satisfies AlimtalkChannel, send };
+};
 
 describe('알림 발송 루프', () => {
   it('가져온 행을 검증하고 형식이 다른 행은 버린다', () => {
@@ -31,13 +43,17 @@ describe('알림 발송 루프', () => {
   });
 
   it('템플릿으로 채워 보내고, 결과를 건마다 기록한다', async () => {
-    const send = vi.fn<AlimtalkChannel['send']>().mockResolvedValue({ ok: true, retryable: false });
+    const { channel, send } = okAlimtalk();
     const finish = vi.fn(() => Promise.resolve());
-    const channel: AlimtalkChannel = { provider: 'test', send };
     const first = row();
     const unknown = row({ type: 'free_text' });
 
-    expect(await deliverAll([first, unknown], channel, finish)).toEqual({ sent: 1, failed: 1 });
+    expect(await deliverAll(parseClaimed([first, unknown]).rows, { alimtalk: channel }, finish)).toEqual({
+      sent: 1,
+      failed: 1,
+      pushed: 0,
+      expired: [],
+    });
     expect(send).toHaveBeenCalledTimes(1);
     expect(send.mock.calls[0]![0]).toMatchObject({
       to: '01012345678',
@@ -65,13 +81,42 @@ describe('알림 발송 루프', () => {
     const channel: AlimtalkChannel = { provider: 'test', send: () => Promise.reject(new Error('boom')) };
     const finish = vi.fn(() => Promise.resolve());
     const target = row();
-    expect(await deliverAll([target], channel, finish)).toEqual({ sent: 0, failed: 1 });
+    expect(await deliverAll(parseClaimed([target]).rows, { alimtalk: channel }, finish)).toMatchObject({
+      sent: 0,
+      failed: 1,
+    });
     expect(finish).toHaveBeenCalledWith({
       id: target.id,
       ok: false,
       error: 'EXCEPTION boom',
       retry: true,
       provider: 'test',
+    });
+  });
+
+  it('켜 둔 기기로 웹 푸시도 보내고(첫 시도만), 만료된 구독을 모은다', async () => {
+    const { channel } = okAlimtalk();
+    const pushSend = vi
+      .fn<PushChannel['send']>()
+      .mockResolvedValue({ sent: 1, failed: 0, expired: ['https://push.example.com/old'] });
+    const subscriptions = [
+      { endpoint: 'https://push.example.com/new', p256dh: 'key', auth: 'auth' },
+      { endpoint: 'https://push.example.com/old', p256dh: 'key', auth: 'auth' },
+    ];
+    const first = row({ push_subscriptions: subscriptions });
+    const retry = row({ push_subscriptions: subscriptions, attempts: 2 });
+
+    const result = await deliverAll(
+      parseClaimed([first, retry]).rows,
+      { alimtalk: channel, push: { send: pushSend } },
+      () => Promise.resolve(),
+    );
+    expect(result).toEqual({ sent: 2, failed: 0, pushed: 1, expired: ['https://push.example.com/old'] });
+    expect(pushSend).toHaveBeenCalledTimes(1);
+    expect(pushSend.mock.calls[0]![1]).toMatchObject({
+      title: '[강남점] 예약하신 수업이 2시간 뒤에 시작합니다.',
+      url: '/m/my-bookings',
+      tag: `reminder_2h:${first.id}`,
     });
   });
 });

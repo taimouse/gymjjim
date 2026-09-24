@@ -31,7 +31,7 @@
   --brand-soft-foreground: oklch(0.42 0.19 275);
 
   /* 상태색: solid(채움) + soft(연한 배경) + soft-foreground(연한 배경 위 글자) */
-  --success: oklch(0.56 0.14 155);
+  --success: oklch(0.53 0.14 155);
   --success-foreground: oklch(0.99 0.01 155);
   --success-soft: oklch(0.95 0.045 155);
   --success-soft-foreground: oklch(0.4 0.1 155);
@@ -46,7 +46,7 @@
   --danger-soft: oklch(0.95 0.035 25);
   --danger-soft-foreground: oklch(0.47 0.17 27);
 
-  --info: oklch(0.58 0.14 240);
+  --info: oklch(0.55 0.14 240);
   --info-foreground: oklch(0.99 0.01 240);
   --info-soft: oklch(0.95 0.028 240);
   --info-soft-foreground: oklch(0.43 0.11 245);
@@ -63,7 +63,8 @@
   --secondary: var(--gray-100);
   --secondary-foreground: var(--gray-900);
   --muted: var(--gray-100);
-  --muted-foreground: var(--gray-500);
+  /* 본문 보조 글씨: 회색 배경(muted) 위에서도 4.5:1 이상 */
+  --muted-foreground: oklch(0.52 0.014 270);
   --accent: var(--gray-100);
   --accent-foreground: var(--gray-900);
   --destructive: var(--danger);
@@ -99,12 +100,14 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --brand: oklch(0.58 0.2 275);
-    --brand-foreground: oklch(0.99 0.005 275);
+    /* 다크 모드: 포인트 색을 밝히고 그 위 글씨는 어둡게 (버튼 글씨·text-primary 모두 4.5:1 이상) */
+    --brand: oklch(0.65 0.18 275);
+    --brand-foreground: var(--gray-950);
     --brand-soft: oklch(0.3 0.08 275);
     --brand-soft-foreground: oklch(0.85 0.08 275);
 
     --success: oklch(0.62 0.14 155);
+    --success-foreground: var(--gray-950);
     --success-soft: oklch(0.3 0.06 155);
     --success-soft-foreground: oklch(0.86 0.1 155);
 
@@ -113,10 +116,12 @@
     --warning-soft-foreground: oklch(0.9 0.1 85);
 
     --danger: oklch(0.64 0.2 25);
+    --danger-foreground: var(--gray-950);
     --danger-soft: oklch(0.31 0.08 25);
     --danger-soft-foreground: oklch(0.87 0.08 25);
 
     --info: oklch(0.64 0.13 240);
+    --info-foreground: var(--gray-950);
     --info-soft: oklch(0.3 0.06 240);
     --info-soft-foreground: oklch(0.86 0.07 240);
 

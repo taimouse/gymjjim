@@ -3,6 +3,7 @@ import type { ReactNode } from 'react';
 import { BottomTabs } from '@/components/member/bottom-tabs';
 import { MemberProvider, type MemberSession } from '@/components/member/member-context';
 import { MemberRealtime } from '@/components/member/member-realtime';
+import { SkipLink } from '@/components/skip-link';
 import { parseBookingSettings } from '@/features/centers/schema';
 import { requireMember } from '@/lib/auth/session';
 import { createClient } from '@/lib/supabase/server';
@@ -30,9 +31,14 @@ export default async function MemberLayout({ children }: { children: ReactNode }
 
   return (
     <MemberProvider session={session}>
-      <div className="mx-auto min-h-dvh max-w-md bg-background pb-[calc(4rem+env(safe-area-inset-bottom))]">
+      <SkipLink />
+      <main
+        id="main"
+        tabIndex={-1}
+        className="mx-auto min-h-dvh max-w-md bg-background pb-[calc(4rem+env(safe-area-inset-bottom))] outline-none"
+      >
         {children}
-      </div>
+      </main>
       <BottomTabs />
       <MemberRealtime />
     </MemberProvider>

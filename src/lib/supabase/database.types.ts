@@ -682,6 +682,54 @@ export type Database = {
           },
         ]
       }
+      push_subscriptions: {
+        Row: {
+          auth: string
+          center_id: string
+          created_at: string
+          endpoint: string
+          id: string
+          member_id: string
+          p256dh: string
+          user_agent: string | null
+        }
+        Insert: {
+          auth: string
+          center_id: string
+          created_at?: string
+          endpoint: string
+          id?: string
+          member_id: string
+          p256dh: string
+          user_agent?: string | null
+        }
+        Update: {
+          auth?: string
+          center_id?: string
+          created_at?: string
+          endpoint?: string
+          id?: string
+          member_id?: string
+          p256dh?: string
+          user_agent?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "push_subscriptions_center_id_fkey"
+            columns: ["center_id"]
+            isOneToOne: false
+            referencedRelation: "centers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "push_subscriptions_member_fk"
+            columns: ["member_id", "center_id"]
+            isOneToOne: false
+            referencedRelation: "members"
+            referencedColumns: ["id", "center_id"]
+          },
+        ]
+      }
       sessions: {
         Row: {
           booked_count: number
@@ -871,6 +919,7 @@ export type Database = {
           member_name: string
           payload: Json
           phone: string
+          push_subscriptions: Json
           sms_fallback: boolean
           template_code: string
           type: string
@@ -892,6 +941,10 @@ export type Database = {
       create_member_invite: {
         Args: { p_invite_url_base?: string; p_member_id: string }
         Returns: Json
+      }
+      delete_push_subscription: {
+        Args: { p_endpoint: string }
+        Returns: undefined
       }
       enqueue_scheduled_notifications: {
         Args: { p_center_id?: string; p_now?: string }
@@ -975,6 +1028,10 @@ export type Database = {
         }[]
       }
       preview_booking: { Args: { p_session_id: string }; Returns: Json }
+      remove_push_subscriptions: {
+        Args: { p_endpoints: string[] }
+        Returns: number
+      }
       repeat_last_week_candidates: {
         Args: { p_center_id: string }
         Returns: {
@@ -1004,6 +1061,16 @@ export type Database = {
           p_type: Database["public"]["Enums"]["program_type"]
         }
         Returns: string
+      }
+      save_push_subscription: {
+        Args: {
+          p_auth: string
+          p_center_id: string
+          p_endpoint: string
+          p_p256dh: string
+          p_user_agent?: string
+        }
+        Returns: undefined
       }
       search_members: {
         Args: {

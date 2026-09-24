@@ -137,7 +137,7 @@ export function SessionEditSheet({ session, onClose }: { session: CalendarSessio
             </Field>
           </div>
           <Field>
-            <FieldLabel>{t('create.instructor')}</FieldLabel>
+            <FieldLabel htmlFor="edit-instructor">{t('create.instructor')}</FieldLabel>
             <Controller
               control={form.control}
               name="instructorId"
@@ -146,7 +146,7 @@ export function SessionEditSheet({ session, onClose }: { session: CalendarSessio
                   value={field.value ?? NO_INSTRUCTOR}
                   onValueChange={(value) => field.onChange(value === NO_INSTRUCTOR ? null : value)}
                 >
-                  <SelectTrigger className="w-full">
+                  <SelectTrigger id="edit-instructor" className="w-full">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>

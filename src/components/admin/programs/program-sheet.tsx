@@ -182,7 +182,7 @@ export function ProgramSheet({
               />
             </Field>
             <Field>
-              <FieldLabel>{t('fields.instructor')}</FieldLabel>
+              <FieldLabel htmlFor="program-instructor">{t('fields.instructor')}</FieldLabel>
               <Controller
                 control={form.control}
                 name="defaultInstructorId"
@@ -192,7 +192,7 @@ export function ProgramSheet({
                     onValueChange={(value) => field.onChange(value === NO_INSTRUCTOR ? null : value)}
                     disabled={readOnly}
                   >
-                    <SelectTrigger className="w-full">
+                    <SelectTrigger id="program-instructor" className="w-full">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>

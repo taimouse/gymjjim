@@ -73,7 +73,7 @@ export function GrantPassDialog({ memberId, onClose }: { memberId: string; onClo
           <form id="grant-pass-form" onSubmit={onSubmit} noValidate className="space-y-5">
             <FieldGroup>
               <Field data-invalid={!!errors.productId}>
-                <FieldLabel>{t('product')}</FieldLabel>
+                <FieldLabel htmlFor="grant-product">{t('product')}</FieldLabel>
                 <Controller
                   control={form.control}
                   name="productId"
@@ -86,7 +86,7 @@ export function GrantPassDialog({ memberId, onClose }: { memberId: string; onClo
                         if (selected) form.setValue('paidAmount', selected.price);
                       }}
                     >
-                      <SelectTrigger className="w-full">
+                      <SelectTrigger id="grant-product" className="w-full">
                         <SelectValue placeholder={t('productPlaceholder')} />
                       </SelectTrigger>
                       <SelectContent>

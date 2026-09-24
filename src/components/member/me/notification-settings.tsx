@@ -10,6 +10,8 @@ import { useMember } from '@/components/member/member-context';
 import { Switch } from '@/components/ui/switch';
 import { updateMySettings } from '@/features/members/actions';
 
+import { PushToggle } from './push-toggle';
+
 /** 알림 설정: 바꾸는 즉시 저장 (실패하면 원래대로) */
 export function NotificationSettings() {
   const t = useTranslations('member.me');
@@ -59,6 +61,7 @@ export function NotificationSettings() {
             onCheckedChange={(checked) => save({ ...values, marketingAgreed: checked })}
           />
         </label>
+        <PushToggle />
       </div>
     </section>
   );

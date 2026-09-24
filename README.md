@@ -122,6 +122,84 @@ Cron → Edge Function ─┼─ notification_logs (pending) ─ claim → 템�
    ```
    로컬 Supabase 에서는 주소로 `http://host.docker.internal:54321/functions/v1` 을 넣고 `pnpm supabase functions serve` 를 켜 둡니다.
 
+## PWA · 웹 푸시
+
+- 회원은 휴대폰 브라우저에서 **홈 화면에 추가**하면 앱처럼 쓸 수 있습니다(시작 화면 `/m`). 아이폰은 Safari 공유 버튼 → "홈 화면에 추가".
+- 서비스 워커(Serwist, `src/app/sw.ts`)는 배포 빌드에서만 켜집니다. CSS 와 오프라인 안내(`/offline`)만 미리 받고, 예약·이용권 데이터(Supabase)는 캐시하지 않습니다.
+- 웹 푸시는 알림톡의 보조 채널입니다. 회원이 **내 정보 > 알림 설정**에서 기기마다 켜고, 발송기가 같은 안내를 푸시로도 보냅니다(만료된 구독은 자동 정리).
+  ```bash
+  pnpm dlx web-push generate-vapid-keys
+  ```
+  공개키는 앱의 `NEXT_PUBLIC_VAPID_PUBLIC_KEY`, 공개키·비공개키·`VAPID_SUBJECT` 는 Edge Function 시크릿에 넣습니다.
+
+## E2E 테스트 (Playwright)
+
+로컬 Supabase(Docker)와 시드 데이터가 있어야 합니다. 테스트가 쓰는 프로그램·수업·이용권은 서비스 키로 직접 만들고, 끝나면 숨깁니다.
+
+```bash
+pnpm supabase start
+pnpm supabase db reset
+pnpm exec playwright install chromium
+pnpm test:e2e
+```
+
+| 시나리오                                                | 화면          |
+| ------------------------------------------------------- | ------------- |
+| (1) 회원 로그인 → 예약 → 취소                           | 회원 375px    |
+| (2) 정원 마감 → 대기 신청 → 취소 발생 → 자동 승격       | 회원 375px    |
+| (3) 관리자 수업 생성 → 대리 예약 → 출석 체크 → 되돌리기 | 관리자 1280px |
+| (4) 회원 등록 → 이용권 부여 → 정지 → 만료일 연장 확인   | 관리자 1280px |
+
+회원 화면은 카카오·매직링크만 있으므로, 테스트는 시드 회원의 비밀번호로 받은 세션 쿠키를 브라우저에 넣어 로그인합니다.
+
+## 배포 (Vercel + Supabase)
+
+### 1) Supabase
+
+1. [Supabase](https://supabase.com/dashboard)에서 프로젝트를 만듭니다(리전: Seoul).
+2. 마이그레이션을 적용합니다. 운영에는 시드를 넣지 않습니다.
+   ```bash
+   pnpm supabase login
+   pnpm supabase link --project-ref <project-ref>
+   pnpm supabase db push
+   ```
+3. **Authentication > URL Configuration**: Site URL `https://<도메인>`, Redirect URLs `https://<도메인>/**`
+4. **Authentication > Email Templates**: `supabase/templates/magic_link.html`, `invite.html` 내용을 붙여 넣습니다.
+5. **Authentication > Providers > Kakao**: [카카오 로그인 설정](#카카오-로그인-설정)의 키를 넣고 "Allow users without an email" 을 켭니다.
+6. 첫 센터와 대표 계정: **Authentication > Users** 에서 대표 이메일로 사용자를 초대한 뒤 SQL Editor 에서 연결합니다(이후 직원은 앱의 설정 > 직원에서 초대).
+   ```sql
+   with center as (
+     insert into public.centers (name, timezone) values ('센터 이름', 'Asia/Seoul') returning id
+   )
+   insert into public.staff (center_id, user_id, role, name, email)
+   select center.id, u.id, 'owner', '대표 이름', u.email
+   from center, auth.users u
+   where u.email = 'owner@example.com';
+   ```
+7. 알림: [실제 발송 연결](#실제-발송-연결-solapi)대로 시크릿을 넣고 `send-notifications` 함수를 배포한 뒤 Vault 에 호출 주소·비밀값을 넣습니다. 키를 넣기 전에는 `mock` 으로 기록만 남습니다.
+
+### 2) Vercel
+
+1. 저장소를 Import 합니다(Framework: Next.js, 설치·빌드 명령은 기본값 — `pnpm install`, `pnpm build`).
+2. Environment Variables:
+
+   | 이름                                   | 값                                                  |
+   | -------------------------------------- | --------------------------------------------------- |
+   | `NEXT_PUBLIC_SITE_URL`                 | `https://<도메인>`                                  |
+   | `NEXT_PUBLIC_SUPABASE_URL`             | `https://<project-ref>.supabase.co`                 |
+   | `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Supabase **Settings > API Keys** 의 publishable key |
+   | `SUPABASE_SECRET_KEY`                  | 같은 곳의 secret key (서버 전용)                    |
+   | `NEXT_PUBLIC_VAPID_PUBLIC_KEY`         | 웹 푸시 공개키 (선택)                               |
+
+3. 배포 후 도메인을 연결하고, Supabase 의 Site URL·Redirect URLs 와 카카오 Redirect URI 를 그 도메인으로 맞춥니다.
+
+### 3) 배포 후 확인
+
+- `/admin-login` 대표 로그인 → 설정에서 센터 정보·예약 규칙 저장
+- 회원 등록 → 앱 초대 링크로 회원 연결(카카오·이메일) → `/m` 에서 예약·취소
+- 설정 > 알림의 **최근 발송 내역**에 예약 확정 알림이 쌓이는지(`mock` 이면 "테스트 발송")
+- 휴대폰에서 홈 화면 추가, 내 정보에서 푸시 알림 켜기
+
 ## 스크립트
 
 | 명령                        | 설명                                                                              |

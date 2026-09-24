@@ -1,4 +1,9 @@
+import { existsSync } from 'node:fs';
+
 import { defineConfig, devices } from '@playwright/test';
+
+// 로컬 Supabase 주소·키를 앱과 같은 .env.local 에서 읽는다 (픽스처는 서비스 키로 만든다)
+if (existsSync('.env.local')) process.loadEnvFile('.env.local');
 
 const PORT = Number(process.env.E2E_PORT ?? 3000);
 const baseURL = process.env.E2E_BASE_URL ?? `http://localhost:${PORT}`;

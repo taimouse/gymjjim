@@ -3,6 +3,7 @@ allowBuilds:
   '@parcel/watcher': false
   '@sentry-internal/node-cpu-profiler': false
   '@swc/core': false
+  esbuild: true
   unrs-resolver: false
 minimumReleaseAgeExclude:
   - icu-minify@4.14.7

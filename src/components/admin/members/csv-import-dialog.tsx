@@ -158,7 +158,7 @@ export function CsvImportDialog({ onClose }: { onClose: () => void }) {
             <FieldGroup className="grid gap-3 sm:grid-cols-2">
               {CSV_FIELDS.map((field) => (
                 <Field key={field}>
-                  <FieldLabel>{t(`fields.${field}`)}</FieldLabel>
+                  <FieldLabel htmlFor={`csv-map-${field}`}>{t(`fields.${field}`)}</FieldLabel>
                   <Select
                     value={mapping[field] === null ? NONE : String(mapping[field])}
                     onValueChange={(value) =>
@@ -168,7 +168,7 @@ export function CsvImportDialog({ onClose }: { onClose: () => void }) {
                       }))
                     }
                   >
-                    <SelectTrigger className="w-full">
+                    <SelectTrigger id={`csv-map-${field}`} className="w-full">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
