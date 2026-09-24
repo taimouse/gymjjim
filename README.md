@@ -60,6 +60,36 @@ pnpm dev
 
 http://localhost:3000 에서 확인합니다.
 
+### 3) 시드 계정 (비밀번호 모두 `gymjjim1234!`)
+
+| 계정                                                | 역할                            | 로그인                                     |
+| --------------------------------------------------- | ------------------------------- | ------------------------------------------ |
+| `owner@gymjjim.test`                                | 대표                            | `/admin-login`                             |
+| `coach.lee@gymjjim.test`, `coach.park@gymjjim.test` | 트레이너                        | `/admin-login`                             |
+| `member1@gymjjim.test`                              | 회원 홍길동 (동의 완료)         | `/login` → 이메일 링크 (Mailpit 에서 확인) |
+| `member2@gymjjim.test`                              | 회원 김민지 (첫 로그인 동의 전) | `/login` → 이메일 링크                     |
+
+## 로그인 구조
+
+- **관리자**(대표·트레이너): 이메일 + 비밀번호 → `/admin`. 대표가 설정에서 직원을 초대하면 초대 메일 → `/admin/set-password`
+- **회원**: 카카오 로그인(주) + 이메일 매직링크(보조) → `/m`
+  1. 관리자가 이름 + 전화번호로 회원 등록 → 초대 링크(1회용, 7일) 발송·복사
+  2. 회원이 `/invite/<token>` 에서 로그인 → `members.user_id` 자동 연결
+  3. 첫 로그인 때 개인정보 수집·이용(필수), 마케팅 수신(선택) 동의 → `/m`
+- `src/proxy.ts`(Next 16 의 middleware)가 JWT 의 역할 클레임으로 1차 라우팅하고, 권한이 없으면 `/403`. 레이아웃이 DB 로 다시 확인하고 최종 권한은 RLS·RPC 가 판단합니다.
+
+### 카카오 로그인 설정
+
+1. [카카오 디벨로퍼스](https://developers.kakao.com)에서 앱 생성 → **[앱] > [일반] > [비즈니스 정보]에서 개인 개발자 비즈 앱 전환** (Supabase 는 `account_email` 동의항목을 항상 요청하므로 필요합니다. 전화번호 동의항목은 쓰지 않습니다)
+2. [카카오 로그인] 활성화, 동의항목: 닉네임(필수), 프로필 사진(선택), 카카오계정 이메일(선택)
+3. Redirect URI 등록: `http://127.0.0.1:54321/auth/v1/callback`(로컬), `https://<project-ref>.supabase.co/auth/v1/callback`(운영)
+4. REST API 키·Client Secret 을 `.env.local` 의 `SUPABASE_AUTH_EXTERNAL_KAKAO_CLIENT_ID`·`SUPABASE_AUTH_EXTERNAL_KAKAO_SECRET` 에 넣고 `supabase/config.toml` 의 `[auth.external.kakao] enabled = true`
+5. 운영 Supabase 대시보드: Authentication > Providers > Kakao 활성화 + "Allow users without an email" 켜기
+
+### 메일 템플릿
+
+`supabase/templates/*.html` 은 `{{ .RedirectTo }}&token_hash=…` 형식이라 **Redirect URL 허용 목록**(`additional_redirect_urls`, 운영은 대시보드 URL Configuration)에 `https://<도메인>/**` 가 있어야 합니다.
+
 ## 스크립트
 
 | 명령                        | 설명                                                                              |

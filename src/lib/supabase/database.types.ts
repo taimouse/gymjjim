@@ -823,6 +823,11 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      accept_member_invite: { Args: { p_token: string }; Returns: Json }
+      admin_find_user_id_by_email: {
+        Args: { p_email: string }
+        Returns: string
+      }
       book_session: {
         Args: { p_member_pass_id?: string; p_session_id: string }
         Returns: Json
@@ -835,6 +840,10 @@ export type Database = {
         Args: { p_reason?: string; p_session_id: string }
         Returns: Json
       }
+      complete_onboarding: {
+        Args: { p_marketing_agreed?: boolean }
+        Returns: Json
+      }
       create_hold: {
         Args: {
           p_end_date: string
@@ -843,6 +852,24 @@ export type Database = {
           p_start_date: string
         }
         Returns: Json
+      }
+      create_member_invite: {
+        Args: { p_invite_url_base?: string; p_member_id: string }
+        Returns: Json
+      }
+      get_invite: { Args: { p_token: string }; Returns: Json }
+      my_memberships: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          center_id: string
+          center_name: string
+          center_timezone: string
+          marketing_agreed_at: string
+          member_id: string
+          name: string
+          notify_enabled: boolean
+          onboarded_at: string
+        }[]
       }
       set_attendance: {
         Args: {

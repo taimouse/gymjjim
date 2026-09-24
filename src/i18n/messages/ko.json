@@ -28,9 +28,105 @@
     "adminEntry": "관리자",
     "memberEntry": "회원"
   },
+  "validation": {
+    "required": "필수 입력 항목이에요.",
+    "invalid": "입력한 값을 다시 확인해 주세요.",
+    "email": "올바른 이메일 주소를 입력해 주세요.",
+    "passwordMin": "비밀번호는 8자 이상이어야 해요.",
+    "passwordMax": "비밀번호는 72자 이하여야 해요.",
+    "passwordMismatch": "비밀번호가 서로 달라요.",
+    "privacyRequired": "개인정보 수집·이용에 동의해야 이용할 수 있어요."
+  },
+  "auth": {
+    "memberLogin": {
+      "title": "회원 로그인",
+      "subtitle": "수업 예약과 이용권 확인을 위해 로그인해 주세요.",
+      "kakao": "카카오로 계속하기",
+      "or": "또는",
+      "emailLabel": "이메일",
+      "emailPlaceholder": "you@example.com",
+      "sendLink": "이메일로 로그인 링크 받기",
+      "firstTime": "처음이신가요? 센터에서 받은 초대 링크로 먼저 연결해 주세요.",
+      "adminQuestion": "센터 관리자이신가요?",
+      "adminAction": "관리자 로그인"
+    },
+    "checkEmail": {
+      "title": "메일함을 확인해 주세요",
+      "description": "{email} 주소로 로그인 링크를 보냈어요. 링크를 누르면 바로 로그인돼요.",
+      "hint": "메일이 오지 않으면 스팸함도 확인해 주세요.",
+      "retry": "다른 이메일로 받기"
+    },
+    "adminLogin": {
+      "title": "관리자 로그인",
+      "subtitle": "대표·트레이너 계정으로 로그인하세요.",
+      "email": "이메일",
+      "password": "비밀번호",
+      "submit": "로그인",
+      "memberQuestion": "회원이신가요?",
+      "memberAction": "회원 로그인"
+    },
+    "setPassword": {
+      "title": "비밀번호 설정",
+      "subtitle": "앞으로 로그인할 때 쓸 비밀번호를 정해 주세요.",
+      "password": "새 비밀번호",
+      "confirm": "비밀번호 확인",
+      "submit": "저장하고 시작하기"
+    },
+    "signOut": "로그아웃"
+  },
+  "invite": {
+    "title": "{center}에서 초대했어요",
+    "greeting": "{name} 님, 연결하면 수업 예약과 이용권 확인을 바로 할 수 있어요.",
+    "connect": "연결하기",
+    "loginToConnect": "로그인하고 연결하기",
+    "invalid": "사용할 수 없는 초대 링크예요",
+    "expired": "초대 링크가 만료됐어요",
+    "used": "이미 사용한 초대 링크예요",
+    "askCenter": "센터에 새 초대 링크를 요청해 주세요.",
+    "goHome": "처음 화면으로"
+  },
+  "welcome": {
+    "title": "{center} 이용 동의",
+    "subtitle": "처음 한 번만 확인하면 돼요.",
+    "agreeAll": "모두 동의하기",
+    "privacy": "개인정보 수집·이용 동의",
+    "privacyItems": "수집 항목: 이름, 휴대전화 번호, 예약·출석 기록",
+    "privacyPurpose": "이용 목적: 수업 예약, 회원 관리, 예약 관련 안내 발송",
+    "privacyPeriod": "보유 기간: 회원 탈퇴 시까지 (법령에 따라 보존이 필요한 경우 해당 기간)",
+    "marketing": "마케팅 정보 수신 동의",
+    "marketingDetail": "이벤트·혜택 소식을 받아요. 동의하지 않아도 모든 기능을 쓸 수 있어요.",
+    "required": "필수",
+    "optional": "선택",
+    "submit": "동의하고 시작하기"
+  },
+  "admin": {
+    "placeholder": {
+      "title": "{center}",
+      "greeting": "{name} 님, 안녕하세요."
+    }
+  },
+  "member": {
+    "placeholder": {
+      "title": "{name} 님, 반가워요"
+    }
+  },
+  "forbidden": {
+    "title": "접근 권한이 없어요",
+    "admin": "관리자 화면은 센터 직원만 이용할 수 있어요.",
+    "owner": "대표만 이용할 수 있는 화면이에요.",
+    "member": "회원 화면은 센터에 연결된 회원만 이용할 수 있어요. 센터에서 받은 초대 링크로 먼저 연결해 주세요.",
+    "default": "이 화면을 볼 수 있는 권한이 없어요.",
+    "home": "처음으로",
+    "switchAccount": "다른 계정으로 로그인"
+  },
   "errors": {
     "NOT_AUTHENTICATED": "로그인이 필요해요.",
     "FORBIDDEN": "이 작업을 할 권한이 없어요.",
+    "INVALID_CREDENTIALS": "이메일 또는 비밀번호가 맞지 않아요.",
+    "RATE_LIMITED": "요청이 너무 많아요. 잠시 후 다시 시도해 주세요.",
+    "KAKAO_UNAVAILABLE": "카카오 로그인을 사용할 수 없어요. 이메일로 로그인해 주세요.",
+    "AUTH_LINK_INVALID": "로그인 링크가 만료되었거나 올바르지 않아요. 다시 시도해 주세요.",
+    "WEAK_PASSWORD": "더 안전한 비밀번호를 입력해 주세요.",
     "SESSION_NOT_FOUND": "수업을 찾을 수 없어요.",
     "SESSION_CANCELLED": "폐강된 수업이에요.",
     "SESSION_STARTED": "이미 시작한 수업이라 취소할 수 없어요.",
@@ -56,6 +152,11 @@
     "HOLD_OVERLAP": "이미 정지한 기간과 겹쳐요.",
     "HOLD_HAS_BOOKINGS": "정지 기간에 예약된 수업이 있어요. 예약을 먼저 취소해 주세요.",
     "MEMBER_NOT_FOUND": "회원을 찾을 수 없어요.",
+    "MEMBER_ALREADY_LINKED": "이미 앱에 연결된 회원이에요.",
+    "ALREADY_MEMBER": "이 계정은 이미 이 센터의 다른 회원과 연결되어 있어요.",
+    "INVITE_INVALID": "사용할 수 없는 초대 링크예요. 센터에 새 링크를 요청해 주세요.",
+    "INVITE_USED": "이미 사용한 초대 링크예요.",
+    "INVITE_EXPIRED": "초대 링크가 만료됐어요. 센터에 새 링크를 요청해 주세요.",
     "LAST_OWNER": "대표는 최소 1명 있어야 해요.",
     "INVALID_TIMEZONE": "올바른 시간대가 아니에요.",
     "VALIDATION": "입력한 내용을 다시 확인해 주세요.",

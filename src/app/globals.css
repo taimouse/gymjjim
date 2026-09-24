@@ -87,6 +87,10 @@
   --sidebar-border: var(--gray-200);
   --sidebar-ring: var(--ring);
 
+  /* 카카오 로그인 버튼 (카카오 디자인 가이드 색상) */
+  --kakao: #fee500;
+  --kakao-foreground: rgb(0 0 0 / 85%);
+
   /* radius · 그림자 2단계 */
   --radius: 0.75rem;
   --elevation-1: 0 1px 2px oklch(0.2 0.01 270 / 6%), 0 1px 3px oklch(0.2 0.01 270 / 8%);
@@ -188,6 +192,9 @@
   --color-info-foreground: var(--info-foreground);
   --color-info-soft: var(--info-soft);
   --color-info-soft-foreground: var(--info-soft-foreground);
+
+  --color-kakao: var(--kakao);
+  --color-kakao-foreground: var(--kakao-foreground);
 
   --color-chart-1: var(--chart-1);
   --color-chart-2: var(--chart-2);

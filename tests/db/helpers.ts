@@ -64,6 +64,25 @@ export async function rpc<T = unknown>(
   });
 }
 
+/** returns table / setof 를 돌려주는 RPC 를 사용자 권한으로 호출한다. */
+export async function rpcRows<T extends Row = Row>(
+  userId: string | null,
+  fn: string,
+  args: Record<string, unknown> = {},
+): Promise<T[]> {
+  if (!IDENTIFIER.test(fn)) throw new Error(`invalid function name: ${fn}`);
+  const names = Object.keys(args);
+  for (const name of names) if (!IDENTIFIER.test(name)) throw new Error(`invalid arg name: ${name}`);
+  const params = names.map((name, index) => `${name} => $${index + 1}`).join(', ');
+  return withUser(userId, async (client) => {
+    const { rows } = await client.query<T>(
+      `select * from public.${fn}(${params})`,
+      names.map((name) => args[name]),
+    );
+    return rows;
+  });
+}
+
 /** RPC 가 앱 에러 코드(예: SESSION_FULL)로 실패해야 할 때 그 코드를 돌려준다. */
 export async function rpcError(
   userId: string | null,
