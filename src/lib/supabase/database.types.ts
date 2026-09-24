@@ -945,6 +945,20 @@ export type Database = {
         }
         Returns: Json
       }
+      update_session: {
+        Args: {
+          p_capacity?: number
+          p_clear_instructor?: boolean
+          p_ends_at?: string
+          p_instructor_id?: string
+          p_note?: string
+          p_notify?: boolean
+          p_scope?: string
+          p_session_id: string
+          p_starts_at?: string
+        }
+        Returns: Json
+      }
       withdraw_member: { Args: { p_member_id: string }; Returns: Json }
     }
     Enums: {

@@ -53,6 +53,11 @@ export function toDateKey(value: DateInput, timeZone = DEFAULT_TIME_ZONE): strin
   return fmt(value, 'yyyy-MM-dd', timeZone);
 }
 
+/** 센터 시간대 기준 24시간제 시각 `19:00` (폼 입력값용) */
+export function toTimeKey(value: DateInput, timeZone = DEFAULT_TIME_ZONE): string {
+  return fmt(value, 'HH:mm', timeZone);
+}
+
 /** 센터 시간대 기준 오늘 `2026-09-24` */
 export function todayKey(timeZone = DEFAULT_TIME_ZONE, now: DateInput = new Date()): string {
   return toDateKey(now, timeZone);

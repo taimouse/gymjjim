@@ -6,6 +6,8 @@ import { AdminNav } from '@/components/admin/admin-nav';
 import { AdminTopbar } from '@/components/admin/admin-topbar';
 import { CommandPalette } from '@/components/admin/command-palette';
 import { MemberDrawer } from '@/components/admin/members/member-drawer';
+import { RealtimeSync } from '@/components/admin/realtime-sync';
+import { SessionDrawer } from '@/components/admin/sessions/session-drawer';
 import { BrandMark } from '@/components/brand-mark';
 import { parseBookingSettings } from '@/features/centers/schema';
 import { requireStaff } from '@/lib/auth/session';
@@ -40,11 +42,13 @@ export default async function AdminShellLayout({ children }: { children: ReactNo
           <main className="mx-auto w-full max-w-7xl flex-1 p-4 md:p-6">{children}</main>
         </div>
       </div>
-      {/* ⌘K 와 회원 드로어는 URL(?member=) 을 읽으므로 Suspense 로 감싼다 */}
+      {/* ⌘K·회원·수업 드로어는 URL(?member=, ?session=) 을 읽으므로 Suspense 로 감싼다 */}
       <Suspense>
         <CommandPalette />
         <MemberDrawer />
+        <SessionDrawer />
       </Suspense>
+      <RealtimeSync />
     </AdminProvider>
   );
 }

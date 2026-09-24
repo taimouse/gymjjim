@@ -251,7 +251,139 @@
     }
   },
   "calendar": {
-    "title": "캘린더"
+    "title": "캘린더",
+    "today": "오늘",
+    "prev": "이전",
+    "next": "다음",
+    "views": {
+      "timeGridWeek": "주",
+      "timeGridDay": "일",
+      "dayGridMonth": "월"
+    },
+    "newSession": "수업 만들기",
+    "dragHint": "빈 시간을 드래그하면 수업을 만들 수 있어요",
+    "filters": {
+      "instructor": "강사",
+      "program": "프로그램",
+      "allInstructors": "전체 강사",
+      "allPrograms": "전체 프로그램",
+      "reset": "필터 해제"
+    },
+    "event": {
+      "counts": "예약 {booked}/{capacity}",
+      "waitlist": "대기 {count}",
+      "full": "마감 {booked}/{capacity}",
+      "cancelled": "폐강"
+    },
+    "availability": {
+      "open": "예약가능",
+      "almost": "마감임박",
+      "waitlist": "대기가능",
+      "closed": "마감",
+      "ended": "종료",
+      "cancelled": "폐강"
+    },
+    "create": {
+      "title": "수업 만들기",
+      "program": "프로그램",
+      "programPlaceholder": "프로그램을 선택하세요",
+      "noPrograms": "먼저 프로그램을 만들어 주세요.",
+      "instructor": "강사",
+      "instructorNone": "지정 안 함",
+      "date": "날짜",
+      "startTime": "시작 시각",
+      "duration": "소요 시간(분)",
+      "capacity": "정원",
+      "repeat": "반복",
+      "weekdays": "반복 요일",
+      "until": "반복 종료일",
+      "note": "메모",
+      "preview": "수업 {count}개가 만들어져요",
+      "submit": "만들기",
+      "done": "수업 {count}개를 만들었어요"
+    },
+    "weekdayShort": {
+      "1": "월",
+      "2": "화",
+      "3": "수",
+      "4": "목",
+      "5": "금",
+      "6": "토",
+      "7": "일"
+    },
+    "scope": {
+      "label": "반복 수업이에요. 어디까지 바꿀까요?",
+      "this": "이 수업만",
+      "following": "이후 전체"
+    },
+    "move": {
+      "title": "수업 시간을 옮길까요?",
+      "description": "{from} → {to}",
+      "notify": "예약자에게 알림 보내기",
+      "notifyHint": "예약·대기 중인 회원 {count}명에게 변경 안내가 가요.",
+      "confirm": "옮기기",
+      "done": "수업 시간을 옮겼어요",
+      "notified": "수업 시간을 옮기고 {count}명에게 알렸어요"
+    },
+    "edit": {
+      "title": "수업 수정",
+      "notify": "시간이 바뀌면 예약자에게 알림 보내기",
+      "done": "수업을 수정했어요 ({count}개)"
+    },
+    "drawer": {
+      "instructor": "강사",
+      "noInstructor": "강사 미정",
+      "capacity": "정원",
+      "seatsLeft": "남은 자리",
+      "waitlistCount": "대기",
+      "booked": "예약자 {count}명",
+      "waitlisted": "대기자 {count}명",
+      "cancelledList": "취소 {count}건",
+      "noBookings": "아직 예약한 회원이 없어요",
+      "noWaitlist": "대기자가 없어요",
+      "addMember": "회원 대리 예약",
+      "edit": "수업 수정",
+      "cancelSession": "폐강",
+      "attended": "출석",
+      "noShow": "노쇼",
+      "markedAttended": "{name} 님 출석",
+      "markedNoShow": "{name} 님 노쇼",
+      "markedBooked": "{name} 님 출석 체크를 되돌렸어요",
+      "cancelBooking": "예약 취소",
+      "position": "{position}번",
+      "bookedByStaff": "대리 예약",
+      "remaining": "잔여 {count}회",
+      "cancelledReason": "폐강 사유: {reason}",
+      "note": "메모"
+    },
+    "cancelSession": {
+      "title": "이 수업을 폐강할까요?",
+      "description": "예약·대기 {count}명이 모두 취소되고 차감된 횟수는 복구돼요. 회원에게 폐강 알림이 가요. 되돌릴 수 없어요.",
+      "reason": "폐강 사유 (선택)",
+      "reasonPlaceholder": "예) 강사 사정",
+      "confirm": "폐강하기",
+      "done": "폐강했어요. {count}명에게 알렸어요"
+    },
+    "cancelBooking": {
+      "title": "{name} 님의 예약을 취소할까요?",
+      "free": "무료 취소 기간이라 횟수가 복구돼요.",
+      "late": "무료 취소 기간이 지났어요. 그대로 취소하면 1회 차감돼요.",
+      "waive": "차감하지 않고 취소",
+      "confirm": "예약 취소",
+      "done": "예약을 취소했어요"
+    },
+    "staffBook": {
+      "title": "회원 대리 예약",
+      "placeholder": "회원 이름 또는 전화번호 뒷 4자리",
+      "hint": "관리자 대리 예약은 예약 오픈·마감 시간과 관계없이 할 수 있어요.",
+      "empty": "찾는 회원이 없어요",
+      "done": "{name} 님을 예약했어요",
+      "waitlisted": "{name} 님을 대기 {position}번으로 등록했어요",
+      "fullTitle": "정원이 모두 찼어요",
+      "fullDescription": "{name} 님을 어떻게 등록할까요?",
+      "overCapacity": "정원 초과로 예약",
+      "addWaitlist": "대기로 등록"
+    }
   },
   "members": {
     "title": "회원",
