@@ -52,3 +52,12 @@ test('(4) 회원 등록 → 이용권 부여 → 정지 → 만료일 연장 확
   await expect(page.getByText(t.hold.done)).toBeVisible();
   await expect(drawer.getByText(formatDateKey(extended, { year: true }))).toBeVisible();
 });
+
+test('(5) 어디서든 Ctrl+K 로 회원을 찾아 드로어를 연다', async ({ page }) => {
+  await loginAsOwner(page);
+  await page.keyboard.press('Control+k');
+  const palette = page.getByRole('dialog', { name: messages.admin.command.title });
+  await palette.getByPlaceholder(messages.admin.command.placeholder).fill('홍길동');
+  await palette.getByRole('option', { name: /홍길동/ }).click();
+  await expect(page.getByRole('dialog', { name: '홍길동' })).toBeVisible();
+});

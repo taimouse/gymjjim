@@ -12,6 +12,7 @@ import { PassStatusBadge } from '@/components/admin/members/pass-status-badge';
 import { useErrorText } from '@/components/form-messages';
 import { Button } from '@/components/ui/button';
 import {
+  Command,
   CommandDialog,
   CommandEmpty,
   CommandGroup,
@@ -77,38 +78,41 @@ export function StaffBookDialog({ sessionId, onClose }: { sessionId: string; onC
         description={t('hint')}
         className="sm:max-w-lg"
       >
-        <CommandInput
-          value={query}
-          onValueChange={setQuery}
-          placeholder={t('placeholder')}
-          disabled={pending}
-        />
-        <p className="px-3 pt-2 text-sm text-muted-foreground">{t('hint')}</p>
-        <CommandList className="max-h-[50vh]">
-          {term.length > 0 && !search.isFetching && <CommandEmpty>{t('empty')}</CommandEmpty>}
-          <CommandGroup>
-            {(search.data?.rows ?? []).map((member) => (
-              <CommandItem
-                key={member.id}
-                value={`member ${member.id} ${member.name} ${member.phone ?? ''}`}
-                keywords={[member.name, member.phone ?? '']}
-                onSelect={() => book(member)}
-                disabled={pending}
-                className="min-h-12"
-              >
-                <UserRound aria-hidden />
-                <span className="font-medium">{member.name}</span>
-                <span className="text-muted-foreground tabular-nums">{maskPhone(member.phone)}</span>
-                <PassStatusBadge
-                  state={member.pass_state}
-                  remaining={member.pass_remaining}
-                  daysLeft={member.pass_days_left}
-                  className="ml-auto"
-                />
-              </CommandItem>
-            ))}
-          </CommandGroup>
-        </CommandList>
+        {/* 서버에서 이미 검색한 결과라 cmdk 의 자체 필터는 끈다 */}
+        <Command shouldFilter={false}>
+          <CommandInput
+            value={query}
+            onValueChange={setQuery}
+            placeholder={t('placeholder')}
+            disabled={pending}
+          />
+          <p className="px-3 pt-2 text-sm text-muted-foreground">{t('hint')}</p>
+          <CommandList className="max-h-[50vh]">
+            {term.length > 0 && !search.isFetching && <CommandEmpty>{t('empty')}</CommandEmpty>}
+            <CommandGroup>
+              {(search.data?.rows ?? []).map((member) => (
+                <CommandItem
+                  key={member.id}
+                  value={`member ${member.id} ${member.name} ${member.phone ?? ''}`}
+                  keywords={[member.name, member.phone ?? '']}
+                  onSelect={() => book(member)}
+                  disabled={pending}
+                  className="min-h-12"
+                >
+                  <UserRound aria-hidden />
+                  <span className="font-medium">{member.name}</span>
+                  <span className="text-muted-foreground tabular-nums">{maskPhone(member.phone)}</span>
+                  <PassStatusBadge
+                    state={member.pass_state}
+                    remaining={member.pass_remaining}
+                    daysLeft={member.pass_days_left}
+                    className="ml-auto"
+                  />
+                </CommandItem>
+              ))}
+            </CommandGroup>
+          </CommandList>
+        </Command>
       </CommandDialog>
       {full && (
         <ConfirmDialog

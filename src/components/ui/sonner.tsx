@@ -22,6 +22,8 @@ const Toaster = ({ ...props }: ToasterProps) => {
           '--normal-text': 'var(--popover-foreground)',
           '--normal-border': 'var(--border)',
           '--border-radius': 'var(--radius)',
+          // 모달이 열리면 Radix 가 body 의 클릭을 막는다. 토스트의 [되돌리기]는 눌려야 한다
+          pointerEvents: 'auto',
         } as React.CSSProperties
       }
       toastOptions={{

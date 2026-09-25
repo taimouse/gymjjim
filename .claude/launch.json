@@ -8,6 +8,12 @@
       "port": 3000
     },
     {
+      "name": "web-local",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": ["dev:local"],
+      "port": 3000
+    },
+    {
       "name": "web-prod",
       "runtimeExecutable": "pnpm",
       "runtimeArgs": ["start", "--port", "3001"],

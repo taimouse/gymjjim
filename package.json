@@ -5,10 +5,12 @@
   "type": "module",
   "packageManager": "pnpm@11.24.0",
   "engines": {
-    "node": ">=22"
+    "node": ">=22.18"
   },
   "scripts": {
     "dev": "next dev",
+    "dev:local": "node --experimental-strip-types scripts/dev-stack/main.mts",
+    "dev:stack": "node --experimental-strip-types scripts/dev-stack/main.mts --no-next",
     "build": "next build",
     "start": "next start",
     "typecheck": "next typegen && tsc --noEmit && tsc -p tsconfig.sw.json",

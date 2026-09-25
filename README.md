@@ -13,61 +13,57 @@ Next.js 16 (App Router, Turbopack) · TypeScript strict · Tailwind CSS v4 · sh
 
 ## 요구 사항
 
-| 도구           | 버전              | 비고                                                                                  |
-| -------------- | ----------------- | ------------------------------------------------------------------------------------- |
-| Node.js        | 22 이상 (24 권장) |                                                                                       |
-| pnpm           | 11                | `corepack enable` 후 자동 사용                                                        |
-| Docker Desktop | 최신              | 로컬 Supabase(`supabase start`)와 E2E 테스트에 필요. **DB 단위 테스트에는 필요 없음** |
+| 도구           | 버전                 | 비고                                                                           |
+| -------------- | -------------------- | ------------------------------------------------------------------------------ |
+| Node.js        | 22.18 이상 (24 권장) | 로컬 스택 실행기(`scripts/dev-stack`)가 TypeScript 를 그대로 실행합니다        |
+| pnpm           | 11                   | `corepack enable` 후 자동 사용                                                 |
+| Docker Desktop | (선택)               | 실제 Supabase 로컬 스택(`supabase start`)을 쓸 때만. 없어도 개발할 수 있습니다 |
 
-## 처음 실행하기
+## 처음 실행하기 (도커 없이)
 
 ```bash
 pnpm install
-cp .env.example .env.local
+pnpm dev:local
 ```
 
-### 1) 로컬 Supabase 띄우기 (Docker 필요)
+http://localhost:3000 을 엽니다. `pnpm dev:local` 하나가 아래를 모두 켜고, Ctrl+C 로 한꺼번에 끕니다.
+
+| 구성                           | 주소                                                   | 설명                                                                |
+| ------------------------------ | ------------------------------------------------------ | ------------------------------------------------------------------- |
+| 앱 (next dev)                  | http://localhost:3000                                  |                                                                     |
+| API (Supabase 와 같은 주소·키) | http://127.0.0.1:54321                                 | `/auth/v1` 개발용 인증 서버 · `/rest/v1` PostgREST · `/realtime/v1` |
+| 개발용 메일함                  | http://127.0.0.1:54321/_dev/mail                       | 매직링크·직원 초대 메일 대신 링크를 모아 보여줍니다                 |
+| PostgreSQL 17                  | `postgres://postgres:postgres@127.0.0.1:54322/gymjjim` | embedded-postgres, 데이터는 `.cache/pg-dev`                         |
+
+- 처음 실행하면 DB 를 만들고 마이그레이션·시드를 적용합니다(30초쯤). PostgREST 공식 실행 파일(약 15MB)도 이때 `.cache/bin` 에 한 번 받습니다.
+- 다음부터는 DB 를 그대로 쓰고 **새 마이그레이션만** 이어서 적용합니다. 처음부터 다시: `pnpm dev:local --reset`
+- 앱 없이 백엔드만 켜기: `pnpm dev:stack` (다른 터미널에서 `pnpm dev`. 이때는 `.env.local` 에 아래 개발용 값을 넣어 두세요)
+  - `NEXT_PUBLIC_SUPABASE_URL=http://127.0.0.1:54321`, 키는 실행할 때 만들어지는 `.cache/dev-stack.env` 와 같게
+- **안 되는 것**: 카카오 로그인(로그인 화면으로 돌아갑니다), 알림 발송(Edge Function). 나머지 화면·예약 규칙·RLS·실시간 반영은 실제와 같은 DB·API 로 동작합니다.
+- 개발 전용 도구입니다. 비밀값이 공개된 기본값이라 운영에는 쓰지 않습니다.
+
+### 시드 계정 (비밀번호 모두 `gymjjim1234!`)
+
+| 계정                                                | 역할                            | 로그인                                          |
+| --------------------------------------------------- | ------------------------------- | ----------------------------------------------- |
+| `owner@gymjjim.test`                                | 대표                            | `/admin-login`                                  |
+| `coach.lee@gymjjim.test`, `coach.park@gymjjim.test` | 트레이너                        | `/admin-login`                                  |
+| `member1@gymjjim.test`                              | 회원 홍길동 (동의 완료)         | `/login` → 이메일 로그인 링크 → 메일함에서 열기 |
+| `member2@gymjjim.test`                              | 회원 김민지 (첫 로그인 동의 전) | `/login` → 이메일 로그인 링크 → 메일함에서 열기 |
+
+### 실제 Supabase 로컬 스택으로 실행하기 (Docker 필요, 선택)
+
+카카오 로그인·Studio·Edge Function 까지 실제와 같게 보려면 Docker Desktop(또는 Rancher Desktop·Podman)을 설치하고:
 
 ```bash
+cp .env.example .env.local
 pnpm supabase start          # 처음엔 이미지 다운로드로 몇 분 걸립니다
 pnpm supabase status         # API URL, Publishable key, Secret key 확인
-```
-
-`pnpm supabase status`에 나온 값을 `.env.local`에 넣습니다.
-
-- `NEXT_PUBLIC_SUPABASE_URL` ← API URL (기본 `http://127.0.0.1:54321`)
-- `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` ← Publishable key
-- `SUPABASE_SECRET_KEY` ← Secret key
-
-마이그레이션과 시드 데이터를 적용합니다.
-
-```bash
-pnpm supabase db reset
-```
-
-로컬 서비스 주소:
-
-| 서비스                                 | 주소                   |
-| -------------------------------------- | ---------------------- |
-| Supabase Studio                        | http://127.0.0.1:54323 |
-| 메일 확인(Mailpit, 매직링크·초대 메일) | http://127.0.0.1:54324 |
-
-### 2) 개발 서버
-
-```bash
+pnpm supabase db reset       # 마이그레이션 + 시드
 pnpm dev
 ```
 
-http://localhost:3000 에서 확인합니다.
-
-### 3) 시드 계정 (비밀번호 모두 `gymjjim1234!`)
-
-| 계정                                                | 역할                            | 로그인                                     |
-| --------------------------------------------------- | ------------------------------- | ------------------------------------------ |
-| `owner@gymjjim.test`                                | 대표                            | `/admin-login`                             |
-| `coach.lee@gymjjim.test`, `coach.park@gymjjim.test` | 트레이너                        | `/admin-login`                             |
-| `member1@gymjjim.test`                              | 회원 홍길동 (동의 완료)         | `/login` → 이메일 링크 (Mailpit 에서 확인) |
-| `member2@gymjjim.test`                              | 회원 김민지 (첫 로그인 동의 전) | `/login` → 이메일 링크                     |
+`pnpm supabase status` 값을 `.env.local` 의 `NEXT_PUBLIC_SUPABASE_URL`·`NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`·`SUPABASE_SECRET_KEY` 에 넣습니다. Studio 는 http://127.0.0.1:54323, 메일 확인(Mailpit)은 http://127.0.0.1:54324 입니다.
 
 ## 로그인 구조
 
@@ -134,14 +130,14 @@ Cron → Edge Function ─┼─ notification_logs (pending) ─ claim → 템�
 
 ## E2E 테스트 (Playwright)
 
-로컬 Supabase(Docker)와 시드 데이터가 있어야 합니다. 테스트가 쓰는 프로그램·수업·이용권은 서비스 키로 직접 만들고, 끝나면 숨깁니다.
+시드 데이터가 있는 Supabase 가 필요합니다. 도커 없이 로컬 스택으로 돌릴 수 있고, 테스트가 쓰는 프로그램·수업·이용권은 서비스 키로 직접 만들고 끝나면 숨깁니다.
 
 ```bash
-pnpm supabase start
-pnpm supabase db reset
-pnpm exec playwright install chromium
-pnpm test:e2e
+pnpm dev:local                                   # 터미널 1: 로컬 스택 + 앱
+E2E_BROWSER_CHANNEL=msedge pnpm test:e2e         # 터미널 2: 설치된 Edge 로 실행 (Playwright 브라우저를 받지 않아도 됨)
 ```
+
+로컬 스택이 켜져 있으면 Playwright 가 `.cache/dev-stack.env` 의 주소·키를 먼저 씁니다. 실제 Supabase 로컬 스택을 쓸 때는 `pnpm supabase start && pnpm supabase db reset` 후 `pnpm exec playwright install chromium`, `pnpm test:e2e`.
 
 | 시나리오                                                | 화면          |
 | ------------------------------------------------------- | ------------- |
@@ -220,11 +216,11 @@ pnpm test:e2e
 
 ## Docker 없이 개발하기
 
-DB 로직은 Docker 없이도 검증할 수 있습니다.
+`pnpm dev:local`(위 "처음 실행하기")로 화면까지 모두 볼 수 있고, DB 로직은 테스트로도 검증합니다.
 
 - `pnpm test:db`는 [embedded-postgres](https://github.com/leinelissen/embedded-postgres)로 실제 PostgreSQL 17을 띄워 `supabase/migrations`와 `supabase/seed.sql`을 적용하고 RPC·RLS를 테스트합니다. 첫 실행은 DB 초기화로 30초쯤 걸리고, 이후엔 `.cache/`를 재사용합니다.
 - Supabase 전용 스키마(auth 등)는 `tests/db/supabase-shim.sql`이 최소한으로 흉내 냅니다.
-- 로그인이 필요한 화면과 E2E는 Supabase Auth·API가 있어야 하므로 로컬 Supabase(Docker)나 개발용 Supabase 프로젝트가 필요합니다.
+- 로그인이 필요한 화면과 E2E 는 `pnpm dev:local` 의 개발용 인증 서버·PostgREST 로 실행합니다 (`scripts/dev-stack`).
 
 ## 폴더 구조
 

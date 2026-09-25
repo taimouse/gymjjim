@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl';
 import { useEffect, useState } from 'react';
 
 import {
+  Command,
   CommandDialog,
   CommandEmpty,
   CommandGroup,
@@ -50,33 +51,36 @@ export function CommandPalette() {
       description={t('command.description')}
       className="sm:max-w-xl"
     >
-      <CommandInput value={query} onValueChange={setQuery} placeholder={t('command.placeholder')} />
-      <CommandList className="max-h-[60vh]">
-        <CommandEmpty>{t('command.empty')}</CommandEmpty>
-        <MemberCommandResults
-          query={query}
-          onSelect={(memberId) => {
-            close();
-            memberDrawer.open(memberId);
-          }}
-        />
-        <CommandGroup heading={t('command.menus')}>
-          {ADMIN_NAV.map(({ href, key, icon: Icon }) => (
-            <CommandItem
-              key={href}
-              value={t(`nav.${key}`)}
-              onSelect={() => {
-                close();
-                router.push(href);
-              }}
-              className="min-h-11"
-            >
-              <Icon aria-hidden />
-              {t(`nav.${key}`)}
-            </CommandItem>
-          ))}
-        </CommandGroup>
-      </CommandList>
+      {/* shadcn 의 CommandDialog 는 cmdk 루트(Command)를 따로 감싸야 한다 */}
+      <Command>
+        <CommandInput value={query} onValueChange={setQuery} placeholder={t('command.placeholder')} />
+        <CommandList className="max-h-[60vh]">
+          <CommandEmpty>{t('command.empty')}</CommandEmpty>
+          <MemberCommandResults
+            query={query}
+            onSelect={(memberId) => {
+              close();
+              memberDrawer.open(memberId);
+            }}
+          />
+          <CommandGroup heading={t('command.menus')}>
+            {ADMIN_NAV.map(({ href, key, icon: Icon }) => (
+              <CommandItem
+                key={href}
+                value={t(`nav.${key}`)}
+                onSelect={() => {
+                  close();
+                  router.push(href);
+                }}
+                className="min-h-11"
+              >
+                <Icon aria-hidden />
+                {t(`nav.${key}`)}
+              </CommandItem>
+            ))}
+          </CommandGroup>
+        </CommandList>
+      </Command>
     </CommandDialog>
   );
 }
