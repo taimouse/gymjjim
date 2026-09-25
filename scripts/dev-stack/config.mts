@@ -33,6 +33,16 @@ export const SERVICE_ROLE_KEY = signJwt(
 /** 개발용 메일함 (매직링크·직원 초대 메일) */
 export const MAILBOX_URL = `${API_URL}/_dev/mail`;
 
+/** 로그인 없이 보기(POST /_dev/session): 앱이 고른 계정 → 시드 계정 (앱의 src/lib/auth/dev-login.ts 와 맞춘다) */
+export const DEV_LOGIN_ACCOUNTS = new Map([
+  ['owner', 'owner@gymjjim.test'],
+  ['staff', 'coach.lee@gymjjim.test'],
+  ['member', 'member1@gymjjim.test'],
+]);
+
+/** 로그인 없이 만든 세션의 JWT amr 방식. 앱은 이 표시가 있는 세션만 화면에 맞춰 계정을 바꾼다 */
+export const DEV_LOGIN_METHOD = 'dev';
+
 /** 앱(next dev)과 E2E 가 쓸 환경 변수 */
 export function appEnv(): Record<string, string> {
   return {
@@ -40,6 +50,8 @@ export function appEnv(): Record<string, string> {
     NEXT_PUBLIC_SUPABASE_URL: API_URL,
     NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: ANON_KEY,
     SUPABASE_SECRET_KEY: SERVICE_ROLE_KEY,
+    // 로그인 없이 보기 (운영 빌드에서는 앱이 이 값을 무시한다)
+    GYMJJIM_DEV_LOGIN: '1',
   };
 }
 

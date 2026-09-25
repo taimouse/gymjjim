@@ -3,6 +3,7 @@
 //   pnpm dev:stack          앱 없이 백엔드만 (다른 터미널에서 pnpm dev · pnpm test:e2e)
 //   pnpm dev:local --reset  DB 를 시드부터 다시 만든다
 // Ctrl+C 로 한꺼번에 끈다. Supabase 로컬(supabase start)과 같은 주소·키를 쓰므로 앱 코드는 그대로다.
+// 앱은 로그인 없이 시드 계정으로 들어간다 (GYMJJIM_DEV_LOGIN=1 → src/lib/auth/dev-login.ts).
 import { type ChildProcess, spawn } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
@@ -41,11 +42,14 @@ async function stop(code: number): Promise<never> {
 function printSummary(): void {
   console.log(`
   ┌─ 로컬 개발 환경 (도커 없이) ───────────────────────────────
-  │ 앱        ${withNext ? SITE_URL : '(pnpm dev 로 따로 실행)'}
+  │ 앱        ${withNext ? SITE_URL : '(pnpm dev 로 따로 실행 · .env.local 에 .cache/dev-stack.env 값)'}
   │ API       ${API_URL}   (Supabase 로컬과 같은 주소·키)
   │ 메일함    ${MAILBOX_URL}   (매직링크·직원 초대 링크)
   │ DB        postgres://postgres:postgres@127.0.0.1:${PORTS.database}/${DATABASE}
-  ├─ 시드 계정 (비밀번호 모두 gymjjim1234!)
+  ├─ 로그인 없이 보기: 주소만 열면 시드 계정으로 들어가요
+  │ 관리자    ${SITE_URL}/admin     대표 김대표 (트레이너 이코치: /admin?as=staff)
+  │ 회원      ${SITE_URL}/m         회원 홍길동
+  ├─ 직접 로그인할 때 (비밀번호 모두 gymjjim1234!)
   │ 관리자    owner@gymjjim.test · coach.lee@gymjjim.test   → /admin-login
   │ 회원      member1@gymjjim.test → /login 에서 "이메일로 로그인 링크 받기" 후 메일함
   ├─ 안 되는 것: 카카오 로그인 · 알림 발송(Edge Function)

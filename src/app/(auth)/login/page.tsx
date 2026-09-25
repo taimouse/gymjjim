@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { getTranslations } from 'next-intl/server';
 
+import { DevLoginPanel } from '@/components/dev-login-panel';
 import { ErrorAlert } from '@/components/form-messages';
 import { KakaoLoginButton } from '@/components/member/kakao-login-button';
 import { MagicLinkForm } from '@/components/member/magic-link-form';
@@ -39,6 +40,7 @@ export default async function MemberLoginPage({ searchParams }: PageProps<'/logi
           {t('adminAction')}
         </Link>
       </p>
+      <DevLoginPanel />
     </div>
   );
 }

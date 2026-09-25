@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { getTranslations } from 'next-intl/server';
 
+import { DevLoginPanel } from '@/components/dev-login-panel';
 import { SignOutButton } from '@/components/sign-out-button';
 import { Button } from '@/components/ui/button';
 import {
@@ -34,21 +35,24 @@ export default async function ForbiddenPage({ searchParams }: PageProps<'/403'>)
 
   return (
     <main className="flex min-h-dvh items-center justify-center bg-surface p-4">
-      <Empty className="max-w-md border bg-background">
-        <EmptyHeader>
-          <EmptyMedia variant="icon">
-            <ShieldX aria-hidden />
-          </EmptyMedia>
-          <EmptyTitle>{t('title')}</EmptyTitle>
-          <EmptyDescription>{t(isReason(reason) ? reason : 'default')}</EmptyDescription>
-        </EmptyHeader>
-        <EmptyContent className="flex-row justify-center">
-          <Button asChild variant="outline">
-            <Link href="/">{t('home')}</Link>
-          </Button>
-          <SignOutButton to={reason === 'member' ? 'member' : 'admin'} variant="ghost" />
-        </EmptyContent>
-      </Empty>
+      <div className="flex w-full max-w-md flex-col gap-6">
+        <Empty className="border bg-background">
+          <EmptyHeader>
+            <EmptyMedia variant="icon">
+              <ShieldX aria-hidden />
+            </EmptyMedia>
+            <EmptyTitle>{t('title')}</EmptyTitle>
+            <EmptyDescription>{t(isReason(reason) ? reason : 'default')}</EmptyDescription>
+          </EmptyHeader>
+          <EmptyContent className="flex-row justify-center">
+            <Button asChild variant="outline">
+              <Link href="/">{t('home')}</Link>
+            </Button>
+            <SignOutButton to={reason === 'member' ? 'member' : 'admin'} variant="ghost" />
+          </EmptyContent>
+        </Empty>
+        <DevLoginPanel />
+      </div>
     </main>
   );
 }

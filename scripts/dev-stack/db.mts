@@ -24,6 +24,8 @@ create table if not exists dev_stack.migrations (name text primary key, applied_
 create table if not exists dev_stack.refresh_tokens (
   token text primary key, user_id uuid not null, session_id uuid not null,
   revoked boolean not null default false, created_at timestamptz not null default now());
+-- 세션을 처음 만든 방식(JWT amr). 토큰을 갱신해도 유지한다 (GoTrue 와 같다)
+alter table dev_stack.refresh_tokens add column if not exists method text not null default 'password';
 create table if not exists dev_stack.one_time_tokens (
   token_hash text primary key, user_id uuid not null, type text not null,
   used_at timestamptz, created_at timestamptz not null default now());

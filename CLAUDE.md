@@ -85,6 +85,7 @@
 - 화면 문자열 하드코딩 금지 → next-intl 메시지 키 사용
 - `any` 금지, 외부 입력은 전부 Zod로 검증
 - 한 파일이 300줄을 넘으면 분리
+- `'use client'` 파일이 export 한 상수·일반 함수는 서버 컴포넌트에서 쓰지 않는다 (클라이언트 참조로 바뀌어 런타임에야 터진다). 서버도 쓰는 값은 별도 모듈에 둔다
 
 ## 7. UI/UX 원칙
 - 관리자: PC 우선(1280px), 태블릿 대응. 회원: 모바일 우선(375px)
@@ -134,4 +135,5 @@ scripts/             DB 도구 (타입 생성 등)
   - Next.js 16 문서는 `node_modules/next/dist/docs/`에 번들되어 있다 (`AGENTS.md` 참고). `middleware`는 `proxy.ts`로 이름이 바뀌었다
 - Docker 없이도 `pnpm test:db`(embedded PostgreSQL)로 마이그레이션·RPC·RLS를 검증할 수 있다
 - 화면 확인·E2E 는 `pnpm dev:local`(도커 없는 로컬 스택: embedded PostgreSQL + PostgREST + 개발용 인증·Realtime, `scripts/dev-stack`)로 한다. E2E 는 `E2E_BROWSER_CHANNEL=msedge pnpm test:e2e`
+  - 로컬 스택에서는 로그인 없이 시드 계정으로 들어간다: `/admin` 대표, `/admin?as=staff` 트레이너, `/m` 회원 (`src/lib/auth/dev-login.ts`). 운영 빌드에서는 항상 꺼진다
 - `src/features/notifications`의 templates·solapi·channels·dispatch는 Edge Function(Deno)도 가져다 쓴다. 상대 경로 + `.ts` 확장자로만 import 하고 `@/` 경로·Next 전용 모듈은 쓰지 않는다 (zod 는 함수의 `deno.json`이 연결)

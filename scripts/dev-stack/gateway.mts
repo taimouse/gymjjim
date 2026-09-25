@@ -3,10 +3,11 @@
 //   /rest/v1/*       PostgREST (apikey 만 있으면 Authorization 으로 옮긴다 — Kong 과 같은 동작)
 //   /realtime/v1/*   Realtime 흉내 (웹소켓)
 //   /_dev/mail       개발용 메일함 (매직링크·직원 초대 링크)
+//   /_dev/session    로그인 없이 보기 (앱의 proxy 가 서버에서 부른다)
 import http, { type IncomingMessage, type ServerResponse } from 'node:http';
 import type { Duplex } from 'node:stream';
 
-import { handleAuth } from './auth.mts';
+import { handleAuth, handleDevSession } from './auth.mts';
 import type { AuthStore } from './auth-store.mts';
 import { PORTS } from './config.mts';
 import { renderMailbox } from './mailbox.mts';
@@ -17,6 +18,9 @@ interface Realtime {
 
 const EXPOSED_HEADERS =
   'content-range, content-location, preference-applied, x-supabase-api-version, location';
+
+/** 브라우저(앱)가 다른 출처에서 부르는 Supabase API. 개발용 페이지·API(/_dev)는 CORS 를 열지 않는다 */
+const API_ROUTE = /^\/(auth|rest|realtime)\/v1(\/|$)/;
 
 function cors(req: IncomingMessage, res: ServerResponse): void {
   res.setHeader('access-control-allow-origin', req.headers.origin ?? '*');
@@ -29,6 +33,14 @@ function cors(req: IncomingMessage, res: ServerResponse): void {
   );
   res.setHeader('access-control-expose-headers', EXPOSED_HEADERS);
   res.setHeader('access-control-max-age', '86400');
+}
+
+function internalError(res: ServerResponse, tag: string) {
+  return (error: unknown) => {
+    console.error(`[${tag}]`, error);
+    if (!res.headersSent) res.writeHead(500, { 'content-type': 'application/json' });
+    res.end(JSON.stringify({ code: 500, error_code: 'unexpected_failure', msg: String(error) }));
+  };
 }
 
 /** /rest/v1/* → PostgREST. 본문·응답은 흘려보낸다 */
@@ -64,20 +76,22 @@ function proxyRest(req: IncomingMessage, res: ServerResponse, url: URL): void {
 export function startGateway(store: AuthStore, realtime: Realtime): Promise<http.Server> {
   const server = http.createServer((req, res) => {
     const url = new URL(req.url ?? '/', `http://${req.headers.host ?? '127.0.0.1'}`);
-    cors(req, res);
-    if (req.method === 'OPTIONS') {
-      res.writeHead(204);
-      res.end();
-      return;
-    }
     const route = url.pathname;
+    if (API_ROUTE.test(route)) {
+      cors(req, res);
+      if (req.method === 'OPTIONS') {
+        res.writeHead(204);
+        res.end();
+        return;
+      }
+    }
     if (route.startsWith('/rest/v1')) return proxyRest(req, res, url);
     if (route.startsWith('/auth/v1')) {
-      handleAuth(req, res, url, store).catch((error: unknown) => {
-        console.error('[auth]', error);
-        if (!res.headersSent) res.writeHead(500, { 'content-type': 'application/json' });
-        res.end(JSON.stringify({ code: 500, error_code: 'unexpected_failure', msg: String(error) }));
-      });
+      handleAuth(req, res, url, store).catch(internalError(res, 'auth'));
+      return;
+    }
+    if (route === '/_dev/session') {
+      handleDevSession(req, res, store).catch(internalError(res, 'dev-login'));
       return;
     }
     if (route === '/_dev/mail') {

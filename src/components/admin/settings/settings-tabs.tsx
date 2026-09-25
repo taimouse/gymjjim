@@ -6,8 +6,7 @@ import type { ReactNode } from 'react';
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
-export const SETTINGS_TABS = ['general', 'staff', 'notifications'] as const;
-export type SettingsTab = (typeof SETTINGS_TABS)[number];
+import { SETTINGS_TABS, type SettingsTab } from './tabs';
 
 /** 설정 탭: 센터·예약 규칙 / 직원 / 알림 (선택한 탭은 URL ?tab= 에 남긴다) */
 export function SettingsTabs({ tab, panels }: { tab: SettingsTab; panels: Record<SettingsTab, ReactNode> }) {

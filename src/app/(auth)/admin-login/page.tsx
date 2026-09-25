@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { getTranslations } from 'next-intl/server';
 
 import { AdminLoginForm } from '@/components/admin/admin-login-form';
+import { DevLoginPanel } from '@/components/dev-login-panel';
 import { ErrorAlert } from '@/components/form-messages';
 import { isAppErrorCode } from '@/lib/errors';
 import { safeNext } from '@/lib/safe-redirect';
@@ -33,6 +34,7 @@ export default async function AdminLoginPage({ searchParams }: PageProps<'/admin
           {t('memberAction')}
         </Link>
       </p>
+      <DevLoginPanel />
     </div>
   );
 }

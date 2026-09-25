@@ -1,11 +1,12 @@
 // 개발용 인증 서버: 앱이 쓰는 Supabase Auth API 만 흉내 낸다 (/auth/v1/*).
 // 비밀번호 로그인 · 토큰 갱신 · 매직링크(메일함으로) · 직원 초대 · 비밀번호 설정 · 로그아웃.
 // 카카오 로그인은 지원하지 않는다 → 로그인 화면으로 돌려보낸다.
+// 덧붙여 로그인 없이 보기(POST /_dev/session): 앱의 proxy 가 서버에서 불러 시드 계정 세션을 받는다.
 import { randomUUID } from 'node:crypto';
 import type { IncomingMessage, ServerResponse } from 'node:http';
 
 import { type AuthStore, type AuthUser, type SignOutScope } from './auth-store.mts';
-import { API_URL, JWT_SECRET, SITE_URL } from './config.mts';
+import { API_URL, DEV_LOGIN_ACCOUNTS, DEV_LOGIN_METHOD, JWT_SECRET, SITE_URL } from './config.mts';
 import { bearerToken, type JwtClaims, signJwt, verifyJwt } from './jwt.mts';
 
 const ACCESS_TOKEN_SECONDS = 3600;
@@ -88,7 +89,7 @@ function sessionJson(user: AuthUser, sessionId: string, refreshToken: string, me
 
 async function newSession(store: AuthStore, user: AuthUser, method: string): Promise<Json> {
   const sessionId = randomUUID();
-  const refreshToken = await store.createRefreshToken(user.id, sessionId);
+  const refreshToken = await store.createRefreshToken(user.id, sessionId, method);
   return sessionJson(user, sessionId, refreshToken, method);
 }
 
@@ -143,8 +144,9 @@ export async function handleAuth(req: IncomingMessage, res: ServerResponse, url:
         const user = rotated ? await store.findById(rotated.userId) : null;
         if (!rotated || !user)
           return fail(res, 400, 'refresh_token_not_found', 'Invalid Refresh Token: Refresh Token Not Found');
-        const refreshToken = await store.createRefreshToken(user.id, rotated.sessionId);
-        return send(res, 200, sessionJson(user, rotated.sessionId, refreshToken, 'token_refresh'));
+        // amr 은 세션을 처음 만든 방식 그대로 (GoTrue 와 같다)
+        const refreshToken = await store.createRefreshToken(user.id, rotated.sessionId, rotated.method);
+        return send(res, 200, sessionJson(user, rotated.sessionId, refreshToken, rotated.method));
       }
       return fail(res, 400, 'unsupported_grant_type', `개발용 인증 서버가 지원하지 않는 방식: ${grant}`);
     }
@@ -240,4 +242,26 @@ export async function handleAuth(req: IncomingMessage, res: ServerResponse, url:
     default:
       return fail(res, 404, 'not_found', `개발용 인증 서버에 없는 API: ${route}`);
   }
+}
+
+/**
+ * 로그인 없이 보기: 시드 계정 세션을 비밀번호 없이 만든다. 개발 스택에만 있는 API.
+ * 앱의 proxy 가 서버에서 JSON 으로 부른다 (다른 사이트의 브라우저에서는 CORS 사전 요청에 막힌다).
+ */
+export async function handleDevSession(req: IncomingMessage, res: ServerResponse, store: AuthStore) {
+  if (req.method !== 'POST' || !String(req.headers['content-type'] ?? '').startsWith('application/json'))
+    return fail(res, 405, 'method_not_allowed', 'POST application/json 으로 부릅니다.');
+  const email = DEV_LOGIN_ACCOUNTS.get(text((await readJson(req)).as));
+  if (!email)
+    return fail(res, 400, 'validation_failed', `as 는 ${[...DEV_LOGIN_ACCOUNTS.keys()].join(' · ')} 중 하나`);
+  const user = await store.findByEmail(email);
+  if (!user)
+    return fail(
+      res,
+      404,
+      'user_not_found',
+      `${email} 이 없습니다. pnpm dev:local --reset 으로 시드를 다시 넣어 주세요.`,
+    );
+  const signedIn = (await store.update(user.id, { signedIn: true })) ?? user;
+  return send(res, 200, await newSession(store, signedIn, DEV_LOGIN_METHOD));
 }

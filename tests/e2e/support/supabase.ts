@@ -9,7 +9,8 @@ import { messages } from './messages';
 /** 시드 계정 (supabase/seed.sql). 비밀번호는 모두 같다 */
 export const PASSWORD = 'gymjjim1234!';
 export const CENTER_ID = 'c0000000-0000-4000-8000-000000000001';
-export const OWNER = { email: 'owner@gymjjim.test' };
+export const OWNER = { email: 'owner@gymjjim.test', name: '김대표' };
+export const COACH = { email: 'coach.lee@gymjjim.test', name: '이코치' };
 export const MEMBERS = {
   hong: { email: 'member1@gymjjim.test', id: 'd0000000-0000-4000-8000-000000000001', name: '홍길동' },
   kim: { email: 'member2@gymjjim.test', id: 'd0000000-0000-4000-8000-000000000002', name: '김민지' },

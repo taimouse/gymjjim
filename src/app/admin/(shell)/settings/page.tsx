@@ -7,8 +7,9 @@ import { CenterInfoForm } from '@/components/admin/settings/center-info-form';
 import { NotificationLogs } from '@/components/admin/settings/notifications/notification-logs';
 import { NotificationTemplates } from '@/components/admin/settings/notifications/notification-templates';
 import { SmsFallbackCard } from '@/components/admin/settings/notifications/sms-fallback-card';
-import { SETTINGS_TABS, type SettingsTab, SettingsTabs } from '@/components/admin/settings/settings-tabs';
+import { SettingsTabs } from '@/components/admin/settings/settings-tabs';
 import { StaffSection } from '@/components/admin/settings/staff-section';
+import { parseSettingsTab } from '@/components/admin/settings/tabs';
 import { parseBookingSettings } from '@/features/centers/schema';
 import { requireStaff } from '@/lib/auth/session';
 import { firstParam } from '@/lib/search-params';
@@ -23,8 +24,7 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function SettingsPage({ searchParams }: PageProps<'/admin/settings'>) {
   const { center, staff } = await requireStaff();
   const t = await getTranslations();
-  const requested = firstParam((await searchParams).tab);
-  const tab: SettingsTab = SETTINGS_TABS.find((value) => value === requested) ?? 'general';
+  const tab = parseSettingsTab(firstParam((await searchParams).tab));
   const supabase = await createClient();
   const { data } = await supabase
     .from('centers')

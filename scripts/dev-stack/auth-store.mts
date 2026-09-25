@@ -96,25 +96,25 @@ export function createAuthStore(pool: pg.Pool) {
       );
     },
 
-    async createRefreshToken(userId: string, sessionId: string): Promise<string> {
+    async createRefreshToken(userId: string, sessionId: string, method: string): Promise<string> {
       const token = randomBytes(24).toString('base64url');
       await pool.query(
-        'insert into dev_stack.refresh_tokens (token, user_id, session_id) values ($1, $2, $3)',
-        [token, userId, sessionId],
+        'insert into dev_stack.refresh_tokens (token, user_id, session_id, method) values ($1, $2, $3, $4)',
+        [token, userId, sessionId, method],
       );
       return token;
     },
 
     /** 쓴 refresh token 은 바로 폐기하고 같은 세션의 새 토큰을 준다 (Supabase 와 같은 회전 방식) */
     async rotateRefreshToken(token: string) {
-      const { rows } = await pool.query<{ user_id: string; session_id: string }>(
+      const { rows } = await pool.query<{ user_id: string; session_id: string; method: string }>(
         `update dev_stack.refresh_tokens set revoked = true where token = $1 and not revoked
-         returning user_id, session_id`,
+         returning user_id, session_id, method`,
         [token],
       );
       const row = rows[0];
       if (!row) return null;
-      return { userId: row.user_id, sessionId: row.session_id };
+      return { userId: row.user_id, sessionId: row.session_id, method: row.method };
     },
 
     async sessionActive(sessionId: string): Promise<boolean> {
