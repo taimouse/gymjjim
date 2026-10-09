@@ -21,7 +21,7 @@ export async function generateMetadata(): Promise<Metadata> {
   return { title: t('title'), robots: { index: false } };
 }
 
-const REASONS = ['admin', 'owner', 'member'] as const;
+const REASONS = ['admin', 'owner', 'member', 'platform', 'suspended'] as const;
 type Reason = (typeof REASONS)[number];
 
 function isReason(value: string | undefined): value is Reason {

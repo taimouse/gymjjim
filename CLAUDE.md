@@ -16,6 +16,11 @@
 | owner | 센터 대표. 모든 권한 + 설정·직원 관리 | PC |
 | staff | 트레이너/스태프. 캘린더·예약·출석·회원 조회/수정 (설정·삭제 불가) | PC/태블릿/폰 |
 | member | 회원. 본인 예약·이용권만 | 폰 |
+| platform admin | gymjjim 운영자(`platform_admins`). 전체 센터·요금제·청구 관리 (`/platform`). 센터 업무 데이터는 보지 않는다 | PC |
+
+- 요금제(`plans`)의 회원·직원 한도는 DB 트리거가 검사한다 (`PLAN_MEMBER_LIMIT`, `PLAN_STAFF_LIMIT`)
+- 정지·해지(`centers.status` = `suspended`·`closed`)된 센터는 권한 헬퍼(`staff_center_ids` 등)에서 빠져 RLS·RPC 가 모두 막는다. 알림도 건너뛴다
+- 결제는 1단계 수기 관리: 청구서(`invoices`) 발행 → 입금 확인. 토스페이먼츠 자동결제는 다음 단계
 
 ## 3. 기술 스택 (임의 변경·라이브러리 추가 금지. 필요하면 먼저 제안)
 - Next.js (App Router, 최신 안정판) + TypeScript `strict`, 패키지 매니저 pnpm
@@ -106,6 +111,7 @@ src/
 │  ├─ (auth)/        로그인·초대 수락
 │  ├─ admin/         관리자: today, calendar, members, programs, settings
 │  ├─ m/             회원 모바일: book, my-bookings, me
+│  ├─ platform/      운영자 콘솔: 대시보드, centers, plans, invoices (메뉴 4개, 관리자 메뉴와 별개)
 │  └─ api/           웹훅 등 최소한만
 ├─ components/
 │  ├─ ui/            shadcn

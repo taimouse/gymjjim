@@ -38,6 +38,7 @@ export const DEV_LOGIN_ACCOUNTS = new Map([
   ['owner', 'owner@gymjjim.test'],
   ['staff', 'coach.lee@gymjjim.test'],
   ['member', 'member1@gymjjim.test'],
+  ['platform', 'admin@gymjjim.test'],
 ]);
 
 /** 로그인 없이 만든 세션의 JWT amr 방식. 앱은 이 표시가 있는 세션만 화면에 맞춰 계정을 바꾼다 */

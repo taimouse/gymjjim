@@ -8,6 +8,7 @@ const ENTRIES = [
   { account: 'owner', href: '/admin?as=owner' },
   { account: 'staff', href: '/admin?as=staff' },
   { account: 'member', href: '/m?as=member' },
+  { account: 'platform', href: '/platform?as=platform' },
 ] as const;
 
 /** 로컬 개발 스택(pnpm dev:local)에서만 보이는 "로그인 없이 둘러보기". 운영에서는 아무것도 그리지 않는다 */

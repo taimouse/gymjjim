@@ -52,6 +52,7 @@ http://localhost:3000 을 엽니다. `pnpm dev:local` 하나가 아래를 모두
 | http://localhost:3000/admin          | 대표 김대표     |
 | http://localhost:3000/admin?as=staff | 트레이너 이코치 |
 | http://localhost:3000/m              | 회원 홍길동     |
+| http://localhost:3000/platform       | 운영자          |
 
 - `/admin` 과 `/m` 을 오가면 계정이 알아서 바뀝니다. 로그인 화면·403 화면에도 계정을 고르는 버튼이 있습니다.
 - 직접 로그인한 세션(이메일·비밀번호, 매직링크)은 운영과 똑같이 동작합니다. 권한이 없으면 403 입니다.
@@ -65,6 +66,9 @@ http://localhost:3000 을 엽니다. `pnpm dev:local` 하나가 아래를 모두
 | `coach.lee@gymjjim.test`, `coach.park@gymjjim.test` | 트레이너                        | `/admin-login`                                  |
 | `member1@gymjjim.test`                              | 회원 홍길동 (동의 완료)         | `/login` → 이메일 로그인 링크 → 메일함에서 열기 |
 | `member2@gymjjim.test`                              | 회원 김민지 (첫 로그인 동의 전) | `/login` → 이메일 로그인 링크 → 메일함에서 열기 |
+| `admin@gymjjim.test`                                | 운영자 (전체 센터·요금제·청구)  | `/admin-login` → `/platform`                    |
+
+이미 만들어 둔 개발 DB 에는 새 마이그레이션만 적용되고 시드는 다시 들어가지 않습니다. 운영자 계정·예시 센터(홍대점 체험, 부산점 정지)·청구서가 필요하면 `pnpm dev:local --reset` 으로 DB 를 다시 만드세요.
 
 ### 실제 Supabase 로컬 스택으로 실행하기 (Docker 필요, 선택)
 

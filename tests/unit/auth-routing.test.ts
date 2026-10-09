@@ -57,4 +57,14 @@ describe('역할 클레임', () => {
   it('클레임이 없으면 판단을 보류한다 (DB 로 확인)', () => {
     expect(canEnter('admin', null)).toBeNull();
   });
+
+  it('운영자 영역은 platform 클레임이 있어야 하고, 예전 클레임은 운영자가 아니다', () => {
+    expect(areaOf('/platform')).toBe('platform');
+    expect(areaOf('/platform/centers')).toBe('platform');
+    expect(areaOf('/platformx')).toBe('member');
+    const operator = parseRoleClaims({ gymjjim: { staff: [], member: [], platform: true } });
+    expect(canEnter('platform', operator)).toBe(true);
+    expect(canEnter('admin', operator)).toBe(false);
+    expect(canEnter('platform', parseRoleClaims(staffClaims))).toBe(false);
+  });
 });

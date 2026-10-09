@@ -46,7 +46,8 @@
     "mobilePhone": "휴대전화 번호(010으로 시작)를 입력해 주세요.",
     "min": "값이 너무 작아요.",
     "max": "값이 너무 커요.",
-    "color": "색상을 골라 주세요."
+    "color": "색상을 골라 주세요.",
+    "planCode": "영문 소문자·숫자·-·_ 로 2~30자 입력해 주세요."
   },
   "auth": {
     "memberLogin": {
@@ -751,6 +752,18 @@
         "variables": "변수",
         "preview": "미리보기"
       }
+    },
+    "plan": {
+      "title": "이용 중인 요금제",
+      "description": "gymjjim 이용 요금제와 사용량이에요. 요금제 변경은 gymjjim 운영팀에 문의해 주세요.",
+      "trial": "체험 중",
+      "trialUntil": "체험 {date}까지",
+      "noPlan": "요금제 없음",
+      "perMonth": "월 {price}",
+      "members": "회원",
+      "staff": "직원",
+      "peopleUnit": "명",
+      "unlimited": "무제한"
     }
   },
   "notifications": {
@@ -781,7 +794,8 @@
       "PASS_CHANGED": "이용권이 바뀌었어요",
       "INVITE_CHANGED": "새 초대 링크가 나갔거나 이미 연결됐어요",
       "NO_RECIPIENT": "받을 전화번호가 없어요",
-      "TIMEOUT": "발송 중 시간이 초과됐어요"
+      "TIMEOUT": "발송 중 시간이 초과됐어요",
+      "CENTER_SUSPENDED": "센터 이용이 정지됐어요"
     }
   },
   "member": {
@@ -913,7 +927,9 @@
     "member": "회원 화면은 센터에 연결된 회원만 이용할 수 있어요. 센터에서 받은 초대 링크로 먼저 연결해 주세요.",
     "default": "이 화면을 볼 수 있는 권한이 없어요.",
     "home": "처음으로",
-    "switchAccount": "다른 계정으로 로그인"
+    "switchAccount": "다른 계정으로 로그인",
+    "platform": "운영자 화면은 gymjjim 운영자만 이용할 수 있어요.",
+    "suspended": "이용이 정지된 센터예요. 센터 대표님이나 gymjjim 운영팀에 문의해 주세요."
   },
   "offline": {
     "title": "인터넷에 연결되어 있지 않아요",
@@ -965,7 +981,14 @@
     "INVALID_TIMEZONE": "올바른 시간대가 아니에요.",
     "VALIDATION": "입력한 내용을 다시 확인해 주세요.",
     "NETWORK": "인터넷 연결을 확인해 주세요.",
-    "UNKNOWN": "문제가 생겼어요. 잠시 후 다시 시도해 주세요."
+    "UNKNOWN": "문제가 생겼어요. 잠시 후 다시 시도해 주세요.",
+    "PLAN_MEMBER_LIMIT": "요금제의 최대 회원 수에 도달했어요. 요금제를 올리거나 탈퇴한 회원을 정리해 주세요.",
+    "PLAN_STAFF_LIMIT": "요금제의 최대 직원 수에 도달했어요. 요금제를 올리면 더 초대할 수 있어요.",
+    "PLAN_NOT_FOUND": "요금제를 찾을 수 없어요.",
+    "PLAN_CODE_EXISTS": "이미 쓰고 있는 요금제 코드예요.",
+    "CENTER_NOT_FOUND": "센터를 찾을 수 없어요.",
+    "INVOICE_NOT_FOUND": "청구서를 찾을 수 없어요.",
+    "INVOICE_EXISTS": "같은 기간의 청구서가 이미 있어요."
   },
   "dev": {
     "login": {
@@ -973,7 +996,203 @@
       "description": "로컬 개발 환경(pnpm dev:local)에서만 보여요. 시드 계정으로 바로 들어가요.",
       "owner": "대표로 보기",
       "staff": "트레이너로 보기",
-      "member": "회원으로 보기"
+      "member": "회원으로 보기",
+      "platform": "운영자로 보기"
+    }
+  },
+  "platform": {
+    "console": "운영자 콘솔",
+    "role": "운영자",
+    "account": "계정 메뉴",
+    "nav": {
+      "label": "운영자 메뉴",
+      "dashboard": "대시보드",
+      "centers": "센터",
+      "plans": "요금제",
+      "invoices": "청구·입금",
+      "openMenu": "메뉴 열기"
+    },
+    "status": {
+      "trial": "체험",
+      "active": "이용 중",
+      "suspended": "정지",
+      "closed": "해지"
+    },
+    "invoiceStatus": {
+      "pending": "미납",
+      "paid": "입금",
+      "void": "취소",
+      "overdue": "연체"
+    },
+    "dashboard": {
+      "title": "대시보드",
+      "description": "전체 센터와 이번 달 요금 현황이에요.",
+      "wonUnit": "원",
+      "centerUnit": "곳",
+      "mrr": "월 반복 매출",
+      "mrrDetail": "이용 중인 센터의 요금제 합계",
+      "billed": "{month} 청구",
+      "billedDetail": "입금 {paid}원 · 미납 {unpaid}원",
+      "overdue": "연체",
+      "overdueDetail": "납부 기한이 지난 청구서 {count}건",
+      "activeCenters": "이용 중인 센터",
+      "activeCentersDetail": "체험 {trial}곳 · 정지 {suspended}곳",
+      "trialEnding": "체험 종료 임박",
+      "trialEndingDescription": "7일 안에 체험이 끝나는 센터예요. 요금제 안내를 챙겨 주세요.",
+      "trialEndingEmpty": "7일 안에 체험이 끝나는 센터가 없어요.",
+      "byStatus": "상태별 센터",
+      "byStatusDescription": "누르면 해당 상태의 센터 목록으로 가요."
+    },
+    "centers": {
+      "title": "센터",
+      "description": "gymjjim 을 쓰는 모든 센터의 요금제·상태·미납을 관리해요.",
+      "add": "새 센터 등록",
+      "searchPlaceholder": "센터 이름·대표 이름·이메일 검색",
+      "filterLabel": "상태 필터",
+      "all": "전체",
+      "total": "{count}곳",
+      "noOwner": "대표 없음",
+      "ownerPending": "초대 대기",
+      "noPlan": "요금제 없음",
+      "unlimited": "무제한",
+      "overdueCount": "연체 {count}건",
+      "unpaidCount": "미납 {count}건",
+      "columns": {
+        "center": "센터 · 대표",
+        "plan": "요금제",
+        "members": "회원",
+        "unpaid": "미납",
+        "status": "상태"
+      },
+      "empty": {
+        "title": "등록된 센터가 없어요",
+        "description": "새 센터를 등록하면 대표에게 초대 메일이 가요.",
+        "searchTitle": "찾는 센터가 없어요",
+        "searchDescription": "검색어나 상태 필터를 바꿔 보세요."
+      },
+      "form": {
+        "createTitle": "새 센터 등록",
+        "createDescription": "센터를 만들고 대표에게 초대 메일을 보내요. 대표가 비밀번호를 정하면 바로 관리자 화면을 쓸 수 있어요.",
+        "create": "등록하고 초대",
+        "name": "센터 이름",
+        "phone": "대표 전화",
+        "address": "주소",
+        "plan": "요금제",
+        "status": "시작 상태",
+        "trialEndsAt": "체험 종료일",
+        "ownerName": "대표 이름",
+        "ownerEmail": "대표 이메일",
+        "ownerEmailHint": "이 주소로 초대 메일이 가요. 이미 가입된 이메일이면 그 계정과 연결해요.",
+        "created": "센터를 등록하고 대표에게 초대 메일을 보냈어요",
+        "createdExisting": "센터를 등록했어요. 이미 가입된 이메일이라 기존 계정과 연결했어요.",
+        "createdInviteFailed": "센터는 등록했지만 초대 메일을 보내지 못했어요. 센터 상세에서 다시 보내 주세요."
+      },
+      "detail": {
+        "title": "센터 상세",
+        "trialUntil": "체험 {date}까지 · {dday}",
+        "phone": "대표 전화",
+        "address": "주소",
+        "createdAt": "{date} 등록",
+        "owner": "대표",
+        "ownerPending": "초대 대기",
+        "noOwner": "등록된 대표가 없어요.",
+        "resendInvite": "초대 메일 다시 보내기",
+        "resent": "초대 메일을 다시 보냈어요",
+        "linkedExisting": "이미 가입된 이메일이라 기존 계정과 연결했어요",
+        "usage": "사용량",
+        "members": "회원",
+        "staff": "직원",
+        "peopleUnit": "명",
+        "unlimited": "무제한",
+        "settings": "요금제 · 이용 상태",
+        "plan": "요금제",
+        "status": "이용 상태",
+        "trialEndsAt": "체험 종료일",
+        "blockingHint": "정지·해지하면 대표·직원·회원 모두 이용할 수 없고 알림도 보내지 않아요. 데이터는 그대로 남아요.",
+        "memo": "운영 메모",
+        "memoHint": "운영자만 볼 수 있어요.",
+        "saved": "센터 정보를 저장했어요",
+        "blockConfirm": {
+          "title": "{name}을(를) {status} 상태로 바꿀까요?",
+          "description": "저장하는 즉시 대표·직원·회원이 관리자 화면과 회원 앱을 쓸 수 없게 돼요. 다시 이용 중으로 바꾸면 그대로 돌아와요.",
+          "confirm": "{status}로 바꾸기"
+        },
+        "invoices": "청구 내역",
+        "invoicesEmpty": "아직 청구 내역이 없어요."
+      }
+    },
+    "plans": {
+      "title": "요금제",
+      "description": "센터들이 쓰는 요금제와 회원·직원 한도를 관리해요.",
+      "add": "요금제 추가",
+      "createTitle": "요금제 추가",
+      "editTitle": "요금제 수정",
+      "sheetDescription": "한도를 바꾸면 이 요금제를 쓰는 모든 센터에 바로 적용돼요. 이미 넘은 인원은 그대로 두고 새로 추가하는 것만 막아요.",
+      "name": "이름",
+      "code": "코드",
+      "codeHint": "영문 소문자·숫자·-·_ (2~30자). 내부 구분용이에요.",
+      "monthlyPrice": "월 요금",
+      "maxMembers": "최대 회원 수",
+      "maxStaff": "최대 직원 수",
+      "unlimited": "무제한",
+      "unlimitedHint": "비우면 무제한이에요.",
+      "state": "판매",
+      "active": "판매 중",
+      "inactive": "판매 중지",
+      "isActive": "판매 중",
+      "isActiveHint": "판매를 멈추면 새 센터에 고를 수 없어요. 이미 쓰고 있는 센터는 그대로예요.",
+      "saved": "요금제를 저장했어요",
+      "select": "요금제를 고르세요",
+      "perMonth": "월 {price}",
+      "empty": {
+        "title": "요금제가 없어요",
+        "description": "요금제를 추가해야 센터를 등록할 수 있어요."
+      }
+    },
+    "invoices": {
+      "title": "청구·입금",
+      "description": "월별 청구서를 발행하고 입금을 확인해요.",
+      "issue": "{month} 일괄 발행",
+      "issued": "청구서 {count}장을 발행했어요",
+      "issuedNone": "새로 발행할 청구서가 없어요",
+      "issueConfirm": {
+        "title": "{month} 청구서를 발행할까요?",
+        "description": "이용 중이고 유료 요금제인 센터 중 아직 청구서가 없는 곳에 요금제 금액으로 발행해요. 납부 기한은 그 달 10일이에요.",
+        "confirm": "발행하기"
+      },
+      "prevMonth": "이전 달",
+      "nextMonth": "다음 달",
+      "thisMonth": "이번 달",
+      "filterLabel": "청구 상태 필터",
+      "all": "전체",
+      "totals": "청구 {billed} · 입금 {paid} · 미납 {unpaid}",
+      "columns": {
+        "center": "센터",
+        "period": "청구 기간",
+        "amount": "금액",
+        "dueDate": "납부 기한",
+        "status": "상태",
+        "actions": "작업"
+      },
+      "markPaid": "입금 확인",
+      "markPending": "미납으로 되돌리기",
+      "restore": "다시 청구",
+      "void": "청구 취소",
+      "more": "더 보기",
+      "changed": {
+        "paid": "{name} 입금을 확인했어요",
+        "pending": "{name} 청구서를 미납으로 바꿨어요",
+        "void": "{name} 청구를 취소했어요"
+      },
+      "voidConfirm": {
+        "title": "{name} {month} 청구를 취소할까요?",
+        "description": "취소한 청구서는 미납·매출 합계에서 빠지고, 같은 달 청구서를 새로 발행할 수 있어요."
+      },
+      "empty": {
+        "title": "{month} 청구서가 없어요",
+        "description": "위의 일괄 발행 버튼으로 이번 달 청구서를 만들 수 있어요.",
+        "filtered": "상태 필터를 바꿔 보세요."
+      }
     }
   }
 }

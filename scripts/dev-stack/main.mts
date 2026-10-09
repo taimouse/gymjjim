@@ -49,6 +49,7 @@ function printSummary(): void {
   ├─ 로그인 없이 보기: 주소만 열면 시드 계정으로 들어가요
   │ 관리자    ${SITE_URL}/admin     대표 김대표 (트레이너 이코치: /admin?as=staff)
   │ 회원      ${SITE_URL}/m         회원 홍길동
+  │ 운영자    ${SITE_URL}/platform  전체 센터·요금제·청구 (admin@gymjjim.test)
   ├─ 직접 로그인할 때 (비밀번호 모두 gymjjim1234!)
   │ 관리자    owner@gymjjim.test · coach.lee@gymjjim.test   → /admin-login
   │ 회원      member1@gymjjim.test → /login 에서 "이메일로 로그인 링크 받기" 후 메일함

@@ -16,7 +16,8 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function AdminLoginPage({ searchParams }: PageProps<'/admin-login'>) {
   const params = await searchParams;
-  const next = safeNext(firstParam(params.next), '/admin');
+  // 기본은 첫 화면(/) → 운영자는 /platform, 직원은 /admin 으로 나뉜다
+  const next = safeNext(firstParam(params.next), '/');
   const error = firstParam(params.error);
   const t = await getTranslations('auth.adminLogin');
 

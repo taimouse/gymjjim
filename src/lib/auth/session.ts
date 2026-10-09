@@ -49,10 +49,46 @@ export async function requireStaff(options: { owner?: boolean } = {}): Promise<S
   const context = await getStaffContext();
   if (!context) {
     const claims = await getClaims();
-    redirect(claims ? '/403?reason=admin' : '/admin-login');
+    if (!claims) redirect('/admin-login');
+    redirect((await isBlocked('staff')) ? '/403?reason=suspended' : '/403?reason=admin');
   }
   if (options.owner && context.staff.role !== 'owner') redirect('/403?reason=owner');
   return context;
+}
+
+/** 소속 센터가 정지·해지되어 들어갈 수 없는지 (안내 문구를 고르는 용도). via 를 빼면 직원·회원 모두 */
+export async function isBlocked(via?: 'staff' | 'member'): Promise<boolean> {
+  const supabase = await createClient();
+  const { data } = await supabase.rpc('my_blocked_centers');
+  return (data ?? []).some((row) => !via || row.via === via);
+}
+
+export interface PlatformAdmin {
+  userId: string;
+  name: string;
+}
+
+/** 로그인한 사용자가 운영자면 그 정보 (DB 기준) */
+export const getPlatformAdmin = cache(async (): Promise<PlatformAdmin | null> => {
+  const claims = await getClaims();
+  if (!claims) return null;
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from('platform_admins')
+    .select('user_id, name')
+    .eq('user_id', claims.sub)
+    .maybeSingle();
+  return data ? { userId: data.user_id, name: data.name } : null;
+});
+
+/** 운영자 영역 진입 확인 */
+export async function requirePlatformAdmin(): Promise<PlatformAdmin> {
+  const admin = await getPlatformAdmin();
+  if (!admin) {
+    const claims = await getClaims();
+    redirect(claims ? '/403?reason=platform' : '/admin-login?next=/platform');
+  }
+  return admin;
 }
 
 export interface Membership {
@@ -81,7 +117,8 @@ export async function requireMember(options: { allowNotOnboarded?: boolean } = {
   const membership = memberships[0];
   if (!membership) {
     const claims = await getClaims();
-    redirect(claims ? '/403?reason=member' : '/login');
+    if (!claims) redirect('/login');
+    redirect((await isBlocked('member')) ? '/403?reason=suspended' : '/403?reason=member');
   }
   if (!options.allowNotOnboarded && !membership.onboarded_at) redirect('/welcome');
   return membership;

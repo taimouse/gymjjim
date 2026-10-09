@@ -3,12 +3,12 @@
 import { z } from 'zod';
 
 import { staffActionContext } from '@/lib/auth/action-context';
-import { publicEnv } from '@/lib/env';
 import { toAppErrorCode } from '@/lib/errors';
 import { fail, ok, type Result } from '@/lib/result';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
 
+import { sendStaffInvite } from './invite';
 import {
   staffInviteSchema,
   type StaffInviteValues,
@@ -42,33 +42,17 @@ export async function inviteStaff(values: StaffInviteValues): Promise<Result<{ e
     .single();
   if (error) return fail(error.code === '23505' ? 'STAFF_EMAIL_EXISTS' : toAppErrorCode(error));
 
-  const admin = createAdminClient();
-  const redirectTo = new URL(
-    '/auth/confirm?next=/admin/set-password',
-    publicEnv().NEXT_PUBLIC_SITE_URL,
-  ).toString();
-  const invited = await admin.auth.admin.inviteUserByEmail(parsed.data.email, {
-    redirectTo,
-    data: { name: parsed.data.name },
-  });
-
-  let userId = invited.data.user?.id ?? null;
-  const existing = !userId;
-  if (!userId) {
-    const { data } = await admin.rpc('admin_find_user_id_by_email', { p_email: parsed.data.email });
-    userId = data ?? null;
+  const invited = await sendStaffInvite({ id: row.id, email: parsed.data.email, name: parsed.data.name });
+  if (!invited.ok) {
+    if (invited.code === 'INVITE_FAILED') {
+      await createAdminClient()
+        .from('staff')
+        .update({ deleted_at: new Date().toISOString() })
+        .eq('id', row.id);
+    }
+    return fail(invited.code);
   }
-  if (!userId) {
-    await admin.from('staff').update({ deleted_at: new Date().toISOString() }).eq('id', row.id);
-    return fail('INVITE_FAILED');
-  }
-
-  const { error: linkError } = await admin
-    .from('staff')
-    .update({ user_id: userId, invited_at: new Date().toISOString() })
-    .eq('id', row.id);
-  if (linkError) return fail(linkError.code === '23505' ? 'STAFF_EMAIL_EXISTS' : toAppErrorCode(linkError));
-  return ok({ existing });
+  return ok({ existing: invited.existing });
 }
 
 /** 직원 이름·연락처·권한·색상 변경 (대표). 마지막 대표는 강등할 수 없다(DB 트리거). */

@@ -9,7 +9,7 @@ import { type Area, canEnter, parseRoleClaims } from './roles';
  * 개발 스택 게이트웨이의 POST /_dev/session 이 비밀번호 없이 시드 계정 세션을 만들어 준다
  * (실제 Supabase 에는 없는 API). 운영 빌드이거나 GYMJJIM_DEV_LOGIN=1 이 없으면 항상 꺼진다.
  */
-export const DEV_ACCOUNTS = ['owner', 'staff', 'member'] as const;
+export const DEV_ACCOUNTS = ['owner', 'staff', 'member', 'platform'] as const;
 export type DevAccount = (typeof DEV_ACCOUNTS)[number];
 
 /** 로그인 없이 만든 세션의 JWT amr 방식 (scripts/dev-stack/config.mts 와 맞춘다) */
@@ -38,8 +38,8 @@ function isDevSession(claims: Claims): boolean {
 /**
  * 이 요청에서 들어갈 개발용 계정. null 이면 평소대로 처리한다.
  *  - ?as=owner|staff|member → 그 계정으로 바꾼다
- *  - 로그인 전 → 관리자·첫 화면은 대표, 회원 화면은 회원
- *  - 로그인 없이 들어온 세션이 권한 없는 화면에 가면 → 맞는 계정으로 바꾼다 (/admin ↔ /m)
+ *  - 로그인 전 → 관리자·첫 화면은 대표, 회원 화면은 회원, 운영자 화면은 운영자
+ *  - 로그인 없이 들어온 세션이 권한 없는 화면에 가면 → 맞는 계정으로 바꾼다 (/admin ↔ /m ↔ /platform)
  *    직접 로그인한 세션은 운영과 똑같이 403 을 본다
  */
 export function pickDevAccount(
@@ -48,7 +48,7 @@ export function pickDevAccount(
   claims: Claims | null,
 ): DevAccount | null {
   if (isDevAccount(requested)) return requested;
-  const fallback: DevAccount = area === 'member' ? 'member' : 'owner';
+  const fallback: DevAccount = area === 'member' ? 'member' : area === 'platform' ? 'platform' : 'owner';
   if (!claims) return fallback;
   const denied = canEnter(area, parseRoleClaims(claims.app_metadata)) === false;
   return denied && isDevSession(claims) ? fallback : null;

@@ -28,10 +28,12 @@ describe('로그인 없이 보기 (로컬 개발 스택 전용)', () => {
     expect(devLoginEnabled()).toBe(false);
   });
 
-  it('로그인 전에는 관리자·첫 화면은 대표, 회원 화면은 회원으로 들어간다', () => {
+  it('로그인 전에는 관리자·첫 화면은 대표, 회원 화면은 회원, 운영자 화면은 운영자로 들어간다', () => {
     expect(pickDevAccount('admin', null, null)).toBe('owner');
     expect(pickDevAccount('root', null, null)).toBe('owner');
     expect(pickDevAccount('member', null, null)).toBe('member');
+    expect(pickDevAccount('platform', null, null)).toBe('platform');
+    expect(pickDevAccount('platform', null, { app_metadata: OWNER, amr: byDevLogin })).toBe('platform');
   });
 
   it('?as= 로 고른 계정이 우선이고, 모르는 값은 무시한다', () => {

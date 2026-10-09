@@ -7,6 +7,7 @@ import { z } from 'zod';
 const rolesSchema = z.object({
   staff: z.array(z.object({ center_id: z.string(), role: z.enum(['owner', 'staff']) })).default([]),
   member: z.array(z.object({ center_id: z.string(), member_id: z.string() })).default([]),
+  platform: z.boolean().default(false),
 });
 
 export type RoleClaims = z.infer<typeof rolesSchema>;
@@ -19,7 +20,7 @@ export function parseRoleClaims(appMetadata: unknown): RoleClaims | null {
   return parsed.success ? parsed.data : null;
 }
 
-export type Area = 'admin' | 'member' | 'public' | 'root';
+export type Area = 'admin' | 'platform' | 'member' | 'public' | 'root';
 
 const PUBLIC_PREFIXES = ['/login', '/admin-login', '/invite', '/auth', '/403', '/offline'];
 
@@ -31,6 +32,7 @@ export function areaOf(pathname: string): Area {
   if (pathname === '/') return 'root';
   if (PUBLIC_PREFIXES.some((prefix) => matches(pathname, prefix))) return 'public';
   if (matches(pathname, '/admin')) return 'admin';
+  if (matches(pathname, '/platform')) return 'platform';
   return 'member';
 }
 
@@ -38,6 +40,7 @@ export function areaOf(pathname: string): Area {
 export function canEnter(area: Area, roles: RoleClaims | null): boolean | null {
   if (!roles) return null;
   if (area === 'admin') return roles.staff.length > 0;
+  if (area === 'platform') return roles.platform;
   if (area === 'member') return roles.member.length > 0;
   return true;
 }

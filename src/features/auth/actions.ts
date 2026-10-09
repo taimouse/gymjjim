@@ -33,7 +33,7 @@ export async function signInAdmin(values: AdminLoginValues): Promise<Result<neve
     password: parsed.data.password,
   });
   if (error) return fail(error.status === 429 ? 'RATE_LIMITED' : 'INVALID_CREDENTIALS');
-  redirect(safeNext(parsed.data.next, '/admin'));
+  redirect(safeNext(parsed.data.next, '/'));
 }
 
 /** 회원 카카오 로그인 (Supabase Kakao provider). 카카오 동의 화면으로 이동한다. */

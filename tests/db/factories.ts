@@ -183,3 +183,35 @@ export async function createPass(
   );
   return row.id;
 }
+
+/* ───────────── 운영자 콘솔 ───────────── */
+
+export async function createPlatformAdmin(): Promise<string> {
+  const userId = await createUser();
+  await query(`insert into public.platform_admins (user_id, name) values ($1, '운영자')`, [userId]);
+  return userId;
+}
+
+/** 한도가 null 이면 무제한 */
+export async function createPlan(
+  options: { members?: number | null; staff?: number | null; price?: number } = {},
+): Promise<string> {
+  const row = await queryOne<{ id: string }>(
+    `insert into public.plans (code, name, monthly_price, max_members, max_staff)
+     values ('t-' || substr(md5(random()::text), 1, 12), '테스트', $1, $2, $3) returning id`,
+    [options.price ?? 10000, options.members ?? null, options.staff ?? null],
+  );
+  return row.id;
+}
+
+/** 센터 요금제·이용 상태를 바꾼다 (주지 않은 값은 그대로) */
+export async function setCenterPlan(
+  centerId: string,
+  values: { planId?: string; status?: 'trial' | 'active' | 'suspended' | 'closed' },
+): Promise<void> {
+  await query(
+    `update public.centers set plan_id = coalesce($2, plan_id), status = coalesce($3::public.center_status, status)
+     where id = $1`,
+    [centerId, values.planId ?? null, values.status ?? null],
+  );
+}

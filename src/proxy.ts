@@ -7,7 +7,7 @@ import { copyCookies, updateSession } from '@/lib/supabase/proxy';
 /**
  * 역할별 접근 제어 (Next.js 16 에서 middleware → proxy 로 이름이 바뀌었다)
  *  - 세션 갱신
- *  - 로그인 필요 영역: /admin/* → /admin-login, 그 외 → /login
+ *  - 로그인 필요 영역: /admin/*·/platform/* → /admin-login, 그 외 → /login
  *  - JWT 클레임의 소속으로 1차 판단, 권한 없으면 403 페이지
  *  - 최종 권한은 레이아웃(DB 조회)과 RLS·RPC 가 다시 확인한다
  *  - 로컬 개발 스택(pnpm dev:local)에서는 로그인 없이 시드 계정으로 들어간다 (lib/auth/dev-login)
@@ -34,7 +34,7 @@ export async function proxy(request: NextRequest) {
   }
 
   if (!claims) {
-    const loginPath = area === 'admin' ? '/admin-login' : '/login';
+    const loginPath = area === 'admin' || area === 'platform' ? '/admin-login' : '/login';
     const url = new URL(loginPath, request.url);
     if (area !== 'root') url.searchParams.set('next', `${pathname}${search}`);
     return copyCookies(session.response, NextResponse.redirect(url));

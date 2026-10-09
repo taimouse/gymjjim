@@ -119,7 +119,11 @@ export type Database = {
           name: string
           notify_sms_fallback: boolean
           phone: string | null
+          plan_id: string | null
+          status: Database["public"]["Enums"]["center_status"]
+          status_changed_at: string | null
           timezone: string
+          trial_ends_at: string | null
           updated_at: string
         }
         Insert: {
@@ -131,7 +135,11 @@ export type Database = {
           name: string
           notify_sms_fallback?: boolean
           phone?: string | null
+          plan_id?: string | null
+          status?: Database["public"]["Enums"]["center_status"]
+          status_changed_at?: string | null
           timezone?: string
+          trial_ends_at?: string | null
           updated_at?: string
         }
         Update: {
@@ -143,10 +151,82 @@ export type Database = {
           name?: string
           notify_sms_fallback?: boolean
           phone?: string | null
+          plan_id?: string | null
+          status?: Database["public"]["Enums"]["center_status"]
+          status_changed_at?: string | null
           timezone?: string
+          trial_ends_at?: string | null
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "centers_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "plans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      invoices: {
+        Row: {
+          amount: number
+          center_id: string
+          created_at: string
+          due_date: string
+          id: string
+          memo: string | null
+          paid_at: string | null
+          period_end: string
+          period_start: string
+          plan_id: string | null
+          status: Database["public"]["Enums"]["invoice_status"]
+          updated_at: string
+        }
+        Insert: {
+          amount: number
+          center_id: string
+          created_at?: string
+          due_date: string
+          id?: string
+          memo?: string | null
+          paid_at?: string | null
+          period_end: string
+          period_start: string
+          plan_id?: string | null
+          status?: Database["public"]["Enums"]["invoice_status"]
+          updated_at?: string
+        }
+        Update: {
+          amount?: number
+          center_id?: string
+          created_at?: string
+          due_date?: string
+          id?: string
+          memo?: string | null
+          paid_at?: string | null
+          period_end?: string
+          period_start?: string
+          plan_id?: string | null
+          status?: Database["public"]["Enums"]["invoice_status"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "invoices_center_id_fkey"
+            columns: ["center_id"]
+            isOneToOne: false
+            referencedRelation: "centers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "invoices_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "plans"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       member_invites: {
         Row: {
@@ -573,6 +653,89 @@ export type Database = {
           },
         ]
       }
+      plans: {
+        Row: {
+          code: string
+          created_at: string
+          id: string
+          is_active: boolean
+          max_members: number | null
+          max_staff: number | null
+          monthly_price: number
+          name: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          max_members?: number | null
+          max_staff?: number | null
+          monthly_price: number
+          name: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          max_members?: number | null
+          max_staff?: number | null
+          monthly_price?: number
+          name?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      platform_admins: {
+        Row: {
+          created_at: string
+          name: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          name: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          name?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      platform_center_notes: {
+        Row: {
+          center_id: string
+          memo: string
+          updated_at: string
+        }
+        Insert: {
+          center_id: string
+          memo?: string
+          updated_at?: string
+        }
+        Update: {
+          center_id?: string
+          memo?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "platform_center_notes_center_id_fkey"
+            columns: ["center_id"]
+            isOneToOne: true
+            referencedRelation: "centers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       program_allowed_products: {
         Row: {
           center_id: string
@@ -897,6 +1060,7 @@ export type Database = {
         Args: { p_reason?: string; p_session_id: string }
         Returns: Json
       }
+      center_plan_usage: { Args: { p_center_id: string }; Returns: Json }
       center_stats: {
         Args: { p_center_id: string; p_count?: number; p_unit: string }
         Returns: {
@@ -1014,6 +1178,15 @@ export type Database = {
           waitlist_count: number
         }[]
       }
+      my_blocked_centers: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          center_id: string
+          center_name: string
+          status: Database["public"]["Enums"]["center_status"]
+          via: string
+        }[]
+      }
       my_memberships: {
         Args: Record<PropertyKey, never>
         Returns: {
@@ -1026,6 +1199,84 @@ export type Database = {
           notify_enabled: boolean
           onboarded_at: string
         }[]
+      }
+      platform_centers: {
+        Args: {
+          p_center_id?: string
+          p_query?: string
+          p_status?: Database["public"]["Enums"]["center_status"]
+        }
+        Returns: {
+          address: string
+          created_at: string
+          id: string
+          max_members: number
+          max_staff: number
+          member_count: number
+          memo: string
+          monthly_price: number
+          name: string
+          overdue_count: number
+          owner_email: string
+          owner_linked: boolean
+          owner_name: string
+          phone: string
+          plan_id: string
+          plan_name: string
+          staff_count: number
+          status: Database["public"]["Enums"]["center_status"]
+          status_changed_at: string
+          trial_ends_at: string
+          unpaid_amount: number
+          unpaid_count: number
+        }[]
+      }
+      platform_create_center: {
+        Args: {
+          p_address?: string
+          p_name: string
+          p_owner_email: string
+          p_owner_name: string
+          p_phone?: string
+          p_plan_id: string
+          p_status: Database["public"]["Enums"]["center_status"]
+          p_trial_ends_at?: string
+        }
+        Returns: Json
+      }
+      platform_create_invoice: {
+        Args: {
+          p_amount: number
+          p_center_id: string
+          p_due_date: string
+          p_memo?: string
+          p_period_end: string
+          p_period_start: string
+        }
+        Returns: string
+      }
+      platform_issue_monthly_invoices: {
+        Args: { p_month: string }
+        Returns: number
+      }
+      platform_set_invoice_status: {
+        Args: {
+          p_invoice_id: string
+          p_paid_at?: string
+          p_status: Database["public"]["Enums"]["invoice_status"]
+        }
+        Returns: Json
+      }
+      platform_summary: { Args: { p_month?: string }; Returns: Json }
+      platform_update_center: {
+        Args: {
+          p_center_id: string
+          p_memo?: string
+          p_plan_id: string
+          p_status: Database["public"]["Enums"]["center_status"]
+          p_trial_ends_at?: string
+        }
+        Returns: Json
       }
       preview_booking: { Args: { p_session_id: string }; Returns: Json }
       remove_push_subscriptions: {
@@ -1167,7 +1418,9 @@ export type Database = {
         | "late_cancelled"
         | "attended"
         | "no_show"
+      center_status: "trial" | "active" | "suspended" | "closed"
       gender: "male" | "female" | "other"
+      invoice_status: "pending" | "paid" | "void"
       member_status: "active" | "withdrawn"
       notification_channel: "alimtalk" | "sms" | "webpush"
       notification_status: "pending" | "sending" | "sent" | "failed" | "skipped"
@@ -1313,7 +1566,9 @@ export const Constants = {
         "attended",
         "no_show",
       ],
+      center_status: ["trial", "active", "suspended", "closed"],
       gender: ["male", "female", "other"],
+      invoice_status: ["pending", "paid", "void"],
       member_status: ["active", "withdrawn"],
       notification_channel: ["alimtalk", "sms", "webpush"],
       notification_status: ["pending", "sending", "sent", "failed", "skipped"],

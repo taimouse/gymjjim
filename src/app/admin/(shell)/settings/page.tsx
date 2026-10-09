@@ -7,6 +7,7 @@ import { CenterInfoForm } from '@/components/admin/settings/center-info-form';
 import { NotificationLogs } from '@/components/admin/settings/notifications/notification-logs';
 import { NotificationTemplates } from '@/components/admin/settings/notifications/notification-templates';
 import { SmsFallbackCard } from '@/components/admin/settings/notifications/sms-fallback-card';
+import { PlanUsageCard } from '@/components/admin/settings/plan-usage-card';
 import { SettingsTabs } from '@/components/admin/settings/settings-tabs';
 import { StaffSection } from '@/components/admin/settings/staff-section';
 import { parseSettingsTab } from '@/components/admin/settings/tabs';
@@ -20,7 +21,7 @@ export async function generateMetadata(): Promise<Metadata> {
   return { title: t('title') };
 }
 
-/** 설정: 센터 정보·시간대 / 예약 규칙 / 직원 관리 / 알림. 트레이너는 보기만 가능 */
+/** 설정: 센터 정보·시간대 / 예약 규칙 / 이용 요금제 / 직원 관리 / 알림. 트레이너는 보기만 가능 */
 export default async function SettingsPage({ searchParams }: PageProps<'/admin/settings'>) {
   const { center, staff } = await requireStaff();
   const t = await getTranslations();
@@ -60,6 +61,7 @@ export default async function SettingsPage({ searchParams }: PageProps<'/admin/s
                   autoPromoteWaitlist: rules.auto_promote_waitlist,
                 }}
               />
+              <PlanUsageCard />
             </div>
           ),
           staff: <StaffSection />,
