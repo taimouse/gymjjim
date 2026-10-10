@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl';
 import { useMemo, useState } from 'react';
 
 import { useAdmin } from '@/components/admin/admin-context';
+import { PageHeader } from '@/components/admin/page-header';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -50,10 +51,11 @@ function pendingPublish(program: ProgramItem, now: Date): string | null {
     : null;
 }
 
-/** 프로그램 카드 목록 + 생성/편집 드로어 */
+/** 프로그램: 제목(+ 추가 버튼) · 카드 목록 · 생성/편집 드로어 */
 export function ProgramList() {
   const t = useTranslations('programs');
   const tPublish = useTranslations('publish');
+  const tAdmin = useTranslations('admin');
   const { centerId, isOwner, timezone } = useAdmin();
   const programs = useProgramsQuery(centerId);
   const now = useNow();
@@ -64,14 +66,19 @@ export function ProgramList() {
 
   return (
     <div className="space-y-4">
-      {isOwner && (
-        <div className="flex justify-end">
-          <Button onClick={() => setEditing({ values: EMPTY_PROGRAM })}>
-            <Plus aria-hidden />
-            {t('add')}
-          </Button>
-        </div>
-      )}
+      <PageHeader
+        title={t('title')}
+        description={t('description')}
+        actions={
+          isOwner && (
+            <Button onClick={() => setEditing({ values: EMPTY_PROGRAM })}>
+              <Plus aria-hidden />
+              {t('add')}
+            </Button>
+          )
+        }
+      />
+      {!isOwner && <p className="text-sm text-muted-foreground">{tAdmin('readOnly')}</p>}
 
       {programs.isPending ? (
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">

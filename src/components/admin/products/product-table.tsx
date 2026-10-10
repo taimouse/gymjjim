@@ -7,6 +7,7 @@ import { useState } from 'react';
 import { toast } from 'sonner';
 
 import { useAdmin } from '@/components/admin/admin-context';
+import { PageHeader } from '@/components/admin/page-header';
 import { useErrorText } from '@/components/form-messages';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -42,9 +43,10 @@ function toFormValues(product: ProductItem): ProductFormValues {
   };
 }
 
-/** 이용권 상품 테이블 + 편집 드로어 */
+/** 이용권: 제목(+ 추가 버튼) · 상품 테이블 · 편집 드로어 */
 export function ProductTable() {
   const t = useTranslations('products');
+  const tAdmin = useTranslations('admin');
   const errorText = useErrorText();
   const { centerId, isOwner } = useAdmin();
   const queryClient = useQueryClient();
@@ -66,7 +68,8 @@ export function ProductTable() {
 
   return (
     <div className="space-y-4">
-      {addButton && <div className="flex justify-end">{addButton}</div>}
+      <PageHeader title={t('title')} description={t('description')} actions={addButton} />
+      {!isOwner && <p className="text-sm text-muted-foreground">{tAdmin('readOnly')}</p>}
 
       {products.isPending ? (
         <div className="space-y-2">
