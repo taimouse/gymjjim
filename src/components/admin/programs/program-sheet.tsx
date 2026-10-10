@@ -167,6 +167,20 @@ export function ProgramSheet({
                 <ValidationMessage error={errors.durationMin} />
               </Field>
             </div>
+            <Field data-invalid={!!errors.passCost}>
+              <FieldLabel htmlFor="program-pass-cost">{t('fields.passCost')}</FieldLabel>
+              <Input
+                id="program-pass-cost"
+                type="number"
+                inputMode="numeric"
+                min={1}
+                max={100}
+                className="max-w-32"
+                {...form.register('passCost', numberInput)}
+              />
+              <FieldDescription>{t('fields.passCostHint')}</FieldDescription>
+              <ValidationMessage error={errors.passCost} />
+            </Field>
             <Field>
               <FieldLabel>{t('fields.color')}</FieldLabel>
               <Controller

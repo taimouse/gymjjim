@@ -142,6 +142,19 @@ export function BookingSheet({
               ) : (
                 <p className="font-semibold text-danger">{errorText(passError)}</p>
               )}
+              {pass && pass.remaining_count !== null && preview.data && (
+                <p className="mt-2 rounded-lg bg-brand-soft px-3 py-2 text-sm font-semibold text-brand-soft-foreground">
+                  {t('sheet.costLine', {
+                    cost: preview.data.cost,
+                    after: pass.remaining_count - preview.data.cost,
+                  })}
+                </p>
+              )}
+              {passError === 'PASS_INSUFFICIENT' && preview.data && (
+                <p className="mt-1 text-sm text-muted-foreground">
+                  {t('sheet.costNeeded', { cost: preview.data.cost })}
+                </p>
+              )}
             </div>
           )}
 

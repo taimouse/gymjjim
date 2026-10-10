@@ -30,7 +30,8 @@ export function seedBookings(input: {
   now: Date;
 }): Row[] {
   const { sessions, passes, holds, allowed, programs, now } = input;
-  const skip = new Set([memberId(2), memberId(7), memberId(19)]);
+  // 홍길동(1)은 예약 이력 없이 횟수권 20회로 시작한다
+  const skip = new Set([memberId(1), memberId(2), memberId(7), memberId(19)]);
   const wod = programId(2);
   const full = sessions.find(
     (s) => s.program_id === wod && Date.parse(String(s.starts_at)) > now.getTime() + 20 * 3_600_000,
@@ -38,7 +39,9 @@ export function seedBookings(input: {
   if (full) full.capacity = 8;
   const bookings: Row[] = [];
   const usedOf = (passId: unknown) =>
-    bookings.filter((b) => b.member_pass_id === passId && b.pass_deducted).length;
+    bookings
+      .filter((b) => b.member_pass_id === passId)
+      .reduce((sum, b) => sum + Number(b.deducted_count ?? 0), 0);
 
   for (const session of sessions) {
     const date = toDateKey(String(session.starts_at), TZ);
@@ -62,7 +65,8 @@ export function seedBookings(input: {
     let booked = 0;
     let waitlist = 0;
     for (const [member, pass] of [...candidates].sort(([a], [b]) => a.localeCompare(b))) {
-      if (pass.remaining_count !== null && Number(pass.remaining_count) <= usedOf(pass.id)) continue;
+      const cost = Number(program.pass_cost ?? 1);
+      if (pass.remaining_count !== null && Number(pass.remaining_count) < usedOf(pass.id) + cost) continue;
       const overlap = bookings.some((b) => {
         const other = sessions.find((s) => s.id === b.session_id)!;
         return (
@@ -100,6 +104,7 @@ export function seedBookings(input: {
             member_pass_id: pass.id,
             status,
             pass_deducted: pass.type !== 'period',
+            deducted_count: pass.type !== 'period' ? cost : 0,
             attended_at: status === 'attended' ? session.starts_at : null,
             created_at: createdAt,
             updated_at: createdAt,
@@ -136,6 +141,7 @@ export function seedBookings(input: {
     Object.assign(b, {
       status: i < 2 ? 'cancelled' : 'late_cancelled',
       pass_deducted: i < 2 ? false : b.pass_deducted,
+      deducted_count: i < 2 ? 0 : b.deducted_count,
       cancelled_at: new Date(now.getTime() - 2 * 3_600_000).toISOString(),
       cancel_reason: 'member',
     });

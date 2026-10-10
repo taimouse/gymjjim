@@ -72,6 +72,8 @@ export function passError(pass: Row, session: Row, date: string, excludeBookingI
   if (pass.end_date && String(pass.end_date) < date) return 'PASS_EXPIRED';
   if (inHold(pass.id, date)) return 'PASS_ON_HOLD';
   if (pass.remaining_count !== null && Number(pass.remaining_count) <= 0) return 'PASS_EXHAUSTED';
+  if (pass.remaining_count !== null && Number(pass.remaining_count) < programCost(session.program_id))
+    return 'PASS_INSUFFICIENT';
   if (pass.period_limit_count !== null) {
     const key = periodKey(date, pass.period_limit_unit);
     const used = table('bookings').filter((booking) => {
@@ -88,6 +90,7 @@ export function passError(pass: Row, session: Row, date: string, excludeBookingI
 const RANK: Record<string, number> = {
   PERIOD_LIMIT_REACHED: 1,
   PASS_ON_HOLD: 2,
+  PASS_INSUFFICIENT: 3,
   PASS_EXHAUSTED: 3,
   PASS_EXPIRED: 4,
   PASS_NOT_STARTED: 5,
@@ -159,10 +162,17 @@ export function enqueue(
   });
 }
 
-export function deductPass(pass: Row): boolean {
-  if (pass.remaining_count === null) return false;
+/** 프로그램의 횟수권 차감 횟수 (없으면 1) */
+export function programCost(programId: unknown): number {
+  return Number(byId('programs', programId)?.pass_cost ?? 1);
+}
+
+/** 횟수권에서 count 회 차감. 차감한 횟수를 돌려준다 (기간권은 0) */
+export function deductPass(pass: Row, count: number): number {
+  if (pass.remaining_count === null) return 0;
   if (Number(pass.remaining_count) <= 0) raise('PASS_EXHAUSTED');
-  update(pass, { remaining_count: Number(pass.remaining_count) - 1 });
+  if (Number(pass.remaining_count) < count) raise('PASS_INSUFFICIENT');
+  update(pass, { remaining_count: Number(pass.remaining_count) - count });
   if (pass.remaining_count === 1) {
     enqueue(
       pass.member_id,
@@ -171,13 +181,19 @@ export function deductPass(pass: Row): boolean {
       `pass_remaining_one:${String(pass.id)}`,
     );
   }
-  return true;
+  return count;
 }
 
-export function restorePass(passId: unknown) {
+/** 차감했던 count 회를 되돌린다 (총 횟수를 넘지 않게) */
+export function restorePass(passId: unknown, count: unknown) {
   const pass = byId('member_passes', passId);
   if (!pass || pass.remaining_count === null) return;
-  update(pass, { remaining_count: Math.min(Number(pass.remaining_count) + 1, Number(pass.total_count)) });
+  update(pass, {
+    remaining_count: Math.min(
+      Number(pass.remaining_count) + Math.max(Number(count) || 0, 0),
+      Number(pass.total_count),
+    ),
+  });
 }
 
 export const me = () => currentMember();

@@ -122,7 +122,7 @@ export function createSeed(now: Date = new Date()): Tables {
       updated_at: nowIso,
     }),
   );
-  const programs = PROGRAMS.map(([name, type, capacity, minutes, color, description, instructor], i) =>
+  const programs = PROGRAMS.map(([name, type, capacity, minutes, color, description, instructor, cost], i) =>
     row('programs', {
       id: programId(i + 1),
       center_id: CENTER,
@@ -133,6 +133,7 @@ export function createSeed(now: Date = new Date()): Tables {
       color,
       description,
       default_instructor_id: staffId(instructor),
+      pass_cost: cost,
       sort_order: i + 1,
       created_at: daysAgo(400),
       updated_at: nowIso,

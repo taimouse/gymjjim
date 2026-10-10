@@ -34,6 +34,7 @@ function toFormValues(program: ProgramItem, timeZone: string): ProgramFormValues
     defaultInstructorId: program.default_instructor_id,
     description: program.description ?? '',
     allowedProductIds: program.allowedProductIds,
+    passCost: program.pass_cost,
     publishAt: program.publish_at
       ? `${toDateKey(program.publish_at, timeZone)}T${toTimeKey(program.publish_at, timeZone)}`
       : '',
@@ -144,6 +145,10 @@ export function ProgramList() {
                       </dd>
                     </div>
                   </dl>
+                  <p className="flex items-center gap-1.5 text-sm font-medium text-brand-soft-foreground">
+                    <Ticket className="size-4" aria-hidden />
+                    {t('card.passCost', { count: program.pass_cost })}
+                  </p>
                   {publishAt && (
                     <p className="flex items-center gap-1.5 rounded-lg bg-warning-soft px-2.5 py-1.5 text-sm text-warning-soft-foreground">
                       <CalendarClock className="size-4 shrink-0" aria-hidden />

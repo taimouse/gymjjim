@@ -30,6 +30,7 @@ export async function saveProgram(input: SaveProgramInput): Promise<Result<{ id:
     p_default_instructor_id: values.defaultInstructorId ?? undefined,
     p_description: values.description,
     p_allowed_product_ids: values.allowedProductIds,
+    p_pass_cost: values.passCost,
     p_publish_at: values.publishAt
       ? localToUtc(values.publishAt.slice(0, 10), values.publishAt.slice(11), context.center.timezone)
       : undefined,

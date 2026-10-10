@@ -11,6 +11,7 @@ import {
   ms,
   now,
   pickPass,
+  programCost,
   requireSession,
   restorePass,
   sessionPayload,
@@ -77,6 +78,7 @@ export const bookingRpcs = {
             }
           : null,
         error: picked.error,
+        cost: programCost(session.program_id),
         free_cancel_until: new Date(freeCancelUntil(session)).toISOString(),
         close_at: new Date(closeAt(session)).toISOString(),
       };
@@ -114,7 +116,7 @@ export const bookingRpcs = {
         if (booking.session_id !== session.id || !['booked', 'waitlisted'].includes(String(booking.status)))
           continue;
         if (booking.pass_deducted) {
-          restorePass(booking.member_pass_id);
+          restorePass(booking.member_pass_id, booking.deducted_count);
           restoredCount += 1;
         }
         const previous = booking.status;
@@ -122,6 +124,7 @@ export const bookingRpcs = {
           status: 'cancelled',
           waitlist_position: null,
           pass_deducted: false,
+          deducted_count: 0,
           cancelled_at: nowIso(),
           cancel_reason: 'session_cancelled',
         });

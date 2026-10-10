@@ -33,6 +33,12 @@ export const programFormSchema = z.object({
   defaultInstructorId: z.uuid().nullable(),
   description: z.string().trim().max(1000, { error: 'max' }),
   allowedProductIds: z.array(z.uuid()),
+  /** 횟수권으로 예약할 때 1회 예약에 차감하는 횟수 (기간권은 차감 없음) */
+  passCost: z
+    .number({ error: 'required' })
+    .int({ error: 'invalid' })
+    .min(1, { error: 'min' })
+    .max(100, { error: 'max' }),
   /** 공개 예약 `yyyy-MM-ddTHH:mm` (센터 시간대). 빈 값 = 바로 공개 */
   publishAt: publishAtField,
 });
@@ -53,5 +59,6 @@ export const EMPTY_PROGRAM: ProgramFormValues = {
   defaultInstructorId: null,
   description: '',
   allowedProductIds: [],
+  passCost: 1,
   publishAt: '',
 };

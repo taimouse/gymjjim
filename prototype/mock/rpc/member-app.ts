@@ -55,6 +55,7 @@ export const memberAppRpcs = {
             my_status: booking?.status ?? null,
             my_waitlist_position: booking?.waitlist_position ?? null,
             my_pass_type: booking ? (byId('member_passes', booking.member_pass_id)?.type ?? null) : null,
+            pass_cost: Number(program?.pass_cost ?? 1),
           };
         })
         .sort(

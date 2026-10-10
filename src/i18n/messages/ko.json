@@ -229,7 +229,8 @@
       "duration": "{minutes}분",
       "noInstructor": "강사 미정",
       "allowedProducts": "이용권 {count}종",
-      "noProducts": "사용 가능한 이용권 없음"
+      "noProducts": "사용 가능한 이용권 없음",
+      "passCost": "횟수권 {count}회 차감"
     },
     "type": {
       "group": "그룹",
@@ -247,7 +248,9 @@
       "description": "설명",
       "allowedProducts": "사용 가능한 이용권",
       "allowedProductsHint": "체크한 이용권을 가진 회원만 이 수업을 예약할 수 있어요.",
-      "noProductsYet": "먼저 이용권 상품을 만들어 주세요."
+      "noProductsYet": "먼저 이용권 상품을 만들어 주세요.",
+      "passCost": "횟수권 차감 횟수",
+      "passCostHint": "횟수권으로 예약하면 1회 예약에 이만큼 차감돼요. 기간권은 차감하지 않아요."
     },
     "saved": "프로그램을 저장했어요",
     "deleted": "프로그램을 삭제했어요",
@@ -468,7 +471,7 @@
     "cancelBooking": {
       "title": "{name} 님의 예약을 취소할까요?",
       "free": "무료 취소 기간이라 횟수가 복구돼요.",
-      "late": "무료 취소 기간이 지났어요. 그대로 취소하면 1회 차감돼요.",
+      "late": "무료 취소 기간이 지났어요. 그대로 취소하면 차감된 횟수가 복구되지 않아요.",
       "waive": "차감하지 않고 취소",
       "confirm": "예약 취소",
       "done": "예약을 취소했어요"
@@ -859,14 +862,15 @@
       "myBooked": "예약 완료",
       "myWaitlist": "대기 {position}번",
       "myAttended": "출석",
-      "noInstructor": "강사 미정"
+      "noInstructor": "강사 미정",
+      "cost": "횟수권 {count}회 차감"
     },
     "sheet": {
       "passToUse": "사용할 이용권",
       "passRemaining": "{name} · 잔여 {count}회",
       "passUnlimited": "{name} · 기간권",
       "passEnds": "{date}까지",
-      "cancelRule": "{time}까지 취소하면 횟수가 복구돼요. 그 뒤에 취소하거나 결석하면 1회 차감돼요.",
+      "cancelRule": "{time}까지 취소하면 차감된 횟수가 복구돼요. 그 뒤에 취소하거나 결석하면 복구되지 않아요.",
       "cancelRulePeriod": "{time}까지 취소하면 늦은 취소로 기록되지 않아요.",
       "capacity": "정원 {capacity}명 · 예약 {booked}명",
       "book": "예약하기",
@@ -881,12 +885,14 @@
       "closedInfo": "예약이 마감된 수업이에요.",
       "attendedInfo": "출석한 수업이에요.",
       "noShowInfo": "결석(노쇼)으로 기록된 수업이에요.",
-      "startedInfo": "이미 시작한 수업이에요."
+      "startedInfo": "이미 시작한 수업이에요.",
+      "costLine": "이 수업은 {cost}회 차감 · 예약 후 잔여 {after}회",
+      "costNeeded": "이 수업은 횟수권 {cost}회가 필요해요."
     },
     "cancel": {
       "title": "예약을 취소할까요?",
       "free": "지금 취소하면 횟수가 복구됩니다.",
-      "late": "무료 취소 시간이 지나서 지금 취소하면 1회 차감됩니다.",
+      "late": "무료 취소 시간이 지나서 지금 취소하면 차감된 횟수가 복구되지 않아요.",
       "period": "지금 취소하면 기록에 남지 않아요.",
       "latePeriod": "무료 취소 시간이 지나서 늦은 취소로 기록돼요. (기간 내 이용 횟수에 포함)",
       "waitlist": "대기 신청을 취소해요. 횟수는 차감되지 않아요.",
@@ -894,7 +900,7 @@
       "keep": "유지하기",
       "done": "예약을 취소했어요",
       "doneRestored": "예약을 취소하고 횟수를 복구했어요",
-      "doneLate": "예약을 취소했어요 (1회 차감)"
+      "doneLate": "예약을 취소했어요 (차감 유지)"
     },
     "repeat": {
       "title": "지난주와 같은 수업",
@@ -954,6 +960,14 @@
         "disabled": "이 기기의 푸시 알림을 껐어요",
         "failed": "푸시 알림을 켜지 못했어요. 잠시 후 다시 시도해 주세요."
       }
+    },
+    "credits": {
+      "title": "내 횟수권",
+      "remaining": "{count}회",
+      "remainingLabel": "남은 횟수",
+      "detail": "{name} · {count}회",
+      "ends": "{date}까지",
+      "none": "사용할 수 있는 횟수권이 없어요"
     }
   },
   "forbidden": {
@@ -1024,7 +1038,8 @@
     "PLAN_CODE_EXISTS": "이미 쓰고 있는 요금제 코드예요.",
     "CENTER_NOT_FOUND": "센터를 찾을 수 없어요.",
     "INVOICE_NOT_FOUND": "청구서를 찾을 수 없어요.",
-    "INVOICE_EXISTS": "같은 기간의 청구서가 이미 있어요."
+    "INVOICE_EXISTS": "같은 기간의 청구서가 이미 있어요.",
+    "PASS_INSUFFICIENT": "남은 횟수가 부족해요. 이 수업은 더 많은 횟수가 차감돼요."
   },
   "dev": {
     "login": {

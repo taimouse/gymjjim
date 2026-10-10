@@ -102,6 +102,7 @@ export const adminRpcs = {
         description:
           typeof a.p_description === 'string' && a.p_description.trim() ? a.p_description.trim() : null,
         publish_at: a.p_publish_at ?? null,
+        pass_cost: a.p_pass_cost ?? 1,
       };
       let program: Row | undefined;
       if (!a.p_id) {

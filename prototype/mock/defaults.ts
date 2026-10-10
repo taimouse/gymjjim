@@ -53,6 +53,7 @@ const DEFAULTS: Record<string, () => Row> = {
     is_active: true,
     sort_order: 0,
     publish_at: null,
+    pass_cost: 1,
     deleted_at: null,
   }),
   sessions: () => ({
@@ -72,6 +73,7 @@ const DEFAULTS: Record<string, () => Row> = {
     member_pass_id: null,
     waitlist_position: null,
     pass_deducted: false,
+    deducted_count: 0,
     booked_by: 'member',
     booked_by_staff_id: null,
     cancelled_at: null,

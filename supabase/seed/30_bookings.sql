@@ -12,6 +12,7 @@ declare
   v_wod constant uuid := 'f0000000-0000-4000-8000-000000000002';
   -- 잔여 횟수가 적은 회원은 무작위 예약에서 제외 (상태 예시 유지)
   v_skip constant uuid[] := array[
+    'd0000000-0000-4000-8000-000000000001',
     'd0000000-0000-4000-8000-000000000002',
     'd0000000-0000-4000-8000-000000000007',
     'd0000000-0000-4000-8000-000000000019'
@@ -35,7 +36,7 @@ begin
   update public.sessions set capacity = 8 where id = v_full_session;
 
   for s in
-    select se.id, se.program_id, se.starts_at, se.ends_at, se.capacity, p.type as program_type
+    select se.id, se.program_id, se.starts_at, se.ends_at, se.capacity, p.type as program_type, p.pass_cost
     from public.sessions se
     join public.programs p on p.id = se.program_id
     where se.center_id = v_center
@@ -67,8 +68,8 @@ begin
       order by mp.member_id, mp.end_date nulls last
     loop
       -- 남은 횟수(시드 예약으로 이미 차감한 만큼 반영)
-      continue when m.remaining_count is not null and m.remaining_count <= (
-        select count(*) from public.bookings b where b.member_pass_id = m.pass_id and b.pass_deducted
+      continue when m.remaining_count is not null and m.remaining_count < s.pass_cost + (
+        select coalesce(sum(b.deducted_count), 0) from public.bookings b where b.member_pass_id = m.pass_id
       );
       -- 시간이 겹치는 예약이 있으면 건너뜀
       continue when exists (
@@ -98,9 +99,11 @@ begin
           else 'attended'
         end;
         insert into public.bookings (
-          center_id, session_id, member_id, member_pass_id, status, pass_deducted, booked_by, attended_at, created_at
+          center_id, session_id, member_id, member_pass_id, status, pass_deducted, deducted_count, booked_by,
+          attended_at, created_at
         ) values (
-          v_center, s.id, m.member_id, m.pass_id, v_status, m.pass_type <> 'period', 'member',
+          v_center, s.id, m.member_id, m.pass_id, v_status, m.pass_type <> 'period',
+          case when m.pass_type <> 'period' then s.pass_cost else 0 end, 'member',
           case when v_status = 'attended' then s.starts_at end,
           least(now(), s.starts_at - interval '1 day')
         );
@@ -116,14 +119,18 @@ begin
     end loop;
   end loop;
 
-  -- 김민지(로그인 회원 2): 다가오는 수업 1회 예약 → 10회권 잔여 3 → 2
-  insert into public.bookings (center_id, session_id, member_id, member_pass_id, status, pass_deducted, booked_by)
-  select v_center, se.id, mp.member_id, mp.id, 'booked', true, 'member'
+  -- 김민지(로그인 회원 2): 1회 차감 프로그램의 다가오는 수업 1회 예약 → 10회권 잔여 3 → 2
+  insert into public.bookings (
+    center_id, session_id, member_id, member_pass_id, status, pass_deducted, deducted_count, booked_by
+  )
+  select v_center, se.id, mp.member_id, mp.id, 'booked', true, pg.pass_cost, 'member'
   from public.sessions se
+  join public.programs pg on pg.id = se.program_id
   join public.member_passes mp on mp.member_id = 'd0000000-0000-4000-8000-000000000002'
   join public.program_allowed_products pap on pap.program_id = se.program_id and pap.product_id = mp.product_id
   where se.center_id = v_center
     and se.starts_at > now() + interval '1 day'
+    and pg.pass_cost = 1
     and (se.starts_at at time zone v_tz)::date <= mp.end_date
     and (select count(*) from public.bookings b where b.session_id = se.id and b.status = 'booked') < se.capacity
   order by se.starts_at
@@ -141,6 +148,7 @@ begin
   update public.bookings b set
     status = case when u.rn <= 2 then 'cancelled'::public.booking_status else 'late_cancelled' end,
     pass_deducted = case when u.rn <= 2 then false else b.pass_deducted end,
+    deducted_count = case when u.rn <= 2 then 0 else b.deducted_count end,
     cancelled_at = now() - interval '2 hours',
     cancel_reason = 'member'
   from upcoming u
@@ -159,7 +167,7 @@ begin
 
   update public.member_passes mp set
     remaining_count = mp.remaining_count - (
-      select count(*) from public.bookings b where b.member_pass_id = mp.id and b.pass_deducted
+      select coalesce(sum(b.deducted_count), 0) from public.bookings b where b.member_pass_id = mp.id
     )
   where mp.center_id = v_center and mp.remaining_count is not null;
 end;

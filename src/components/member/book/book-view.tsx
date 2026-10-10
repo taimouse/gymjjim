@@ -10,12 +10,13 @@ import { QueryError } from '@/components/member/query-error';
 import { Button } from '@/components/ui/button';
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from '@/components/ui/empty';
 import { Skeleton } from '@/components/ui/skeleton';
-import { useMemberSchedule } from '@/features/booking/queries';
+import { useMemberSchedule, useMyPasses } from '@/features/booking/queries';
 import { addDaysToKey, formatDateKey } from '@/lib/format';
 import { useNow } from '@/lib/use-now';
 
 import { BookingSheet } from './booking-sheet';
 import { DateChips } from './date-chips';
+import { MyCredits, usableCreditPasses } from './my-credits';
 import { RepeatSheet } from './repeat-sheet';
 import { SessionCard } from './session-card';
 
@@ -24,7 +25,7 @@ const DATE_KEY = /^\d{4}-\d{2}-\d{2}$/;
 /** 예약 탭: 날짜 칩 → 수업 카드 → 바텀시트 [예약하기] (3탭) */
 export function BookView({ today }: { today: string }) {
   const t = useTranslations('member.book');
-  const { centerId, centerName, timezone, bookingSettings } = useMember();
+  const { memberId, centerId, centerName, timezone, bookingSettings } = useMember();
   const searchParams = useSearchParams();
   const now = useNow();
   // 닫히는 애니메이션 동안 내용이 남아 있도록 id 와 open 을 따로 둔다
@@ -36,6 +37,9 @@ export function BookView({ today }: { today: string }) {
   const date = DATE_KEY.test(requested) && requested >= today && requested <= lastDay ? requested : today;
   const schedule = useMemberSchedule(centerId, date);
   const rows = schedule.data ?? [];
+  // 횟수권이 있는 회원에게만 수업 카드에 차감 횟수를 보여준다 (기간권만 있으면 차감이 없다)
+  const myPasses = useMyPasses(memberId);
+  const hasCredits = usableCreditPasses(myPasses.data, today).length > 0;
   const sheetRow = sheet ? rows.find((row) => row.session_id === sheet.id) : undefined;
 
   // 날짜는 URL(?date=)에 남긴다. 서버 왕복 없이 주소만 바꾼다 (Next 라우터와 동기화됨)
@@ -50,6 +54,7 @@ export function BookView({ today }: { today: string }) {
       <header className="px-4 pt-5">
         <p className="truncate text-sm text-muted-foreground">{centerName}</p>
         <h1 className="text-2xl font-bold">{t('title')}</h1>
+        <MyCredits />
         <Button
           variant="secondary"
           className="mt-3 h-12 w-full justify-between rounded-xl px-4 text-base"
@@ -99,6 +104,7 @@ export function BookView({ today }: { today: string }) {
                   closeMinutes={bookingSettings.close_minutes_before}
                   now={now}
                   onOpen={() => setSheet({ id: row.session_id, open: true })}
+                  showCost={hasCredits}
                 />
               </li>
             ))}

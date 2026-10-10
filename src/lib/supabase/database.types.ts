@@ -18,6 +18,7 @@ export type Database = {
           cancelled_at: string | null
           center_id: string
           created_at: string
+          deducted_count: number
           id: string
           member_id: string
           member_pass_id: string | null
@@ -36,6 +37,7 @@ export type Database = {
           cancelled_at?: string | null
           center_id: string
           created_at?: string
+          deducted_count?: number
           id?: string
           member_id: string
           member_pass_id?: string | null
@@ -54,6 +56,7 @@ export type Database = {
           cancelled_at?: string | null
           center_id?: string
           created_at?: string
+          deducted_count?: number
           id?: string
           member_id?: string
           member_pass_id?: string | null
@@ -792,6 +795,7 @@ export type Database = {
           id: string
           is_active: boolean
           name: string
+          pass_cost: number
           publish_at: string | null
           sort_order: number
           type: Database["public"]["Enums"]["program_type"]
@@ -809,6 +813,7 @@ export type Database = {
           id?: string
           is_active?: boolean
           name: string
+          pass_cost?: number
           publish_at?: string | null
           sort_order?: number
           type?: Database["public"]["Enums"]["program_type"]
@@ -826,6 +831,7 @@ export type Database = {
           id?: string
           is_active?: boolean
           name?: string
+          pass_cost?: number
           publish_at?: string | null
           sort_order?: number
           type?: Database["public"]["Enums"]["program_type"]
@@ -1176,6 +1182,7 @@ export type Database = {
           my_pass_type: Database["public"]["Enums"]["pass_type"]
           my_status: Database["public"]["Enums"]["booking_status"]
           my_waitlist_position: number
+          pass_cost: number
           program_color: string
           program_id: string
           program_name: string
@@ -1315,6 +1322,7 @@ export type Database = {
           p_duration_min: number
           p_id?: string
           p_name: string
+          p_pass_cost?: number
           p_publish_at?: string
           p_type: Database["public"]["Enums"]["program_type"]
         }

@@ -4,6 +4,7 @@ import {
   ACTIVE_BOOKING,
   closeAt,
   deductPass,
+  programCost,
   enqueue,
   freeCancelUntil,
   insert,
@@ -71,10 +72,10 @@ export function createBooking(
   else if (waitlistIfFull) status = 'waitlisted';
   else raise('SESSION_FULL');
 
-  let deducted = false;
+  let deductedCount = 0;
   let position: number | null = null;
   if (status === 'booked') {
-    deducted = deductPass(pass);
+    deductedCount = deductPass(pass, programCost(session.program_id));
     update(session, { booked_count: Number(session.booked_count) + 1 });
   } else {
     const positions = table('bookings')
@@ -90,7 +91,8 @@ export function createBooking(
     member_pass_id: pass.id,
     status,
     waitlist_position: position,
-    pass_deducted: deducted,
+    pass_deducted: deductedCount > 0,
+    deducted_count: deductedCount,
     booked_by: bookedBy,
     booked_by_staff_id: byStaff,
   });
@@ -107,6 +109,7 @@ export function createBooking(
     status,
     waitlist_position: position,
     member_pass_id: pass.id,
+    deducted_count: deductedCount,
     remaining_count: pass.remaining_count,
   };
 }
@@ -142,12 +145,13 @@ export function promoteWaitlist(sessionId: unknown): string[] {
       });
       continue;
     }
-    const deducted = deductPass(pass);
+    const deductedCount = deductPass(pass, programCost(session.program_id));
     update(next, {
       status: 'booked',
       waitlist_position: null,
       member_pass_id: pass.id,
-      pass_deducted: deducted,
+      pass_deducted: deductedCount > 0,
+      deducted_count: deductedCount,
       promoted_at: nowIso(),
     });
     update(session, { booked_count: Number(session.booked_count) + 1 });
@@ -197,13 +201,21 @@ export function cancelBooking(bookingId: unknown, waive: boolean, asStaff: boole
   const free = waive || now() <= freeCancelUntil(session);
   let restored = false;
   let deducted = booking.pass_deducted;
+  let deductedCount = booking.deducted_count;
   if (free && booking.pass_deducted) {
-    restorePass(booking.member_pass_id);
+    restorePass(booking.member_pass_id, booking.deducted_count);
     restored = true;
     deducted = false;
+    deductedCount = 0;
   }
   const status = free ? 'cancelled' : 'late_cancelled';
-  update(booking, { status, cancelled_at: nowIso(), cancel_reason: reason, pass_deducted: deducted });
+  update(booking, {
+    status,
+    cancelled_at: nowIso(),
+    cancel_reason: reason,
+    pass_deducted: deducted,
+    deducted_count: deductedCount,
+  });
   update(session, { booked_count: Math.max(0, Number(session.booked_count) - 1) });
   const promoted = rules().auto_promote_waitlist ? promoteWaitlist(session.id) : [];
   return { booking_id: booking.id, status, restored, promoted };
