@@ -6,7 +6,7 @@ import { useTranslations } from 'next-intl';
 import { BrandMark } from '@/components/brand-mark';
 import { PrivacyPolicy } from '@/components/privacy/privacy-policy';
 
-import { CENTER as center } from '../../lib/seed';
+import { CENTER_INFO as center } from '../../mock/seed';
 
 /** 개인정보 처리방침 (실제 앱의 /privacy 와 같은 본문) */
 export default function PrivacyPage() {

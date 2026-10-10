@@ -1,7 +1,7 @@
 'use client';
 
 import { CalendarX2, ChevronRight, Repeat } from 'lucide-react';
-import { usePathname, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 
@@ -25,7 +25,6 @@ const DATE_KEY = /^\d{4}-\d{2}-\d{2}$/;
 export function BookView({ today }: { today: string }) {
   const t = useTranslations('member.book');
   const { centerId, centerName, timezone, bookingSettings } = useMember();
-  const pathname = usePathname();
   const searchParams = useSearchParams();
   const now = useNow();
   // 닫히는 애니메이션 동안 내용이 남아 있도록 id 와 open 을 따로 둔다
@@ -41,7 +40,9 @@ export function BookView({ today }: { today: string }) {
 
   // 날짜는 URL(?date=)에 남긴다. 서버 왕복 없이 주소만 바꾼다 (Next 라우터와 동기화됨)
   const selectDate = (next: string) => {
-    window.history.replaceState(null, '', next === today ? pathname : `${pathname}?date=${next}`);
+    // usePathname 은 basePath 를 빼고 주므로 브라우저 주소의 경로를 그대로 쓴다
+    const path = window.location.pathname;
+    window.history.replaceState(null, '', next === today ? path : `${path}?date=${next}`);
   };
 
   return (

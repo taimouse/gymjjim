@@ -1,6 +1,6 @@
 'use client';
 
-import { usePathname, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 
 import { PageHeader } from '@/components/admin/page-header';
@@ -19,7 +19,6 @@ type Tab = (typeof TABS)[number];
 /** 관리자 첫 화면 "오늘": 오늘 운영(숫자 4개 · 수업 타임라인 · 챙겨야 할 회원) + 주간/월간 통계 탭 */
 export function TodayView({ today }: { today: string }) {
   const t = useTranslations('today');
-  const pathname = usePathname();
   const searchParams = useSearchParams();
   const tab: Tab = TABS.find((value) => value === searchParams.get('tab')) ?? 'today';
   useDashboardRefresh();
@@ -30,7 +29,9 @@ export function TodayView({ today }: { today: string }) {
     if (value === 'today') params.delete('tab');
     else params.set('tab', value);
     const query = params.toString();
-    window.history.replaceState(null, '', query ? `${pathname}?${query}` : pathname);
+    // usePathname 은 basePath 를 빼고 주므로 브라우저 주소의 경로를 그대로 쓴다
+    const path = window.location.pathname;
+    window.history.replaceState(null, '', query ? `${path}?${query}` : path);
   };
 
   return (

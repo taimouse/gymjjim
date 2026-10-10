@@ -2,7 +2,7 @@
 
 import { CalendarCheck, History } from 'lucide-react';
 import Link from 'next/link';
-import { usePathname, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 
@@ -30,12 +30,13 @@ type Tab = 'upcoming' | 'past';
 /** 내 예약: 다가오는 예약 / 지난 기록. 탭은 URL(?tab=past)에 남긴다 */
 export function MyBookingsView() {
   const t = useTranslations('member.myBookings');
-  const pathname = usePathname();
   const searchParams = useSearchParams();
   const tab: Tab = searchParams.get('tab') === 'past' ? 'past' : 'upcoming';
 
   const selectTab = (value: string) => {
-    window.history.replaceState(null, '', value === 'past' ? `${pathname}?tab=past` : pathname);
+    // usePathname 은 basePath 를 빼고 주므로 브라우저 주소의 경로를 그대로 쓴다
+    const path = window.location.pathname;
+    window.history.replaceState(null, '', value === 'past' ? `${path}?tab=past` : path);
   };
 
   return (

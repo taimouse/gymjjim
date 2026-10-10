@@ -3,7 +3,7 @@
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 
-/** /m → 수업 예약 */
+/** /m → /m/book */
 export default function MemberHome() {
   const router = useRouter();
   useEffect(() => router.replace('/m/book/'), [router]);

@@ -1325,14 +1325,14 @@
     "resetDone": "처음 상태로 되돌렸어요",
     "home": {
       "headline": "수업 예약을 3번의 터치로",
-      "intro": "데이터베이스를 연결하기 전에 화면과 흐름을 미리 보는 프로토타입이에요. 회원 화면과 관리자 화면을 둘러보세요.",
+      "intro": "데이터베이스를 연결하기 전에 실제 앱 화면을 그대로 둘러보는 프로토타입이에요. 입력한 내용은 이 브라우저에만 저장돼요.",
       "member": {
         "title": "회원 앱",
-        "description": "가입 동의 → 수업 예약 → 내 예약 확인 (휴대폰 화면)"
+        "description": "가입 동의 → 수업 예약 → 내 예약 → 내 이용권 (휴대폰 화면)"
       },
       "admin": {
         "title": "관리자",
-        "description": "캘린더 · 반복 수업 · 공개 예약 · 프로그램 · 자동 메시지"
+        "description": "오늘 · 캘린더 · 회원 · 프로그램·이용권 · 설정 (실제 관리자 화면과 같은 구성)"
       },
       "privacy": {
         "title": "개인정보 처리방침",
@@ -1341,64 +1341,6 @@
       "open": "열기",
       "phone": "전화",
       "address": "주소"
-    },
-    "member": {
-      "sheetClose": "닫기",
-      "instructor": "강사 {name}",
-      "unpublishedHidden": "공개 예약된 수업은 공개 시각부터 보여요.",
-      "me": {
-        "agreedAt": "개인정보 수집·이용 동의 {date}",
-        "marketing": "마케팅 정보 수신",
-        "marketingOn": "동의함",
-        "marketingOff": "동의 안 함",
-        "privacyLink": "개인정보 처리방침 보기",
-        "redo": "가입 동의 다시 해 보기"
-      }
-    },
-    "admin": {
-      "nav": {
-        "calendar": "캘린더",
-        "programs": "프로그램",
-        "messages": "자동 메시지",
-        "settings": "센터 정보"
-      },
-      "toHome": "프로토타입 처음으로",
-      "drawer": {
-        "title": "수업",
-        "booked": "예약 {booked}/{capacity}",
-        "waitlist": "대기 {count}명",
-        "publishedNow": "회원에게 공개 중이에요",
-        "publishNow": "지금 공개",
-        "published": "공개했어요",
-        "delete": "수업 삭제",
-        "deleted": "수업을 삭제했어요",
-        "group": "반복 수업 · 같은 묶음 {count}개"
-      },
-      "programSaved": "프로그램을 저장했어요",
-      "programDeleted": "프로그램을 삭제했어요",
-      "sessionsCreated": "수업 {count}개를 만들었어요",
-      "moved": "수업 시간을 옮겼어요",
-      "messages": {
-        "title": "자동 메시지",
-        "description": "알림톡은 받는 회원마다 이름이 자동으로 들어가서 발송돼요. 회원을 골라 실제로 받을 문구를 확인해 보세요.",
-        "recipient": "받는 회원",
-        "when": "보내는 때",
-        "triggers": {
-          "booking_confirmed": "회원이 예약하면 바로",
-          "waitlist_promoted": "대기에서 예약으로 바뀌면 바로",
-          "session_changed": "관리자가 수업 시간을 바꾸면",
-          "session_cancelled": "수업을 폐강하면",
-          "reminder_day_before": "수업 전날 오후 8시",
-          "reminder_2h": "수업 2시간 전",
-          "pass_expiring_d7": "이용권 만료 7일 전 오전 10시",
-          "pass_remaining_one": "이용권 잔여 횟수가 1회가 되면",
-          "member_invite": "관리자가 앱 연결 초대를 보내면"
-        }
-      },
-      "settings": {
-        "title": "센터 정보",
-        "description": "시간대는 한국(서울) 기준으로 고정이에요. 실제 앱에서는 대표가 이 정보를 바꿀 수 있어요."
-      }
     }
   }
 }

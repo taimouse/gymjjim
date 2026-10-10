@@ -17,7 +17,9 @@ export const ADMIN_NAV = [
 ] as const satisfies readonly { href: string; key: string; icon: LucideIcon }[];
 
 export function isActivePath(pathname: string, href: string): boolean {
-  return href === '/admin' ? pathname === '/admin' : pathname === href || pathname.startsWith(`${href}/`);
+  // 정적 호스팅(trailingSlash)에서는 끝에 / 가 붙어 온다
+  const path = pathname.length > 1 ? pathname.replace(/\/$/, '') : pathname;
+  return href === '/admin' ? path === '/admin' : path === href || path.startsWith(`${href}/`);
 }
 
 /**

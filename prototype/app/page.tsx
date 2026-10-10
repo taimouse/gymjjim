@@ -8,7 +8,7 @@ import { BrandMark } from '@/components/brand-mark';
 import { formatPhone } from '@/lib/format';
 
 import { ProtoBanner } from '../components/proto-banner';
-import { CENTER as center } from '../lib/seed';
+import { CENTER_INFO as center } from '../mock/seed';
 
 const CARDS = [
   { href: '/m/book/', key: 'member', icon: Smartphone },

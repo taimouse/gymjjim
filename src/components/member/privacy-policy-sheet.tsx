@@ -1,6 +1,7 @@
 'use client';
 
 import { ArrowDown, CheckCircle2, ExternalLink } from 'lucide-react';
+import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 import { type ReactNode, useCallback, useEffect, useRef, useState } from 'react';
 
@@ -105,10 +106,10 @@ export function PrivacyPolicySheet({
             </Button>
           )}
           <Button asChild variant="ghost" size="sm">
-            <a href={privacyHref} target="_blank" rel="noreferrer">
+            <Link href={privacyHref} target="_blank" rel="noreferrer">
               <ExternalLink aria-hidden />
               {t('openFull')}
-            </a>
+            </Link>
           </Button>
         </DrawerFooter>
       </DrawerContent>

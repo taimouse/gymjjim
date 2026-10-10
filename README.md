@@ -219,10 +219,14 @@ E2E_BROWSER_CHANNEL=msedge pnpm test:e2e         # 터미널 2: 설치된 Edge �
 
 ## 프로토타입 (GitHub Pages, DB 없이)
 
-`prototype/` 은 데이터베이스 연결 전에 화면과 흐름을 보여 주는 **정적 프로토타입**입니다. 실제 앱(`src/`)의 화면 컴포넌트·디자인 토큰·문구(`ko.json`)를 그대로 가져다 쓰고, 데이터만 브라우저 `localStorage` 에 저장합니다.
+`prototype/` 은 데이터베이스 연결 전에 화면과 흐름을 보여 주는 **정적 프로토타입**입니다. 실제 앱(`src/`)의 화면을 **그대로** 씁니다. 메뉴, 상단 바, 회원·수업 드로어, 서버 액션, 조회 훅이 모두 같은 코드예요. 빌드할 때 DB 에 닿는 모듈만 브라우저용 가짜로 바꿔 끼웁니다.
 
-- 둘러볼 수 있는 화면: 회원 가입 동의(처리방침 끝까지 읽기) · 수업 예약 · 내 예약 · 관리자 캘린더(반복 수업·공개 예약) · 프로그램 · 자동 메시지 미리보기 · 센터 정보
-- 서버 기능(로그인, 서버 액션, RLS, 알림 발송)은 없습니다. 맨 위 띠의 "처음 상태로" 로 데이터를 되돌립니다.
+- `prototype/next.config.ts` 의 `resolveAlias` 가 `@/lib/supabase/*`, `@/lib/auth/action-context` 같은 모듈을 `prototype/mock` 으로 바꿉니다
+- 서버 액션 파일(`src/features/*/actions.ts`)은 로더(`prototype/scripts/strip-use-server.cjs`)가 `'use server'` 를 떼서 브라우저에서 실행합니다
+- `prototype/mock` 은 실제와 같은 이름의 테이블·RPC(예약 엔진, 회원 검색, 오늘 대시보드 …)를 `localStorage` 위에서 흉내 냅니다. 처음 데이터는 `supabase/seed.sql` 과 같습니다
+- 둘러볼 수 있는 화면: 관리자(오늘 · 캘린더 · 회원 · 프로그램·이용권 · 설정), 회원 앱(첫 로그인 동의 · 예약 · 내 예약 · 내 정보), 개인정보 처리방침
+- 관리자 화면은 대표 계정으로 열리고, `?as=staff` 를 붙이면 트레이너 계정으로 바뀝니다. 회원 화면은 홍길동 계정이며 첫 로그인 동의부터 시작해요
+- 로그인, 실제 알림 발송, 웹 푸시는 없습니다. 맨 위 띠의 "처음 상태로" 로 데이터를 되돌립니다
 
 ```bash
 pnpm proto:dev     # http://localhost:3100
