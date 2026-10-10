@@ -45,8 +45,15 @@ describe('예약 스키마', () => {
       waitlist_position: 2,
       member_pass_id: ID,
       remaining_count: null,
+      credits_used: 0,
+      credit_balance: 10,
     };
     expect(bookSessionResult.parse(valid)).toEqual(valid);
+    // 크레딧으로 예약하면 이용권이 없다
+    expect(
+      bookSessionResult.safeParse({ ...valid, member_pass_id: null, credits_used: 3, credit_balance: 7 })
+        .success,
+    ).toBe(true);
     expect(bookSessionResult.safeParse({ ...valid, status: 'attended' }).success).toBe(false);
   });
 });

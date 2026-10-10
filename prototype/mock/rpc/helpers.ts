@@ -1,6 +1,6 @@
 /**
  * 예약 엔진 공용 규칙 (supabase/migrations 의 private.* 함수와 같은 동작)
- * pass_state · pass_error · pick_pass · deduct_pass · restore_pass · enqueue_notification · session_payload
+ * pass_state · pass_error · pick_pass · deduct_pass · restore_pass · add_credits · enqueue_notification · session_payload
  */
 import { parseISO, startOfISOWeek } from 'date-fns';
 
@@ -72,8 +72,6 @@ export function passError(pass: Row, session: Row, date: string, excludeBookingI
   if (pass.end_date && String(pass.end_date) < date) return 'PASS_EXPIRED';
   if (inHold(pass.id, date)) return 'PASS_ON_HOLD';
   if (pass.remaining_count !== null && Number(pass.remaining_count) <= 0) return 'PASS_EXHAUSTED';
-  if (pass.remaining_count !== null && Number(pass.remaining_count) < programCost(session.program_id))
-    return 'PASS_INSUFFICIENT';
   if (pass.period_limit_count !== null) {
     const key = periodKey(date, pass.period_limit_unit);
     const used = table('bookings').filter((booking) => {
@@ -90,7 +88,6 @@ export function passError(pass: Row, session: Row, date: string, excludeBookingI
 const RANK: Record<string, number> = {
   PERIOD_LIMIT_REACHED: 1,
   PASS_ON_HOLD: 2,
-  PASS_INSUFFICIENT: 3,
   PASS_EXHAUSTED: 3,
   PASS_EXPIRED: 4,
   PASS_NOT_STARTED: 5,
@@ -162,17 +159,11 @@ export function enqueue(
   });
 }
 
-/** 프로그램의 횟수권 차감 횟수 (없으면 1) */
-export function programCost(programId: unknown): number {
-  return Number(byId('programs', programId)?.pass_cost ?? 1);
-}
-
-/** 횟수권에서 count 회 차감. 차감한 횟수를 돌려준다 (기간권은 0) */
-export function deductPass(pass: Row, count: number): number {
-  if (pass.remaining_count === null) return 0;
+/** 횟수권이면 1회 차감하고 true (기간권은 false). 잔여 1회가 되면 안내 알림 */
+export function deductPass(pass: Row): boolean {
+  if (pass.remaining_count === null) return false;
   if (Number(pass.remaining_count) <= 0) raise('PASS_EXHAUSTED');
-  if (Number(pass.remaining_count) < count) raise('PASS_INSUFFICIENT');
-  update(pass, { remaining_count: Number(pass.remaining_count) - count });
+  update(pass, { remaining_count: Number(pass.remaining_count) - 1 });
   if (pass.remaining_count === 1) {
     enqueue(
       pass.member_id,
@@ -181,19 +172,57 @@ export function deductPass(pass: Row, count: number): number {
       `pass_remaining_one:${String(pass.id)}`,
     );
   }
-  return count;
+  return true;
 }
 
-/** 차감했던 count 회를 되돌린다 (총 횟수를 넘지 않게) */
-export function restorePass(passId: unknown, count: unknown) {
+/** 차감했던 1회를 되돌린다 (총 횟수를 넘지 않게) */
+export function restorePass(passId: unknown) {
   const pass = byId('member_passes', passId);
   if (!pass || pass.remaining_count === null) return;
-  update(pass, {
-    remaining_count: Math.min(
-      Number(pass.remaining_count) + Math.max(Number(count) || 0, 0),
-      Number(pass.total_count),
-    ),
+  update(pass, { remaining_count: Math.min(Number(pass.remaining_count) + 1, Number(pass.total_count)) });
+}
+
+/** 프로그램의 크레딧 가격 (null = 크레딧으로 예약할 수 없다) */
+export function creditCost(programId: unknown): number | null {
+  const cost = byId('programs', programId)?.credit_cost;
+  return cost === null || cost === undefined ? null : Number(cost);
+}
+
+/** 이용권이 없을 때 크레딧으로 낼 수 있으면 null, 아니면 보여줄 에러 코드 */
+export function creditError(
+  memberId: unknown,
+  cost: number | null,
+  passErrorCode: string | null,
+): string | null {
+  if (cost === null) return passErrorCode ?? 'NO_VALID_PASS';
+  if (Number(byId('members', memberId)?.credit_balance ?? 0) >= cost) return null;
+  return !passErrorCode || passErrorCode === 'NO_VALID_PASS' ? 'CREDIT_INSUFFICIENT' : passErrorCode;
+}
+
+/** 크레딧 잔액을 delta 만큼 바꾸고 원장에 남긴다. 모자라면 CREDIT_INSUFFICIENT. 바뀐 잔액 */
+export function addCredits(
+  memberId: unknown,
+  delta: number,
+  reason: 'charge' | 'booking' | 'refund' | 'adjust',
+  extra: { bookingId?: unknown; requestId?: unknown; memo?: string | null; staffId?: string | null } = {},
+): number {
+  const member = byId('members', memberId);
+  if (!member) raise('MEMBER_NOT_FOUND');
+  const balance = Number(member.credit_balance ?? 0) + delta;
+  if (balance < 0) raise('CREDIT_INSUFFICIENT');
+  update(member, { credit_balance: balance });
+  insert('credit_transactions', {
+    center_id: member.center_id,
+    member_id: member.id,
+    delta,
+    balance_after: balance,
+    reason,
+    booking_id: extra.bookingId ?? null,
+    request_id: extra.requestId ?? null,
+    memo: extra.memo?.trim() || null,
+    created_by: extra.staffId ?? null,
   });
+  return balance;
 }
 
 export const me = () => currentMember();

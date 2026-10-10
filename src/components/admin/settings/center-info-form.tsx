@@ -18,6 +18,7 @@ import { updateCenterInfo } from '@/features/centers/actions';
 import { centerInfoFormSchema, type CenterInfoFormValues } from '@/features/centers/schema';
 import type { AppErrorCode } from '@/lib/errors';
 import { formatPhone } from '@/lib/format';
+import { cn } from '@/lib/utils';
 
 export function CenterInfoForm({ initial }: { initial: CenterInfoFormValues }) {
   const t = useTranslations('settings.center');
@@ -47,9 +48,9 @@ export function CenterInfoForm({ initial }: { initial: CenterInfoFormValues }) {
       <CardHeader>
         <CardTitle className="text-lg">{t('title')}</CardTitle>
       </CardHeader>
-      <form onSubmit={onSubmit} noValidate>
-        <fieldset disabled={!isOwner}>
-          <CardContent>
+      <form onSubmit={onSubmit} noValidate className="flex flex-1 flex-col">
+        <fieldset disabled={!isOwner} className="flex min-w-0 flex-1 flex-col">
+          <CardContent className={cn('flex-1', isOwner && 'pb-6')}>
             <FieldGroup>
               <Field data-invalid={!!errors.name}>
                 <FieldLabel htmlFor="center-name">{t('name')}</FieldLabel>

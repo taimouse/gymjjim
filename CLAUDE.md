@@ -64,6 +64,7 @@
 | Session | sessions | 캘린더에 실제로 잡힌 1회 수업 |
 | Pass Product | pass_products | 판매용 이용권 상품 (기간권 / 횟수권 / 기간+횟수) |
 | Member Pass | member_passes | 회원이 보유한 이용권 (잔여 횟수, 시작·만료일) |
+| Credit | members.credit_balance · credit_transactions · credit_requests | 크레딧: 이용권과 별개인 회원 지갑(화폐 개념). 1개 가격 `centers.credit_price`(기본 5,000원). 충전 요청 → 직원 승인, 잔액 변화는 원장에 기록 |
 | Pass Hold | pass_holds | 이용권 정지(홀딩) 기간 |
 | Booking | bookings | 예약. status: `booked` `waitlisted` `cancelled` `late_cancelled` `attended` `no_show` |
 
@@ -73,6 +74,7 @@
 - 무료 취소: 시작 3시간 전까지 → 횟수 복구
 - 늦은 취소(`late_cancelled`)·노쇼(`no_show`): 차감 유지
 - 차감 시점: 예약 시 차감, 무료 취소 시 복구
+- 프로그램은 이용권(`program_allowed_products`) / 크레딧(`programs.credit_cost`, 1회 차감 크레딧) 중 하나 또는 둘 다 받는다. 쓸 수 있는 이용권이 있으면 이용권(횟수권 1회 차감), 없으면 크레딧. 크레딧이 모자라면 `CREDIT_INSUFFICIENT`. 크레딧도 무료 취소·폐강 때 돌려주고 늦은 취소·노쇼는 유지
 - 정원 초과 시 `waitlisted`. 취소가 나오면 대기 1순위 자동 승격 + 알림 (예약 마감 전까지만)
 - 같은 회원의 시간이 겹치는 중복 예약 금지
 - 이용권별 기간 내 이용 횟수 제한 옵션 (예: 주 3회)
@@ -94,7 +96,7 @@
 
 ## 7. UI/UX 원칙
 - 관리자: PC 우선(1280px), 태블릿 대응. 회원: 모바일 우선(375px)
-- 관리자 사이드바 메뉴는 **5개로 고정**: 오늘 / 캘린더 / 회원 / 프로그램·이용권 / 설정
+- 관리자 사이드바 메뉴는 **6개로 고정**: 오늘 / 캘린더 / 회원 / 프로그램 / 이용권 / 설정
 - 상세 보기·편집은 페이지 이동 대신 **오른쪽 사이드 드로어** (회원 화면은 바텀시트)
 - 되돌릴 수 있는 작업(출석 체크 등)은 확인창 없이 실행 후 "되돌리기" 토스트. 되돌릴 수 없는 작업(삭제, 늦은 취소 차감, 폐강)만 확인창
 - 회원 검색은 이름 또는 **전화번호 뒷 4자리**로 즉시 검색. 어디서든 `⌘K / Ctrl+K`
@@ -109,7 +111,7 @@
 src/
 ├─ app/
 │  ├─ (auth)/        로그인·초대 수락
-│  ├─ admin/         관리자: today, calendar, members, programs, settings
+│  ├─ admin/         관리자: today, calendar, members, programs, passes, settings
 │  ├─ m/             회원 모바일: book, my-bookings, me
 │  ├─ platform/      운영자 콘솔: 대시보드, centers, plans, invoices (메뉴 4개, 관리자 메뉴와 별개)
 │  └─ api/           웹훅 등 최소한만

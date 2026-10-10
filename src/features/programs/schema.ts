@@ -16,32 +16,49 @@ export const PROGRAM_COLORS = [
   '#E5E7EB',
 ] as const;
 
-export const programFormSchema = z.object({
-  name: z.string().trim().min(1, { error: 'required' }).max(100, { error: 'max' }),
-  type: z.enum(['group', 'private']),
-  defaultCapacity: z
-    .number({ error: 'required' })
-    .int({ error: 'invalid' })
-    .min(1, { error: 'min' })
-    .max(500, { error: 'max' }),
-  durationMin: z
-    .number({ error: 'required' })
-    .int({ error: 'invalid' })
-    .min(5, { error: 'min' })
-    .max(600, { error: 'max' }),
-  color: z.string().regex(/^#[0-9A-Fa-f]{6}$/, { error: 'color' }),
-  defaultInstructorId: z.uuid().nullable(),
-  description: z.string().trim().max(1000, { error: 'max' }),
-  allowedProductIds: z.array(z.uuid()),
-  /** 횟수권으로 예약할 때 1회 예약에 차감하는 횟수 (기간권은 차감 없음) */
-  passCost: z
-    .number({ error: 'required' })
-    .int({ error: 'invalid' })
-    .min(1, { error: 'min' })
-    .max(100, { error: 'max' }),
-  /** 공개 예약 `yyyy-MM-ddTHH:mm` (센터 시간대). 빈 값 = 바로 공개 */
-  publishAt: publishAtField,
-});
+export const programFormSchema = z
+  .object({
+    name: z.string().trim().min(1, { error: 'required' }).max(100, { error: 'max' }),
+    type: z.enum(['group', 'private']),
+    defaultCapacity: z
+      .number({ error: 'required' })
+      .int({ error: 'invalid' })
+      .min(1, { error: 'min' })
+      .max(500, { error: 'max' }),
+    durationMin: z
+      .number({ error: 'required' })
+      .int({ error: 'invalid' })
+      .min(5, { error: 'min' })
+      .max(600, { error: 'max' }),
+    color: z.string().regex(/^#[0-9A-Fa-f]{6}$/, { error: 'color' }),
+    defaultInstructorId: z.uuid().nullable(),
+    description: z.string().trim().max(1000, { error: 'max' }),
+    /** 이용권(횟수권·기간권)으로 예약 가능. 횟수권은 1회 차감 */
+    usePass: z.boolean(),
+    allowedProductIds: z.array(z.uuid()),
+    /** 크레딧으로 예약 가능 (이용권이 없을 때) */
+    useCredit: z.boolean(),
+    /** 크레딧으로 예약할 때 쓰는 크레딧 */
+    creditCost: z.number().nullable(),
+    /** 공개 예약 `yyyy-MM-ddTHH:mm` (센터 시간대). 빈 값 = 바로 공개 */
+    publishAt: publishAtField,
+  })
+  .superRefine((values, context) => {
+    if (!values.usePass && !values.useCredit) {
+      context.addIssue({ code: 'custom', path: ['useCredit'], message: 'paymentRequired' });
+    }
+    if (values.usePass && values.allowedProductIds.length === 0) {
+      context.addIssue({ code: 'custom', path: ['allowedProductIds'], message: 'productsRequired' });
+    }
+    const cost = values.creditCost;
+    if (values.useCredit && (cost === null || !Number.isInteger(cost) || cost < 1 || cost > 100)) {
+      context.addIssue({
+        code: 'custom',
+        path: ['creditCost'],
+        message: cost === null ? 'required' : cost > 100 ? 'max' : 'min',
+      });
+    }
+  });
 export type ProgramFormValues = z.infer<typeof programFormSchema>;
 
 export const saveProgramInput = z.object({
@@ -58,7 +75,9 @@ export const EMPTY_PROGRAM: ProgramFormValues = {
   color: PROGRAM_COLORS[0],
   defaultInstructorId: null,
   description: '',
+  usePass: true,
   allowedProductIds: [],
-  passCost: 1,
+  useCredit: false,
+  creditCost: 1,
   publishAt: '',
 };

@@ -18,7 +18,7 @@ export type Database = {
           cancelled_at: string | null
           center_id: string
           created_at: string
-          deducted_count: number
+          credits_used: number
           id: string
           member_id: string
           member_pass_id: string | null
@@ -37,7 +37,7 @@ export type Database = {
           cancelled_at?: string | null
           center_id: string
           created_at?: string
-          deducted_count?: number
+          credits_used?: number
           id?: string
           member_id: string
           member_pass_id?: string | null
@@ -56,7 +56,7 @@ export type Database = {
           cancelled_at?: string | null
           center_id?: string
           created_at?: string
-          deducted_count?: number
+          credits_used?: number
           id?: string
           member_id?: string
           member_pass_id?: string | null
@@ -117,6 +117,7 @@ export type Database = {
           address: string | null
           booking_settings: NonNullable<Json>
           created_at: string
+          credit_price: number
           deleted_at: string | null
           id: string
           name: string
@@ -133,6 +134,7 @@ export type Database = {
           address?: string | null
           booking_settings?: NonNullable<Json>
           created_at?: string
+          credit_price?: number
           deleted_at?: string | null
           id?: string
           name: string
@@ -149,6 +151,7 @@ export type Database = {
           address?: string | null
           booking_settings?: NonNullable<Json>
           created_at?: string
+          credit_price?: number
           deleted_at?: string | null
           id?: string
           name?: string
@@ -168,6 +171,145 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "plans"
             referencedColumns: ["id"]
+          },
+        ]
+      }
+      credit_requests: {
+        Row: {
+          amount: number
+          center_id: string
+          created_at: string
+          decided_at: string | null
+          decided_by: string | null
+          id: string
+          member_id: string
+          status: Database["public"]["Enums"]["credit_request_status"]
+          unit_price: number
+          updated_at: string
+        }
+        Insert: {
+          amount: number
+          center_id: string
+          created_at?: string
+          decided_at?: string | null
+          decided_by?: string | null
+          id?: string
+          member_id: string
+          status?: Database["public"]["Enums"]["credit_request_status"]
+          unit_price: number
+          updated_at?: string
+        }
+        Update: {
+          amount?: number
+          center_id?: string
+          created_at?: string
+          decided_at?: string | null
+          decided_by?: string | null
+          id?: string
+          member_id?: string
+          status?: Database["public"]["Enums"]["credit_request_status"]
+          unit_price?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "credit_requests_center_id_fkey"
+            columns: ["center_id"]
+            isOneToOne: false
+            referencedRelation: "centers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "credit_requests_member_fk"
+            columns: ["member_id", "center_id"]
+            isOneToOne: false
+            referencedRelation: "members"
+            referencedColumns: ["id", "center_id"]
+          },
+          {
+            foreignKeyName: "credit_requests_staff_fk"
+            columns: ["decided_by", "center_id"]
+            isOneToOne: false
+            referencedRelation: "staff"
+            referencedColumns: ["id", "center_id"]
+          },
+        ]
+      }
+      credit_transactions: {
+        Row: {
+          balance_after: number
+          booking_id: string | null
+          center_id: string
+          created_at: string
+          created_by: string | null
+          delta: number
+          id: string
+          member_id: string
+          memo: string | null
+          reason: Database["public"]["Enums"]["credit_reason"]
+          request_id: string | null
+        }
+        Insert: {
+          balance_after: number
+          booking_id?: string | null
+          center_id: string
+          created_at?: string
+          created_by?: string | null
+          delta: number
+          id?: string
+          member_id: string
+          memo?: string | null
+          reason: Database["public"]["Enums"]["credit_reason"]
+          request_id?: string | null
+        }
+        Update: {
+          balance_after?: number
+          booking_id?: string | null
+          center_id?: string
+          created_at?: string
+          created_by?: string | null
+          delta?: number
+          id?: string
+          member_id?: string
+          memo?: string | null
+          reason?: Database["public"]["Enums"]["credit_reason"]
+          request_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "credit_transactions_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "credit_transactions_center_id_fkey"
+            columns: ["center_id"]
+            isOneToOne: false
+            referencedRelation: "centers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "credit_transactions_member_fk"
+            columns: ["member_id", "center_id"]
+            isOneToOne: false
+            referencedRelation: "members"
+            referencedColumns: ["id", "center_id"]
+          },
+          {
+            foreignKeyName: "credit_transactions_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "credit_requests"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "credit_transactions_staff_fk"
+            columns: ["created_by", "center_id"]
+            isOneToOne: false
+            referencedRelation: "staff"
+            referencedColumns: ["id", "center_id"]
           },
         ]
       }
@@ -395,6 +537,7 @@ export type Database = {
           birth: string | null
           center_id: string
           created_at: string
+          credit_balance: number
           deleted_at: string | null
           gender: Database["public"]["Enums"]["gender"] | null
           id: string
@@ -417,6 +560,7 @@ export type Database = {
           birth?: string | null
           center_id: string
           created_at?: string
+          credit_balance?: number
           deleted_at?: string | null
           gender?: Database["public"]["Enums"]["gender"] | null
           id?: string
@@ -439,6 +583,7 @@ export type Database = {
           birth?: string | null
           center_id?: string
           created_at?: string
+          credit_balance?: number
           deleted_at?: string | null
           gender?: Database["public"]["Enums"]["gender"] | null
           id?: string
@@ -787,6 +932,7 @@ export type Database = {
           center_id: string
           color: string
           created_at: string
+          credit_cost: number | null
           default_capacity: number
           default_instructor_id: string | null
           deleted_at: string | null
@@ -795,7 +941,6 @@ export type Database = {
           id: string
           is_active: boolean
           name: string
-          pass_cost: number
           publish_at: string | null
           sort_order: number
           type: Database["public"]["Enums"]["program_type"]
@@ -805,6 +950,7 @@ export type Database = {
           center_id: string
           color?: string
           created_at?: string
+          credit_cost?: number | null
           default_capacity?: number
           default_instructor_id?: string | null
           deleted_at?: string | null
@@ -813,7 +959,6 @@ export type Database = {
           id?: string
           is_active?: boolean
           name: string
-          pass_cost?: number
           publish_at?: string | null
           sort_order?: number
           type?: Database["public"]["Enums"]["program_type"]
@@ -823,6 +968,7 @@ export type Database = {
           center_id?: string
           color?: string
           created_at?: string
+          credit_cost?: number | null
           default_capacity?: number
           default_instructor_id?: string | null
           deleted_at?: string | null
@@ -831,7 +977,6 @@ export type Database = {
           id?: string
           is_active?: boolean
           name?: string
-          pass_cost?: number
           publish_at?: string | null
           sort_order?: number
           type?: Database["public"]["Enums"]["program_type"]
@@ -1056,6 +1201,10 @@ export type Database = {
     }
     Functions: {
       accept_member_invite: { Args: { p_token: string }; Returns: Json }
+      adjust_credits: {
+        Args: { p_delta: number; p_member_id: string; p_memo?: string }
+        Returns: number
+      }
       admin_find_user_id_by_email: {
         Args: { p_email: string }
         Returns: string
@@ -1067,6 +1216,10 @@ export type Database = {
       cancel_booking: {
         Args: { p_booking_id: string; p_waive_penalty?: boolean }
         Returns: Json
+      }
+      cancel_credit_request: {
+        Args: { p_request_id: string }
+        Returns: undefined
       }
       cancel_session: {
         Args: { p_reason?: string; p_session_id: string }
@@ -1118,6 +1271,10 @@ export type Database = {
         Args: { p_invite_url_base?: string; p_member_id: string }
         Returns: Json
       }
+      decide_credit_request: {
+        Args: { p_approve: boolean; p_request_id: string }
+        Returns: Json
+      }
       delete_push_subscription: {
         Args: { p_endpoint: string }
         Returns: undefined
@@ -1158,6 +1315,7 @@ export type Database = {
         Returns: {
           booking_id: string
           cancel_reason: string
+          credits_used: number
           ends_at: string
           instructor_name: string
           pass_name: string
@@ -1176,13 +1334,14 @@ export type Database = {
         Returns: {
           booked_count: number
           capacity: number
+          credit_cost: number
           ends_at: string
           instructor_name: string
           my_booking_id: string
+          my_credits_used: number
           my_pass_type: Database["public"]["Enums"]["pass_type"]
           my_status: Database["public"]["Enums"]["booking_status"]
           my_waitlist_position: number
-          pass_cost: number
           program_color: string
           program_id: string
           program_name: string
@@ -1200,6 +1359,7 @@ export type Database = {
           via: string
         }[]
       }
+      my_credits: { Args: { p_center_id: string }; Returns: Json }
       my_memberships: {
         Args: Record<PropertyKey, never>
         Returns: {
@@ -1311,18 +1471,22 @@ export type Database = {
           waitlist_count: number
         }[]
       }
+      request_credit_charge: {
+        Args: { p_amount: number; p_center_id: string }
+        Returns: string
+      }
       save_program: {
         Args: {
           p_allowed_product_ids: string[]
           p_center_id: string
           p_color: string
+          p_credit_cost?: number
           p_default_capacity: number
           p_default_instructor_id?: string
           p_description?: string
           p_duration_min: number
           p_id?: string
           p_name: string
-          p_pass_cost?: number
           p_publish_at?: string
           p_type: Database["public"]["Enums"]["program_type"]
         }
@@ -1438,6 +1602,8 @@ export type Database = {
         | "attended"
         | "no_show"
       center_status: "trial" | "active" | "suspended" | "closed"
+      credit_reason: "charge" | "booking" | "refund" | "adjust"
+      credit_request_status: "pending" | "approved" | "rejected" | "cancelled"
       gender: "male" | "female" | "other"
       invoice_status: "pending" | "paid" | "void"
       member_status: "active" | "withdrawn"
@@ -1586,6 +1752,8 @@ export const Constants = {
         "no_show",
       ],
       center_status: ["trial", "active", "suspended", "closed"],
+      credit_reason: ["charge", "booking", "refund", "adjust"],
+      credit_request_status: ["pending", "approved", "rejected", "cancelled"],
       gender: ["male", "female", "other"],
       invoice_status: ["pending", "paid", "void"],
       member_status: ["active", "withdrawn"],

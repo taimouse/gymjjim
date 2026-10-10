@@ -1,6 +1,6 @@
 'use client';
 
-import { CalendarDays, Dumbbell, type LucideIcon, Settings, Sun, Users } from 'lucide-react';
+import { CalendarDays, Dumbbell, type LucideIcon, Settings, Sun, Ticket, Users } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useTranslations } from 'next-intl';
@@ -13,6 +13,7 @@ export const ADMIN_NAV = [
   { href: '/admin/calendar', key: 'calendar', icon: CalendarDays },
   { href: '/admin/members', key: 'members', icon: Users },
   { href: '/admin/programs', key: 'programs', icon: Dumbbell },
+  { href: '/admin/passes', key: 'passes', icon: Ticket },
   { href: '/admin/settings', key: 'settings', icon: Settings },
 ] as const satisfies readonly { href: string; key: string; icon: LucideIcon }[];
 
@@ -23,7 +24,7 @@ export function isActivePath(pathname: string, href: string): boolean {
 }
 
 /**
- * 사이드바 메뉴 5개 (CLAUDE.md 7번 고정).
+ * 사이드바 메뉴 6개 (CLAUDE.md 7번 고정).
  * compactOnTablet: 태블릿 폭(md~xl)에서는 아이콘만 보이고 라벨은 툴팁으로.
  */
 export function AdminNav({

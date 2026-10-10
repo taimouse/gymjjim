@@ -7,6 +7,7 @@ import { useState, useTransition } from 'react';
 import { toast } from 'sonner';
 
 import { useAdmin } from '@/components/admin/admin-context';
+import { MemberCredits } from '@/components/admin/credits/member-credits';
 import { ConfirmDialog } from '@/components/admin/confirm-dialog';
 import { EditSheet } from '@/components/admin/edit-sheet';
 import { useErrorText } from '@/components/form-messages';
@@ -105,6 +106,7 @@ export function MemberDrawer() {
               onHold={(pass) => setDialog({ kind: 'hold', pass })}
               onGrant={() => setDialog({ kind: 'grant' })}
             />
+            <MemberCredits memberId={member.id} />
             <div className="flex flex-wrap gap-2">
               <Button variant="outline" size="sm" onClick={() => setDialog({ kind: 'edit' })}>
                 <Pencil aria-hidden />

@@ -1,6 +1,7 @@
 /** 가짜 Supabase 의 RPC 목록 (이름은 실제 Postgres 함수와 같다) */
 import { adminRpcs } from './admin';
 import { bookingRpcs } from './booking';
+import { creditRpcs } from './credits';
 import { dashboardRpcs } from './dashboard';
 import { memberAppRpcs } from './member-app';
 import { memberRpcs } from './members';
@@ -17,4 +18,5 @@ export const RPCS: Record<string, FakeRpc> = {
   ...memberAppRpcs,
   ...dashboardRpcs,
   ...adminRpcs,
+  ...creditRpcs,
 };

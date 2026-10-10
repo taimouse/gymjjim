@@ -66,7 +66,7 @@ function updateSession(a: Args) {
 
 export const adminRpcs = {
   update_session: {
-    mutates: ['sessions', 'bookings', 'member_passes', 'notification_logs'],
+    mutates: ['sessions', 'bookings', 'member_passes', 'members', 'credit_transactions', 'notification_logs'],
     run: updateSession,
   },
   set_session_publish_at: {
@@ -102,7 +102,7 @@ export const adminRpcs = {
         description:
           typeof a.p_description === 'string' && a.p_description.trim() ? a.p_description.trim() : null,
         publish_at: a.p_publish_at ?? null,
-        pass_cost: a.p_pass_cost ?? 1,
+        credit_cost: a.p_credit_cost ?? null,
       };
       let program: Row | undefined;
       if (!a.p_id) {

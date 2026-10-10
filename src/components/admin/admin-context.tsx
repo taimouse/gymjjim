@@ -9,6 +9,8 @@ export interface AdminSession {
   centerName: string;
   timezone: string;
   bookingSettings: BookingSettings;
+  /** 크레딧 1개 가격(원) */
+  creditPrice: number;
   staffId: string;
   staffName: string;
   role: 'owner' | 'staff';

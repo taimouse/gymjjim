@@ -6,7 +6,7 @@ import { expectDbError, query, queryOne } from './helpers';
 const SEED_CENTER = 'c0000000-0000-4000-8000-000000000001';
 
 describe('시드', () => {
-  it('센터 1 · 대표 1 · 직원 2 · 회원 30 · 상품 5 · 프로그램 6', async () => {
+  it('센터 1 · 대표 1 · 직원 2 · 회원 30 · 상품 4 · 프로그램 6', async () => {
     const row = await queryOne<Record<string, number>>(
       `select
          (select count(*)::int from public.centers where id = $1) as centers,
@@ -17,7 +17,7 @@ describe('시드', () => {
          (select count(*)::int from public.programs where center_id = $1) as programs`,
       [SEED_CENTER],
     );
-    expect(row).toEqual({ centers: 1, owners: 1, staff: 2, members: 30, products: 5, programs: 6 });
+    expect(row).toEqual({ centers: 1, owners: 1, staff: 2, members: 30, products: 4, programs: 6 });
   });
 
   it('이번 주 월요일부터 다음 주 일요일까지 세션이 있다', async () => {

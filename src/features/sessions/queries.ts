@@ -87,6 +87,8 @@ export interface RosterBooking {
   booked_by: Database['public']['Enums']['booked_by'];
   created_at: string;
   cancelled_at: string | null;
+  /** 크레딧으로 예약했으면 쓴 크레딧 */
+  credits_used: number;
   member: { id: string; name: string; phone: string | null } | null;
   pass: { name: string; remaining_count: number | null } | null;
 }
@@ -97,7 +99,7 @@ export async function fetchRoster(sessionId: string): Promise<RosterBooking[]> {
   const { data, error } = await supabase
     .from('bookings')
     .select(
-      'id, status, waitlist_position, booked_by, created_at, cancelled_at, member:members(id, name, phone), pass:member_passes!bookings_pass_center_fk(name, remaining_count)',
+      'id, status, waitlist_position, booked_by, created_at, cancelled_at, credits_used, member:members(id, name, phone), pass:member_passes!bookings_pass_center_fk(name, remaining_count)',
     )
     .eq('session_id', sessionId)
     .order('created_at');

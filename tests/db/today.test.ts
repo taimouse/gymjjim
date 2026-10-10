@@ -21,9 +21,8 @@ async function insertBooking(
 ) {
   await query(
     `insert into public.bookings (center_id, session_id, member_id, member_pass_id, status, pass_deducted,
-       deducted_count, attended_at, cancelled_at)
-     values ($1, $2, $3, $4, $5, $6, case when $6 then 1 else 0 end, case when $7 then now() end,
-       case when $8 then now() end)`,
+       attended_at, cancelled_at)
+     values ($1, $2, $3, $4, $5, $6, case when $7 then now() end, case when $8 then now() end)`,
     [
       scenario.centerId,
       sessionId,

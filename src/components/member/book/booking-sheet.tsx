@@ -1,13 +1,18 @@
 'use client';
 
 import { useQueryClient } from '@tanstack/react-query';
-import { Clock, Ticket, UserRound, Users } from 'lucide-react';
+import { Clock, UserRound, Users } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useState, useTransition } from 'react';
 import { toast } from 'sonner';
 
 import { useErrorText } from '@/components/form-messages';
-import { CancelNotice, cancelNotice, useCancelBooking } from '@/components/member/cancel-confirm';
+import {
+  CancelNotice,
+  cancelNotice,
+  deductionOf,
+  useCancelBooking,
+} from '@/components/member/cancel-confirm';
 import { useMember } from '@/components/member/member-context';
 import { Button } from '@/components/ui/button';
 import {
@@ -19,15 +24,22 @@ import {
   DrawerHeader,
   DrawerTitle,
 } from '@/components/ui/drawer';
-import { Skeleton } from '@/components/ui/skeleton';
 import { Spinner } from '@/components/ui/spinner';
 import { bookSessionAction } from '@/features/booking/actions';
 import { memberBookingKeys, type ScheduleRow, useBookingPreview } from '@/features/booking/queries';
 import { isAppErrorCode, toAppErrorCode } from '@/lib/errors';
-import { formatDate, formatDateKey, formatDateTime, formatTimeRange } from '@/lib/format';
+import { formatDate, formatDateTime, formatTimeRange } from '@/lib/format';
 import { sessionAvailability } from '@/lib/session-status';
 
-/** 수업 바텀시트: 정보 · 사용할 이용권 · 취소 규칙 한 줄 → [예약하기] 한 번 */
+import { PaymentBox } from './payment-box';
+
+const CANCEL_RULE = {
+  count: 'sheet.cancelRule',
+  credit: 'sheet.cancelRuleCredit',
+  period: 'sheet.cancelRulePeriod',
+} as const;
+
+/** 수업 바텀시트: 정보 · 사용할 이용권(또는 크레딧) · 취소 규칙 한 줄 → [예약하기] 한 번 */
 export function BookingSheet({
   row,
   now,
@@ -57,7 +69,12 @@ export function BookingSheet({
   const started = now.getTime() >= Date.parse(row.starts_at);
   const mine = row.my_status === 'booked' || row.my_status === 'waitlisted';
   const pass = preview.data?.pass ?? null;
-  const countPass = (row.my_status ? row.my_pass_type : pass?.type) !== 'period';
+  const method = preview.data?.method ?? null;
+  const deduction = row.my_status
+    ? deductionOf(row.my_pass_type, row.my_credits_used)
+    : method === 'credit'
+      ? 'credit'
+      : deductionOf(pass?.type, 0);
   const canBook = !row.my_status && ['open', 'almost', 'waitlist'].includes(availability);
   const freeUntil = new Date(
     Date.parse(row.starts_at) - bookingSettings.free_cancel_hours_before * 3_600_000,
@@ -81,7 +98,7 @@ export function BookingSheet({
     });
 
   const cancel = () => {
-    if (row.my_booking_id) cancelling.cancel(row.my_booking_id, countPass, () => onOpenChange(false));
+    if (row.my_booking_id) cancelling.cancel(row.my_booking_id, deduction, () => onOpenChange(false));
   };
 
   const previewError = preview.data?.error;
@@ -120,43 +137,7 @@ export function BookingSheet({
             </li>
           </ul>
 
-          {canBook && (
-            <div className="rounded-xl border p-4">
-              <p className="mb-1 flex items-center gap-2 text-sm text-muted-foreground">
-                <Ticket className="size-4" aria-hidden />
-                {t('sheet.passToUse')}
-              </p>
-              {preview.isPending ? (
-                <Skeleton className="h-6 w-48" />
-              ) : pass ? (
-                <p className="font-semibold">
-                  {pass.remaining_count === null
-                    ? t('sheet.passUnlimited', { name: pass.name })
-                    : t('sheet.passRemaining', { name: pass.name, count: pass.remaining_count })}
-                  {pass.end_date && (
-                    <span className="ml-2 font-normal text-muted-foreground">
-                      {t('sheet.passEnds', { date: formatDateKey(pass.end_date) })}
-                    </span>
-                  )}
-                </p>
-              ) : (
-                <p className="font-semibold text-danger">{errorText(passError)}</p>
-              )}
-              {pass && pass.remaining_count !== null && preview.data && (
-                <p className="mt-2 rounded-lg bg-brand-soft px-3 py-2 text-sm font-semibold text-brand-soft-foreground">
-                  {t('sheet.costLine', {
-                    cost: preview.data.cost,
-                    after: pass.remaining_count - preview.data.cost,
-                  })}
-                </p>
-              )}
-              {passError === 'PASS_INSUFFICIENT' && preview.data && (
-                <p className="mt-1 text-sm text-muted-foreground">
-                  {t('sheet.costNeeded', { cost: preview.data.cost })}
-                </p>
-              )}
-            </div>
-          )}
+          {canBook && <PaymentBox preview={preview.data} pending={preview.isPending} errorCode={passError} />}
 
           <StatusLine row={row} availability={availability} started={started} />
 
@@ -166,7 +147,7 @@ export function BookingSheet({
                 status: row.my_status === 'waitlisted' ? 'waitlisted' : 'booked',
                 startsAt: row.starts_at,
                 freeCancelHours: bookingSettings.free_cancel_hours_before,
-                countPass,
+                deduction,
                 now,
               })}
             />
@@ -174,7 +155,7 @@ export function BookingSheet({
             (canBook || (mine && !started)) && (
               <p className="flex items-start gap-2 text-sm text-muted-foreground">
                 <Clock className="mt-0.5 size-4 shrink-0" aria-hidden />
-                {t(countPass ? 'sheet.cancelRule' : 'sheet.cancelRulePeriod', {
+                {t(CANCEL_RULE[deduction], {
                   time: formatDateTime(freeUntil, timezone),
                 })}
               </p>
@@ -205,7 +186,7 @@ export function BookingSheet({
               </Button>
             )
           ) : canBook ? (
-            <Button size="lg" className="h-14 text-lg" onClick={book} disabled={pending || !pass}>
+            <Button size="lg" className="h-14 text-lg" onClick={book} disabled={pending || !method}>
               {pending && <Spinner />}
               {availability === 'waitlist' ? t('sheet.joinWaitlist') : t('sheet.book')}
             </Button>

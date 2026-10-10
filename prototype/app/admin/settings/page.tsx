@@ -8,6 +8,7 @@ import { useAdmin } from '@/components/admin/admin-context';
 import { PageHeader } from '@/components/admin/page-header';
 import { BookingRulesForm } from '@/components/admin/settings/booking-rules-form';
 import { CenterInfoForm } from '@/components/admin/settings/center-info-form';
+import { CreditPriceCard } from '@/components/admin/settings/credit-price-card';
 import { NotificationLogs } from '@/components/admin/settings/notifications/notification-logs';
 import { NotificationTemplates } from '@/components/admin/settings/notifications/notification-templates';
 import { SmsFallbackCard } from '@/components/admin/settings/notifications/sms-fallback-card';
@@ -51,6 +52,7 @@ function Settings() {
                   autoPromoteWaitlist: rules.auto_promote_waitlist,
                 }}
               />
+              <CreditPriceCard initial={Number(center.credit_price ?? 5000)} />
               <PlanUsageCard />
             </div>
           ),

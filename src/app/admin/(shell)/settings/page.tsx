@@ -4,6 +4,7 @@ import { getTranslations } from 'next-intl/server';
 import { PageHeader } from '@/components/admin/page-header';
 import { BookingRulesForm } from '@/components/admin/settings/booking-rules-form';
 import { CenterInfoForm } from '@/components/admin/settings/center-info-form';
+import { CreditPriceCard } from '@/components/admin/settings/credit-price-card';
 import { NotificationLogs } from '@/components/admin/settings/notifications/notification-logs';
 import { NotificationTemplates } from '@/components/admin/settings/notifications/notification-templates';
 import { SmsFallbackCard } from '@/components/admin/settings/notifications/sms-fallback-card';
@@ -21,7 +22,7 @@ export async function generateMetadata(): Promise<Metadata> {
   return { title: t('title') };
 }
 
-/** 설정: 센터 정보·시간대 / 예약 규칙 / 이용 요금제 / 직원 관리 / 알림. 트레이너는 보기만 가능 */
+/** 설정: 센터 정보 / 예약 규칙 / 크레딧 가격 / 이용 요금제 / 직원 관리 / 알림. 트레이너는 보기만 가능 */
 export default async function SettingsPage({ searchParams }: PageProps<'/admin/settings'>) {
   const { center, staff } = await requireStaff();
   const t = await getTranslations();
@@ -60,6 +61,7 @@ export default async function SettingsPage({ searchParams }: PageProps<'/admin/s
                   autoPromoteWaitlist: rules.auto_promote_waitlist,
                 }}
               />
+              <CreditPriceCard initial={center.credit_price} />
               <PlanUsageCard />
             </div>
           ),

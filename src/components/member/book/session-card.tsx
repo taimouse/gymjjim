@@ -1,6 +1,6 @@
 'use client';
 
-import { Ticket } from 'lucide-react';
+import { Coins } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
 import { Badge } from '@/components/ui/badge';
@@ -47,15 +47,12 @@ export function SessionCard({
   closeMinutes,
   now,
   onOpen,
-  showCost = false,
 }: {
   row: ScheduleRow;
   timezone: string;
   closeMinutes: number;
   now: Date;
   onOpen: () => void;
-  /** 횟수권이 있는 회원에게만 이 수업의 차감 횟수를 보여준다 */
-  showCost?: boolean;
 }) {
   const t = useTranslations('member.book');
   const tCommon = useTranslations('common');
@@ -86,10 +83,10 @@ export function SessionCard({
           <span className="font-semibold">{row.program_name}</span>
           <span className="text-muted-foreground"> · {row.instructor_name ?? t('noInstructor')}</span>
         </span>
-        {showCost && (
+        {row.credit_cost !== null && (
           <span className="mt-1 inline-flex w-fit items-center gap-1 rounded-full bg-brand-soft px-2 py-0.5 text-sm font-semibold text-brand-soft-foreground">
-            <Ticket className="size-3.5" aria-hidden />
-            {t('cost', { count: row.pass_cost })}
+            <Coins className="size-3.5" aria-hidden />
+            {t('creditCost', { count: row.credit_cost })}
           </span>
         )}
       </span>

@@ -10,7 +10,17 @@ import { addDaysToKey, toDateKey } from '@/lib/format';
 import type { Row, Tables } from './db';
 import { applyDefaults } from './defaults';
 import { seedBookings } from './seed-bookings';
-import { MEMBERS, TAGS, PRODUCTS, PROGRAMS, ALLOWED, PASSES, TEMPLATE } from './seed-data';
+import {
+  ALLOWED,
+  CREDIT_BALANCES,
+  CREDIT_REQUESTS,
+  MEMBERS,
+  PASSES,
+  PRODUCTS,
+  PROGRAMS,
+  TAGS,
+  TEMPLATE,
+} from './seed-data';
 
 const TZ = 'Asia/Seoul';
 
@@ -48,6 +58,7 @@ export function createSeed(now: Date = new Date()): Tables {
         auto_promote_waitlist: true,
       },
       notify_sms_fallback: false,
+      credit_price: 5000,
       status: 'active',
       plan_id: 'plan-basic',
       trial_ends_at: null,
@@ -122,22 +133,23 @@ export function createSeed(now: Date = new Date()): Tables {
       updated_at: nowIso,
     }),
   );
-  const programs = PROGRAMS.map(([name, type, capacity, minutes, color, description, instructor, cost], i) =>
-    row('programs', {
-      id: programId(i + 1),
-      center_id: CENTER,
-      name,
-      type,
-      default_capacity: capacity,
-      duration_min: minutes,
-      color,
-      description,
-      default_instructor_id: staffId(instructor),
-      pass_cost: cost,
-      sort_order: i + 1,
-      created_at: daysAgo(400),
-      updated_at: nowIso,
-    }),
+  const programs = PROGRAMS.map(
+    ([name, type, capacity, minutes, color, description, instructor, credit], i) =>
+      row('programs', {
+        id: programId(i + 1),
+        center_id: CENTER,
+        name,
+        type,
+        default_capacity: capacity,
+        duration_min: minutes,
+        color,
+        description,
+        default_instructor_id: staffId(instructor),
+        credit_cost: credit,
+        sort_order: i + 1,
+        created_at: daysAgo(400),
+        updated_at: nowIso,
+      }),
   );
   const allowed = ALLOWED.map(([program, product]) => ({
     center_id: CENTER,
@@ -223,5 +235,61 @@ export function createSeed(now: Date = new Date()): Tables {
     bookings,
     notification_logs: [],
     member_invites: [],
+    ...seedCredits(members, daysAgo),
   };
+}
+
+/** 크레딧 지갑: 홍길동 20크레딧(충전 요청 승인) · 장수아 현장 충전 · 대기 중인 충전 요청 2건 */
+function seedCredits(members: Row[], daysAgo: (days: number) => string): Tables {
+  const credit_requests: Row[] = [];
+  const credit_transactions: Row[] = [];
+  CREDIT_BALANCES.forEach(([member, amount, memo], i) => {
+    const owner = members[member - 1]!;
+    const at = daysAgo(3);
+    const request = memo
+      ? null
+      : row('credit_requests', {
+          id: id('5', i + 1),
+          center_id: CENTER,
+          member_id: owner.id,
+          amount,
+          unit_price: 5000,
+          status: 'approved',
+          decided_at: at,
+          decided_by: staffId(1),
+          created_at: at,
+          updated_at: at,
+        });
+    if (request) credit_requests.push(request);
+    owner.credit_balance = amount;
+    credit_transactions.push(
+      row('credit_transactions', {
+        id: id('4', i + 1),
+        center_id: CENTER,
+        member_id: owner.id,
+        delta: amount,
+        balance_after: amount,
+        reason: 'charge',
+        request_id: request?.id ?? null,
+        memo,
+        created_by: staffId(memo ? 2 : 1),
+        created_at: at,
+      }),
+    );
+  });
+  CREDIT_REQUESTS.forEach(([member, amount, minutesAgo], i) => {
+    const at = new Date(Date.parse(daysAgo(0)) - minutesAgo * 60_000).toISOString();
+    credit_requests.push(
+      row('credit_requests', {
+        id: id('5', 10 + i),
+        center_id: CENTER,
+        member_id: members[member - 1]!.id,
+        amount,
+        unit_price: 5000,
+        created_at: at,
+        updated_at: at,
+      }),
+    );
+  });
+  return { credit_requests, credit_transactions };
 }

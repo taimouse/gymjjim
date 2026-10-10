@@ -5,18 +5,25 @@ import { Ticket } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
 import { useMember } from '@/components/member/member-context';
+import { CreditWallet } from '@/components/member/me/credit-wallet';
 import { MyPassCard, type MyPass } from '@/components/member/me/my-pass-card';
 import { NotificationSettings } from '@/components/member/me/notification-settings';
 import { SignOutButton } from '@/components/sign-out-button';
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from '@/components/ui/empty';
 import { Skeleton } from '@/components/ui/skeleton';
 import { todayKey } from '@/lib/format';
+import {
+  creditPrograms,
+  programsForProduct,
+  PROGRAM_USAGE_SELECT,
+  type ProgramUsageRow,
+} from '@/features/programs/usage';
 import { computePassState, pickPrimaryPass } from '@/lib/pass-status';
 import { createClient } from '@/lib/supabase/client';
 
 const USABLE = new Set(['active', 'on_hold', 'upcoming']);
 
-/** 내 정보: 이용권 카드 · 알림 설정 · 로그아웃 (src/app/m/me/page.tsx 와 같은 조회·구성) */
+/** 내 정보: 이용권 카드 · 크레딧 · 알림 설정 · 로그아웃 (src/app/m/me/page.tsx 와 같은 조회·구성) */
 export default function MePage() {
   const t = useTranslations('member.me');
   const { memberId, name, centerName, timezone } = useMember();
@@ -27,7 +34,7 @@ export default function MePage() {
       const { data } = await createClient()
         .from('member_passes')
         .select(
-          'id, name, status, start_date, end_date, total_count, remaining_count, period_limit_count, period_limit_unit, deleted_at, holds:pass_holds(start_date, end_date)',
+          'id, name, product_id, status, start_date, end_date, total_count, remaining_count, period_limit_count, period_limit_unit, deleted_at, holds:pass_holds(start_date, end_date)',
         )
         .eq('member_id', memberId)
         .eq('status', 'active')
@@ -36,6 +43,19 @@ export default function MePage() {
       return data ?? [];
     },
   });
+
+  const programQuery = useQuery({
+    queryKey: ['member-booking', 'program-usage'],
+    queryFn: async (): Promise<ProgramUsageRow[]> => {
+      const { data } = await createClient()
+        .from('programs')
+        .select(PROGRAM_USAGE_SELECT)
+        .is('deleted_at', null)
+        .order('sort_order');
+      return (data ?? []) as ProgramUsageRow[];
+    },
+  });
+  const programs = programQuery.data ?? [];
 
   const all = passes.data ?? [];
   const usable = all.filter((pass) => USABLE.has(computePassState(pass, today)));
@@ -69,12 +89,18 @@ export default function MePage() {
           <ul className="space-y-3">
             {shown.map((pass) => (
               <li key={pass.id}>
-                <MyPassCard pass={pass} today={today} />
+                <MyPassCard
+                  pass={pass}
+                  today={today}
+                  programs={programsForProduct(programs, pass.product_id)}
+                />
               </li>
             ))}
           </ul>
         )}
       </section>
+
+      <CreditWallet programs={creditPrograms(programs)} />
 
       <NotificationSettings />
 

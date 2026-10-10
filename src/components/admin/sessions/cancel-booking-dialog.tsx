@@ -10,6 +10,7 @@ import { useErrorText } from '@/components/form-messages';
 import { Checkbox } from '@/components/ui/checkbox';
 import { cancelBookingAction } from '@/features/booking/actions';
 import { memberKeys } from '@/features/members/queries';
+import { creditKeys } from '@/features/credits/queries';
 import { type RosterBooking, sessionKeys } from '@/features/sessions/queries';
 
 /** 직원의 예약 취소. 늦은 취소(차감)는 되돌릴 수 없으므로 확인창 + "차감하지 않고 취소" 선택 */
@@ -45,6 +46,7 @@ export function CancelBookingDialog({
         queryClient.invalidateQueries({ queryKey: sessionKeys.roster(sessionId) }),
         queryClient.invalidateQueries({ queryKey: sessionKeys.all }),
         queryClient.invalidateQueries({ queryKey: memberKeys.all }),
+        queryClient.invalidateQueries({ queryKey: creditKeys.all }),
       ]);
       toast.success(t('done'));
       onClose();
@@ -55,7 +57,11 @@ export function CancelBookingDialog({
       open
       onOpenChange={(open) => !open && onClose()}
       title={t('title', { name: booking.member?.name ?? '' })}
-      description={isLate ? t('late') : t('free')}
+      description={
+        booking.credits_used > 0
+          ? t(isLate ? 'lateCredit' : 'freeCredit', { count: booking.credits_used })
+          : t(isLate ? 'late' : 'free')
+      }
       confirmLabel={t('confirm')}
       onConfirm={confirm}
       pending={pending}

@@ -63,6 +63,7 @@ export function staffContext(): StaffContext {
       name: String(center.name),
       timezone: String(center.timezone),
       booking_settings: center.booking_settings as StaffContext['center']['booking_settings'],
+      credit_price: Number(center.credit_price ?? 5000),
     },
   } as StaffContext;
 }

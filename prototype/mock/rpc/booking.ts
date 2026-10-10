@@ -2,7 +2,10 @@
 import { byId, nowIso, raise, type Row, table } from '../db';
 import { cancelBooking, createBooking } from './engine';
 import {
+  addCredits,
   closeAt,
+  creditCost,
+  creditError,
   enqueue,
   freeCancelUntil,
   isPublished,
@@ -11,7 +14,6 @@ import {
   ms,
   now,
   pickPass,
-  programCost,
   requireSession,
   restorePass,
   sessionPayload,
@@ -26,7 +28,7 @@ const fromAdmin = () => typeof window !== 'undefined' && !window.location.pathna
 
 export const bookingRpcs = {
   book_session: {
-    mutates: ['bookings', 'sessions', 'member_passes', 'notification_logs'],
+    mutates: ['bookings', 'sessions', 'member_passes', 'members', 'credit_transactions', 'notification_logs'],
     run: (a: Args) => {
       const session = requireSession(a.p_session_id);
       if (!isPublished(session)) raise('BOOKING_NOT_OPEN');
@@ -43,7 +45,7 @@ export const bookingRpcs = {
     },
   },
   staff_book_for_member: {
-    mutates: ['bookings', 'sessions', 'member_passes', 'notification_logs'],
+    mutates: ['bookings', 'sessions', 'member_passes', 'members', 'credit_transactions', 'notification_logs'],
     run: (a: Args) => {
       requireSession(a.p_session_id);
       const member = byId('members', a.p_member_id);
@@ -67,7 +69,10 @@ export const bookingRpcs = {
       if (!isPublished(session)) raise('SESSION_NOT_FOUND');
       const picked = pickPass(me().id, session, localDate(session.starts_at));
       const pass = picked.passId ? byId('member_passes', picked.passId) : null;
+      const cost = creditCost(session.program_id);
+      const error = pass ? picked.error : creditError(me().id, cost, picked.error);
       return {
+        method: pass ? 'pass' : error ? null : 'credit',
         pass: pass
           ? {
               id: pass.id,
@@ -77,15 +82,15 @@ export const bookingRpcs = {
               end_date: pass.end_date,
             }
           : null,
-        error: picked.error,
-        cost: programCost(session.program_id),
+        error,
+        credit: cost === null ? null : { cost, balance: Number(me().credit_balance ?? 0) },
         free_cancel_until: new Date(freeCancelUntil(session)).toISOString(),
         close_at: new Date(closeAt(session)).toISOString(),
       };
     },
   },
   cancel_booking: {
-    mutates: ['bookings', 'sessions', 'member_passes', 'notification_logs'],
+    mutates: ['bookings', 'sessions', 'member_passes', 'members', 'credit_transactions', 'notification_logs'],
     run: (a: Args) => cancelBooking(a.p_booking_id, !!a.p_waive_penalty, fromAdmin()),
   },
   set_attendance: {
@@ -104,7 +109,7 @@ export const bookingRpcs = {
     },
   },
   cancel_session: {
-    mutates: ['bookings', 'sessions', 'member_passes', 'notification_logs'],
+    mutates: ['bookings', 'sessions', 'member_passes', 'members', 'credit_transactions', 'notification_logs'],
     run: (a: Args) => {
       const session = requireSession(a.p_session_id);
       if (session.status === 'cancelled') raise('SESSION_CANCELLED');
@@ -116,7 +121,11 @@ export const bookingRpcs = {
         if (booking.session_id !== session.id || !['booked', 'waitlisted'].includes(String(booking.status)))
           continue;
         if (booking.pass_deducted) {
-          restorePass(booking.member_pass_id, booking.deducted_count);
+          restorePass(booking.member_pass_id);
+          restoredCount += 1;
+        }
+        if (Number(booking.credits_used ?? 0) > 0) {
+          addCredits(booking.member_id, Number(booking.credits_used), 'refund', { bookingId: booking.id });
           restoredCount += 1;
         }
         const previous = booking.status;
@@ -124,7 +133,7 @@ export const bookingRpcs = {
           status: 'cancelled',
           waitlist_position: null,
           pass_deducted: false,
-          deducted_count: 0,
+          credits_used: 0,
           cancelled_at: nowIso(),
           cancel_reason: 'session_cancelled',
         });

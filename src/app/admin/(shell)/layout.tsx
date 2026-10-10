@@ -14,7 +14,7 @@ import { parseBookingSettings } from '@/features/centers/schema';
 import { requireStaff } from '@/lib/auth/session';
 
 /**
- * 관리자 셸: 왼쪽 사이드바(메뉴 5개) + 상단 바(⌘K 검색 · 센터명 · 계정).
+ * 관리자 셸: 왼쪽 사이드바(메뉴 6개) + 상단 바(⌘K 검색 · 센터명 · 계정).
  * PC(xl, 1280px~) 라벨 표시, 태블릿(md~xl) 아이콘만, 폰은 메뉴 버튼으로 여는 시트.
  */
 export default async function AdminShellLayout({ children }: { children: ReactNode }) {
@@ -24,6 +24,7 @@ export default async function AdminShellLayout({ children }: { children: ReactNo
     centerName: center.name,
     timezone: center.timezone,
     bookingSettings: parseBookingSettings(center.booking_settings),
+    creditPrice: center.credit_price,
     staffId: staff.id,
     staffName: staff.name,
     role: staff.role,

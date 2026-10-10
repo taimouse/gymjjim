@@ -1,6 +1,7 @@
 import { useTranslations } from 'next-intl';
 
 import { Badge } from '@/components/ui/badge';
+import type { UsableProgram } from '@/features/programs/usage';
 import { formatDateKey, formatDDay } from '@/lib/format';
 import { computePassState, passDaysLeft, type PassLike, passTone } from '@/lib/pass-status';
 import { cn } from '@/lib/utils';
@@ -8,14 +9,24 @@ import { cn } from '@/lib/utils';
 export interface MyPass extends PassLike {
   id: string;
   name: string;
+  product_id: string | null;
   total_count: number | null;
   period_limit_count: number | null;
   period_limit_unit: 'week' | 'month' | null;
   holds: { start_date: string; end_date: string }[];
 }
 
-/** 내 이용권 카드: 잔여 횟수 · 만료 D-day 를 크게, 기간 · 이용 제한 · 정지 상태 */
-export function MyPassCard({ pass, today }: { pass: MyPass; today: string }) {
+/** 내 이용권 카드: 잔여 횟수 · 만료 D-day 를 크게, 기간 · 이용 제한 · 이 이용권으로 들을 수 있는 수업 · 정지 상태 */
+export function MyPassCard({
+  pass,
+  today,
+  programs,
+}: {
+  pass: MyPass;
+  today: string;
+  /** 이 이용권으로 예약할 수 있는 수업 */
+  programs: UsableProgram[];
+}) {
   const t = useTranslations('member.me');
   const tPass = useTranslations('members.pass');
   const tUnit = useTranslations('products.unit');
@@ -75,6 +86,27 @@ export function MyPassCard({ pass, today }: { pass: MyPass; today: string }) {
           <p>{t('limit', { unit: tUnit(pass.period_limit_unit), count: pass.period_limit_count })}</p>
         )}
       </div>
+
+      {programs.length > 0 && (
+        <div className="mt-3">
+          <p className="mb-1.5 text-sm text-muted-foreground">{t('usablePrograms')}</p>
+          <ul className="flex flex-wrap gap-1.5">
+            {programs.map((program) => (
+              <li
+                key={program.id}
+                className="inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-sm font-medium"
+              >
+                <span
+                  className="size-2.5 rounded-full"
+                  style={{ backgroundColor: program.color }}
+                  aria-hidden
+                />
+                {program.name}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
 
       {hold && holdParams && (
         <p className="mt-3 rounded-xl bg-info-soft p-3 font-semibold text-info-soft-foreground">

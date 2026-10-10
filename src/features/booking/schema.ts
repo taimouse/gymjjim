@@ -60,8 +60,11 @@ export const bookSessionResult = z.object({
   booking_id: z.uuid(),
   status: z.enum(['booked', 'waitlisted']),
   waitlist_position: z.number().int().nullable(),
-  member_pass_id: z.uuid(),
+  /** 크레딧으로 예약하면 null */
+  member_pass_id: z.uuid().nullable(),
   remaining_count: z.number().int().nullable(),
+  credits_used: z.number().int(),
+  credit_balance: z.number().int(),
 });
 export type BookSessionResult = z.infer<typeof bookSessionResult>;
 

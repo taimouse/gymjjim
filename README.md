@@ -3,7 +3,7 @@
 헬스장·PT샵·그룹운동 센터를 위한 **예약 중심** 회원관리 웹앱입니다.
 
 - 회원: 스마트폰에서 3탭 안에 수업 예약·취소, 내 이용권 확인 (`/m`)
-- 관리자: 캘린더, 예약자·출석, 프로그램·이용권·회원 관리 (`/admin`)
+- 관리자: 캘린더, 예약자·출석, 프로그램·이용권·회원·크레딧 관리 (`/admin`)
 
 프로젝트 규칙은 [CLAUDE.md](CLAUDE.md), 단계별 작업 목록은 [PROMPTS.md](PROMPTS.md)에 있습니다.
 
@@ -224,7 +224,7 @@ E2E_BROWSER_CHANNEL=msedge pnpm test:e2e         # 터미널 2: 설치된 Edge �
 - `prototype/next.config.ts` 의 `resolveAlias` 가 `@/lib/supabase/*`, `@/lib/auth/action-context` 같은 모듈을 `prototype/mock` 으로 바꿉니다
 - 서버 액션 파일(`src/features/*/actions.ts`)은 로더(`prototype/scripts/strip-use-server.cjs`)가 `'use server'` 를 떼서 브라우저에서 실행합니다
 - `prototype/mock` 은 실제와 같은 이름의 테이블·RPC(예약 엔진, 회원 검색, 오늘 대시보드 …)를 `localStorage` 위에서 흉내 냅니다. 처음 데이터는 `supabase/seed.sql` 과 같습니다
-- 둘러볼 수 있는 화면: 관리자(오늘 · 캘린더 · 회원 · 프로그램·이용권 · 설정), 회원 앱(첫 로그인 동의 · 예약 · 내 예약 · 내 정보), 개인정보 처리방침
+- 둘러볼 수 있는 화면: 관리자(오늘 · 캘린더 · 회원 · 프로그램 · 이용권 · 설정), 회원 앱(첫 로그인 동의 · 예약 · 내 예약 · 내 정보 · 크레딧 충전 요청), 개인정보 처리방침
 - 관리자 화면은 대표 계정으로 열리고, `?as=staff` 를 붙이면 트레이너 계정으로 바뀝니다. 회원 화면은 홍길동 계정이며 첫 로그인 동의부터 시작해요
 - 로그인, 실제 알림 발송, 웹 푸시는 없습니다. 맨 위 띠의 "처음 상태로" 로 데이터를 되돌립니다
 

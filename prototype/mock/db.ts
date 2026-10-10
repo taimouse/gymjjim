@@ -9,7 +9,7 @@ export type Row = Record<string, unknown>;
 export type Tables = Record<string, Row[]>;
 
 /** 저장 모양이 바뀌면 올린다 (예전 데이터는 버리고 시드로 다시 시작) */
-const STORAGE_KEY = 'jackygym-prototype-db-v4';
+const STORAGE_KEY = 'jackygym-prototype-db-v6';
 
 export const CENTER_ID = 'c0000000-0000-4000-8000-000000000001';
 export const OWNER_STAFF_ID = 'b0000000-0000-4000-8000-000000000001';

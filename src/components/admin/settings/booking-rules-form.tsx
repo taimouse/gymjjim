@@ -19,6 +19,7 @@ import { updateBookingRules } from '@/features/centers/actions';
 import { bookingRulesFormSchema, type BookingRulesFormValues } from '@/features/centers/schema';
 import type { AppErrorCode } from '@/lib/errors';
 import { numberInput } from '@/lib/form';
+import { cn } from '@/lib/utils';
 
 const FIELDS = [
   { name: 'openDaysBefore', label: 'openDays', unit: 'openDaysUnit', hint: 'openDaysHint', hintArg: 'days' },
@@ -69,32 +70,34 @@ export function BookingRulesForm({ initial }: { initial: BookingRulesFormValues 
         <CardTitle className="text-lg">{t('title')}</CardTitle>
         <CardDescription>{t('description')}</CardDescription>
       </CardHeader>
-      <form onSubmit={onSubmit} noValidate>
-        <fieldset disabled={!isOwner}>
-          <CardContent>
+      <form onSubmit={onSubmit} noValidate className="flex flex-1 flex-col">
+        <fieldset disabled={!isOwner} className="flex min-w-0 flex-1 flex-col">
+          <CardContent className={cn('flex-1', isOwner && 'pb-6')}>
             <FieldGroup>
-              {FIELDS.map((field) => (
-                <Field key={field.name} data-invalid={!!errors[field.name]}>
-                  <FieldLabel htmlFor={`rule-${field.name}`}>{t(field.label)}</FieldLabel>
-                  <InputGroup className="max-w-60">
-                    <InputGroupInput
-                      id={`rule-${field.name}`}
-                      type="number"
-                      inputMode="decimal"
-                      min={0}
-                      className="text-right tabular-nums"
-                      {...form.register(field.name, numberInput)}
-                    />
-                    <InputGroupAddon align="inline-end">
-                      <InputGroupText>{t(field.unit)}</InputGroupText>
-                    </InputGroupAddon>
-                  </InputGroup>
-                  <FieldDescription>
-                    {t(field.hint, { [field.hintArg]: values[field.name] ?? 0 })}
-                  </FieldDescription>
-                  <ValidationMessage error={errors[field.name]} />
-                </Field>
-              ))}
+              <div className="grid gap-5 sm:grid-cols-3">
+                {FIELDS.map((field) => (
+                  <Field key={field.name} data-invalid={!!errors[field.name]}>
+                    <FieldLabel htmlFor={`rule-${field.name}`}>{t(field.label)}</FieldLabel>
+                    <InputGroup className="max-w-40">
+                      <InputGroupInput
+                        id={`rule-${field.name}`}
+                        type="number"
+                        inputMode="decimal"
+                        min={0}
+                        className="text-right tabular-nums"
+                        {...form.register(field.name, numberInput)}
+                      />
+                      <InputGroupAddon align="inline-end">
+                        <InputGroupText>{t(field.unit)}</InputGroupText>
+                      </InputGroupAddon>
+                    </InputGroup>
+                    <FieldDescription>
+                      {t(field.hint, { [field.hintArg]: values[field.name] ?? 0 })}
+                    </FieldDescription>
+                    <ValidationMessage error={errors[field.name]} />
+                  </Field>
+                ))}
+              </div>
               <Controller
                 control={form.control}
                 name="autoPromoteWaitlist"

@@ -15,8 +15,7 @@ import { EditSheet } from '@/components/admin/edit-sheet';
 import { PublishAtField } from '@/components/admin/publish-at-field';
 import { ErrorAlert, useErrorText, ValidationMessage } from '@/components/form-messages';
 import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Field, FieldDescription, FieldGroup, FieldLabel } from '@/components/ui/field';
+import { Field, FieldGroup, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -30,6 +29,8 @@ import { useStaffQuery } from '@/features/staff/queries';
 import type { AppErrorCode } from '@/lib/errors';
 import { numberInput } from '@/lib/form';
 import { addDaysToKey, todayKey } from '@/lib/format';
+
+import { ProgramPaymentFields } from './program-payment-fields';
 
 const NO_INSTRUCTOR = 'none';
 
@@ -167,20 +168,6 @@ export function ProgramSheet({
                 <ValidationMessage error={errors.durationMin} />
               </Field>
             </div>
-            <Field data-invalid={!!errors.passCost}>
-              <FieldLabel htmlFor="program-pass-cost">{t('fields.passCost')}</FieldLabel>
-              <Input
-                id="program-pass-cost"
-                type="number"
-                inputMode="numeric"
-                min={1}
-                max={100}
-                className="max-w-32"
-                {...form.register('passCost', numberInput)}
-              />
-              <FieldDescription>{t('fields.passCostHint')}</FieldDescription>
-              <ValidationMessage error={errors.passCost} />
-            </Field>
             <Field>
               <FieldLabel>{t('fields.color')}</FieldLabel>
               <Controller
@@ -223,40 +210,7 @@ export function ProgramSheet({
                 )}
               />
             </Field>
-            <Field>
-              <FieldLabel>{t('fields.allowedProducts')}</FieldLabel>
-              <FieldDescription>{t('fields.allowedProductsHint')}</FieldDescription>
-              <Controller
-                control={form.control}
-                name="allowedProductIds"
-                render={({ field }) =>
-                  (products.data ?? []).length === 0 ? (
-                    <p className="text-sm text-muted-foreground">{t('fields.noProductsYet')}</p>
-                  ) : (
-                    <div className="divide-y rounded-lg border">
-                      {(products.data ?? []).map((product) => (
-                        <label
-                          key={product.id}
-                          className="flex min-h-12 cursor-pointer items-center gap-3 px-3"
-                        >
-                          <Checkbox
-                            checked={field.value.includes(product.id)}
-                            onCheckedChange={(checked) =>
-                              field.onChange(
-                                checked === true
-                                  ? [...field.value, product.id]
-                                  : field.value.filter((id) => id !== product.id),
-                              )
-                            }
-                          />
-                          <span className="flex-1">{product.name}</span>
-                        </label>
-                      ))}
-                    </div>
-                  )
-                }
-              />
-            </Field>
+            <ProgramPaymentFields form={form} products={products.data ?? []} readOnly={readOnly} />
             <Field>
               <FieldLabel htmlFor="program-description">{t('fields.description')}</FieldLabel>
               <Textarea id="program-description" rows={3} {...form.register('description')} />

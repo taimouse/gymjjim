@@ -30,6 +30,7 @@ function readSession(): AdminSession {
     centerName: String(center.name),
     timezone: String(center.timezone),
     bookingSettings: parseBookingSettings(center.booking_settings),
+    creditPrice: Number(center.credit_price ?? 5000),
     staffId: String(staff.id),
     staffName: String(staff.name),
     role: staff.role as 'owner' | 'staff',

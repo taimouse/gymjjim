@@ -16,6 +16,7 @@ const DEFAULTS: Record<string, () => Row> = {
     notify_enabled: true,
     onboarded_at: null,
     withdrawn_at: null,
+    credit_balance: 0,
     deleted_at: null,
   }),
   member_passes: () => ({
@@ -53,7 +54,7 @@ const DEFAULTS: Record<string, () => Row> = {
     is_active: true,
     sort_order: 0,
     publish_at: null,
-    pass_cost: 1,
+    credit_cost: null,
     deleted_at: null,
   }),
   sessions: () => ({
@@ -73,7 +74,7 @@ const DEFAULTS: Record<string, () => Row> = {
     member_pass_id: null,
     waitlist_position: null,
     pass_deducted: false,
-    deducted_count: 0,
+    credits_used: 0,
     booked_by: 'member',
     booked_by_staff_id: null,
     cancelled_at: null,
@@ -104,6 +105,8 @@ const DEFAULTS: Record<string, () => Row> = {
     locked_at: null,
     provider: null,
   }),
+  credit_requests: () => ({ status: 'pending', decided_at: null, decided_by: null }),
+  credit_transactions: () => ({ booking_id: null, request_id: null, memo: null, created_by: null }),
   member_invites: () => ({ used_at: null, used_by: null, revoked_at: null, created_by: null }),
 };
 

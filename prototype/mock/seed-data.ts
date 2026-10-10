@@ -39,16 +39,16 @@ export const PRODUCTS: Array<[string, string, number | null, number | null, numb
   ['1개월 자유이용권', 'period', 30, null, null, 150000],
   ['3개월 주3회권', 'period', 90, null, 3, 330000],
   ['10회권 (2개월)', 'period_count', 60, 10, null, 200000],
-  ['PT 횟수권 50회', 'count', null, 50, null, 700000],
-  ['통합 횟수권 20회', 'count', null, 20, null, 300000],
+  ['PT 10회', 'count', null, 10, null, 700000],
 ];
 
-/** [이름, 종류, 정원, 분, 색, 설명, 강사, 횟수권 차감 횟수] */
+/** [이름, 종류, 정원, 분, 색, 설명, 강사] */
+/** [이름, 종류, 정원, 분, 색, 설명, 강사, 1회 차감 크레딧] */
 export const PROGRAMS: Array<[string, string, number, number, string, string, number, number]> = [
-  ['아침 요가', 'group', 12, 60, '#A7F3D0', '하루를 여는 60분 빈야사 요가', 2, 1],
-  ['크로스핏 WOD', 'group', 16, 60, '#FECACA', '오늘의 운동(WOD) 그룹 수업', 3, 1],
-  ['필라테스 기구', 'group', 6, 50, '#DDD6FE', '리포머 기구 필라테스 소그룹', 2, 2],
-  ['저녁 스피닝', 'group', 20, 45, '#BFDBFE', '음악과 함께하는 실내 사이클', 2, 1],
+  ['아침 요가', 'group', 12, 60, '#A7F3D0', '하루를 여는 60분 빈야사 요가', 2, 2],
+  ['크로스핏 WOD', 'group', 16, 60, '#FECACA', '오늘의 운동(WOD) 그룹 수업', 3, 2],
+  ['필라테스 기구', 'group', 6, 50, '#DDD6FE', '리포머 기구 필라테스 소그룹', 2, 3],
+  ['저녁 스피닝', 'group', 20, 45, '#BFDBFE', '음악과 함께하는 실내 사이클', 2, 2],
   ['1:1 PT', 'private', 1, 50, '#FDE68A', '담당 트레이너와 1:1 수업', 2, 5],
   ['번지피지오', 'group', 8, 50, '#FBCFE8', '번지 코드로 관절 부담을 줄인 재활·근력 운동', 2, 3],
 ];
@@ -67,19 +67,11 @@ export const ALLOWED: Array<[number, number]> = [
   [5, 4],
   [6, 1],
   [6, 3],
-  // 통합 횟수권은 모든 프로그램에서 쓸 수 있다
-  [1, 5],
-  [2, 5],
-  [3, 5],
-  [4, 5],
-  [5, 5],
-  [6, 5],
 ];
 
 /** [회원, 상품, 시작(오늘+일), 끝(오늘+일), 잔여] — seed/10_member_passes.sql */
 export const PASSES: Array<[number, number, number, number | null, number | null]> = [
-  // 홍길동: 통합 횟수권 20회 (예약하면 프로그램별 차감 횟수만큼 줄어든다)
-  [1, 5, -3, null, 20],
+  [1, 2, -20, 69, null],
   [2, 3, -55, 4, 3],
   [3, 1, -45, -16, null],
   [3, 1, -15, 14, null],
@@ -89,7 +81,7 @@ export const PASSES: Array<[number, number, number, number | null, number | null
   [7, 3, -30, 29, 1],
   [8, 1, -27, 2, null],
   [9, 2, -40, 56, null],
-  [10, 4, -15, null, 35],
+  [10, 4, -15, null, 7],
   [11, 2, -30, 59, null],
   [12, 1, -12, 17, null],
   [13, 3, -20, 39, 6],
@@ -120,4 +112,14 @@ export const TEMPLATE: Array<[number, number, number[], string, number, number]>
   [5, 2, [2, 4], '15:00', 50, 1],
   [5, 3, [3], '16:00', 50, 1],
   [6, 2, [2, 4], '10:00', 50, 8],
+];
+
+/** 크레딧 — seed/35_credits.sql: [회원, 잔액] · 대기 중인 충전 요청 [회원, 크레딧, 몇 분 전] */
+export const CREDIT_BALANCES: Array<[number, number, string | null]> = [
+  [1, 20, null],
+  [10, 15, '현장 결제'],
+];
+export const CREDIT_REQUESTS: Array<[number, number, number]> = [
+  [4, 10, 300],
+  [12, 30, 40],
 ];

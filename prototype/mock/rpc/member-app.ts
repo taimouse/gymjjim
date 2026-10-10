@@ -55,7 +55,8 @@ export const memberAppRpcs = {
             my_status: booking?.status ?? null,
             my_waitlist_position: booking?.waitlist_position ?? null,
             my_pass_type: booking ? (byId('member_passes', booking.member_pass_id)?.type ?? null) : null,
-            pass_cost: Number(program?.pass_cost ?? 1),
+            my_credits_used: booking ? Number(booking.credits_used ?? 0) : null,
+            credit_cost: program?.credit_cost ?? null,
           };
         })
         .sort(
@@ -101,6 +102,7 @@ export const memberAppRpcs = {
           instructor_name: instructorName(s),
           pass_name: pass?.name ?? null,
           pass_type: pass?.type ?? null,
+          credits_used: Number(b.credits_used ?? 0),
         };
       });
     },

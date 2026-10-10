@@ -17,7 +17,10 @@ export const getClaims = cache(async () => {
   return data?.claims ?? null;
 });
 
-export type CenterInfo = Pick<Tables<'centers'>, 'id' | 'name' | 'timezone' | 'booking_settings'>;
+export type CenterInfo = Pick<
+  Tables<'centers'>,
+  'id' | 'name' | 'timezone' | 'booking_settings' | 'credit_price'
+>;
 export type StaffInfo = Pick<Tables<'staff'>, 'id' | 'name' | 'role' | 'color' | 'center_id' | 'email'>;
 
 export interface StaffContext {
@@ -33,7 +36,9 @@ export const getStaffContext = cache(async (): Promise<StaffContext | null> => {
   const supabase = await createClient();
   const { data } = await supabase
     .from('staff')
-    .select('id, name, role, color, center_id, email, centers!inner(id, name, timezone, booking_settings)')
+    .select(
+      'id, name, role, color, center_id, email, centers!inner(id, name, timezone, booking_settings, credit_price)',
+    )
     .eq('user_id', claims.sub)
     .is('deleted_at', null)
     .order('created_at')

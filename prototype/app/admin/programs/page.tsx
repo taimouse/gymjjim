@@ -1,28 +1,20 @@
 'use client';
 
-import { useSearchParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
-import { Suspense } from 'react';
 
+import { useAdmin } from '@/components/admin/admin-context';
 import { PageHeader } from '@/components/admin/page-header';
-import { ProgramsTabs } from '@/components/admin/programs/programs-tabs';
+import { ProgramList } from '@/components/admin/programs/program-list';
 
-function Programs() {
-  const t = useTranslations('programs');
-  const tab = useSearchParams().get('tab') === 'products' ? 'products' : 'programs';
+/** 프로그램 (src/app/admin/(shell)/programs/page.tsx) */
+export default function ProgramsPage() {
+  const t = useTranslations();
+  const { isOwner } = useAdmin();
   return (
     <>
-      <PageHeader title={t('title')} description={t('description')} />
-      <ProgramsTabs tab={tab} />
+      <PageHeader title={t('programs.title')} description={t('programs.description')} />
+      {!isOwner && <p className="mb-4 text-sm text-muted-foreground">{t('admin.readOnly')}</p>}
+      <ProgramList />
     </>
-  );
-}
-
-/** 프로그램·이용권 (src/app/admin/(shell)/programs/page.tsx) */
-export default function ProgramsPage() {
-  return (
-    <Suspense>
-      <Programs />
-    </Suspense>
   );
 }

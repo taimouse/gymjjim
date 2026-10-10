@@ -86,6 +86,7 @@ export function SessionRoster({
                 {maskPhone(booking.member?.phone)}
                 {booking.pass?.remaining_count != null &&
                   ` · ${t('remaining', { count: booking.pass.remaining_count })}`}
+                {booking.credits_used > 0 && ` · ${t('paidByCredit', { count: booking.credits_used })}`}
               </p>
             </div>
             <div className="flex shrink-0 items-center gap-1.5">

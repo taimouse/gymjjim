@@ -3,6 +3,7 @@
 import { useSearchParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 
+import { CreditRequests } from '@/components/admin/credits/credit-requests';
 import { PageHeader } from '@/components/admin/page-header';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { formatDateKey } from '@/lib/format';
@@ -16,7 +17,7 @@ import { useDashboardRefresh } from './use-dashboard-refresh';
 const TABS = ['today', 'week', 'month'] as const;
 type Tab = (typeof TABS)[number];
 
-/** 관리자 첫 화면 "오늘": 오늘 운영(숫자 4개 · 수업 타임라인 · 챙겨야 할 회원) + 주간/월간 통계 탭 */
+/** 관리자 첫 화면 "오늘": 오늘 운영(숫자 4개 · 수업 타임라인 · 크레딧 충전 요청 · 챙겨야 할 회원) + 주간/월간 통계 탭 */
 export function TodayView({ today }: { today: string }) {
   const t = useTranslations('today');
   const searchParams = useSearchParams();
@@ -49,7 +50,10 @@ export function TodayView({ today }: { today: string }) {
           <TodayNumbers today={today} />
           <div className="grid items-start gap-6 xl:grid-cols-[minmax(0,1fr)_minmax(0,26rem)]">
             <TodayTimeline today={today} />
-            <Followups />
+            <div className="space-y-6">
+              <CreditRequests />
+              <Followups />
+            </div>
           </div>
         </TabsContent>
         <TabsContent value="week" className="text-base">
