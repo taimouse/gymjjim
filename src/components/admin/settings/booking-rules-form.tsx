@@ -78,7 +78,7 @@ export function BookingRulesForm({ initial }: { initial: BookingRulesFormValues 
                 {FIELDS.map((field) => (
                   <Field key={field.name} data-invalid={!!errors[field.name]}>
                     <FieldLabel htmlFor={`rule-${field.name}`}>{t(field.label)}</FieldLabel>
-                    <InputGroup className="max-w-40">
+                    <InputGroup>
                       <InputGroupInput
                         id={`rule-${field.name}`}
                         type="number"
