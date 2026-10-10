@@ -22,7 +22,7 @@ export function parseRoleClaims(appMetadata: unknown): RoleClaims | null {
 
 export type Area = 'admin' | 'platform' | 'member' | 'public' | 'root';
 
-const PUBLIC_PREFIXES = ['/login', '/admin-login', '/invite', '/auth', '/403', '/offline'];
+const PUBLIC_PREFIXES = ['/login', '/admin-login', '/invite', '/auth', '/403', '/offline', '/privacy'];
 
 function matches(pathname: string, prefix: string): boolean {
   return pathname === prefix || pathname.startsWith(`${prefix}/`);

@@ -58,17 +58,24 @@ function str(value: unknown, fallback = '-'): string {
 export function formatKoreanDateTime(value: unknown, timeZone: string = DEFAULT_TIME_ZONE): string {
   const date = typeof value === 'string' || value instanceof Date ? new Date(value) : null;
   if (!date || Number.isNaN(date.getTime())) return '-';
+  // 오전/오후는 ICU 의 dayPeriod 대신 24시간제 시각으로 정한다 (런타임 ICU 에 따라 "PM" 이 나오는 경우가 있다)
   const parts = new Intl.DateTimeFormat('ko-KR', {
     timeZone,
     month: 'numeric',
     day: 'numeric',
-    weekday: 'short',
     hour: 'numeric',
     minute: '2-digit',
-    hour12: true,
+    hourCycle: 'h23',
   }).formatToParts(date);
   const part = (type: Intl.DateTimeFormatPartTypes) => parts.find((item) => item.type === type)?.value ?? '';
-  return `${part('month')}월 ${part('day')}일 (${part('weekday')}) ${part('dayPeriod')} ${part('hour')}:${part('minute')}`;
+  const hour24 = Number(part('hour')) % 24;
+  const month = Number(part('month'));
+  const day = Number(part('day'));
+  const year = Number(new Intl.DateTimeFormat('en-US', { timeZone, year: 'numeric' }).format(date));
+  const weekday = WEEKDAYS[new Date(Date.UTC(year, month - 1, day)).getUTCDay()];
+  const meridiem = hour24 < 12 ? '오전' : '오후';
+  const hour12 = hour24 % 12 === 0 ? 12 : hour24 % 12;
+  return `${month}월 ${day}일 (${weekday}) ${meridiem} ${hour12}:${part('minute')}`;
 }
 
 /** 날짜 키 `2026-09-24` → `9월 24일 (목)` (시간대 변환 없음) */
@@ -90,6 +97,7 @@ const memberOf = (payload: Payload, context: TemplateContext) =>
 function sessionVariables(payload: Payload, context: TemplateContext): Record<string, string> {
   return {
     '#{센터명}': centerOf(payload, context),
+    '#{회원명}': memberOf(payload, context),
     '#{수업명}': str(payload.program_name),
     '#{수업일시}': formatKoreanDateTime(payload.starts_at, timeZoneOf(payload, context)),
     '#{강사명}': str(payload.instructor_name, '미정'),
@@ -101,26 +109,26 @@ const SESSION_SAMPLE: Payload = {
   starts_at: '2026-09-24T10:00:00Z',
   ends_at: '2026-09-24T10:50:00Z',
   timezone: DEFAULT_TIME_ZONE,
-  center_name: '짐찜 피트니스 강남점',
+  center_name: '재키 피트니스 구미점',
   instructor_name: '이코치',
 };
 
 export const NOTIFICATION_TEMPLATES: Record<NotificationType, TemplateDefinition> = {
   booking_confirmed: {
     code: 'BOOKING_CONFIRMED',
-    body: '[#{센터명}] 수업 예약이 확정되었습니다.\n\n■ 수업: #{수업명}\n■ 일시: #{수업일시}\n■ 강사: #{강사명}\n\n예약 변경·취소는 회원 앱에서 할 수 있습니다.',
+    body: '[#{센터명}] #{회원명}님, 수업 예약이 확정되었습니다.\n\n■ 수업: #{수업명}\n■ 일시: #{수업일시}\n■ 강사: #{강사명}\n\n예약 변경·취소는 회원 앱에서 할 수 있습니다.',
     variables: sessionVariables,
     sample: SESSION_SAMPLE,
   },
   waitlist_promoted: {
     code: 'WAITLIST_PROMOTED',
-    body: '[#{센터명}] 대기 신청하신 수업의 자리가 나서 예약이 확정되었습니다.\n\n■ 수업: #{수업명}\n■ 일시: #{수업일시}\n■ 강사: #{강사명}\n\n참석이 어려우시면 회원 앱에서 예약을 취소해 주세요.',
+    body: '[#{센터명}] #{회원명}님, 대기 신청하신 수업의 자리가 나서 예약이 확정되었습니다.\n\n■ 수업: #{수업명}\n■ 일시: #{수업일시}\n■ 강사: #{강사명}\n\n참석이 어려우시면 회원 앱에서 예약을 취소해 주세요.',
     variables: sessionVariables,
     sample: SESSION_SAMPLE,
   },
   session_changed: {
     code: 'SESSION_CHANGED',
-    body: '[#{센터명}] 예약하신 수업의 시간이 변경되었습니다.\n\n■ 수업: #{수업명}\n■ 변경 전: #{변경전일시}\n■ 변경 후: #{수업일시}\n\n변경된 시간에 참석이 어려우시면 회원 앱에서 예약을 취소해 주세요.',
+    body: '[#{센터명}] #{회원명}님, 예약하신 수업의 시간이 변경되었습니다.\n\n■ 수업: #{수업명}\n■ 변경 전: #{변경전일시}\n■ 변경 후: #{수업일시}\n\n변경된 시간에 참석이 어려우시면 회원 앱에서 예약을 취소해 주세요.',
     variables: (payload, context) => ({
       ...sessionVariables(payload, context),
       '#{변경전일시}': formatKoreanDateTime(payload.previous_starts_at, timeZoneOf(payload, context)),
@@ -129,7 +137,7 @@ export const NOTIFICATION_TEMPLATES: Record<NotificationType, TemplateDefinition
   },
   session_cancelled: {
     code: 'SESSION_CANCELLED',
-    body: '[#{센터명}] 예약하신 수업이 폐강되었습니다.\n\n■ 수업: #{수업명}\n■ 일시: #{수업일시}\n■ 사유: #{폐강사유}\n\n이 수업으로 차감된 이용권 횟수는 복구되었습니다.',
+    body: '[#{센터명}] #{회원명}님, 예약하신 수업이 폐강되었습니다.\n\n■ 수업: #{수업명}\n■ 일시: #{수업일시}\n■ 사유: #{폐강사유}\n\n이 수업으로 차감된 이용권 횟수는 복구되었습니다.',
     variables: (payload, context) => ({
       ...sessionVariables(payload, context),
       '#{폐강사유}': str(payload.reason, '센터 사정'),
@@ -138,13 +146,13 @@ export const NOTIFICATION_TEMPLATES: Record<NotificationType, TemplateDefinition
   },
   reminder_day_before: {
     code: 'REMINDER_DAY_BEFORE',
-    body: '[#{센터명}] 내일 예약하신 수업을 안내해 드립니다.\n\n■ 수업: #{수업명}\n■ 일시: #{수업일시}\n■ 강사: #{강사명}\n\n참석이 어려우시면 회원 앱에서 미리 취소해 주세요.',
+    body: '[#{센터명}] #{회원명}님, 내일 예약하신 수업을 안내해 드립니다.\n\n■ 수업: #{수업명}\n■ 일시: #{수업일시}\n■ 강사: #{강사명}\n\n참석이 어려우시면 회원 앱에서 미리 취소해 주세요.',
     variables: sessionVariables,
     sample: SESSION_SAMPLE,
   },
   reminder_2h: {
     code: 'REMINDER_2H',
-    body: '[#{센터명}] 예약하신 수업이 2시간 뒤에 시작합니다.\n\n■ 수업: #{수업명}\n■ 일시: #{수업일시}\n■ 강사: #{강사명}',
+    body: '[#{센터명}] #{회원명}님, 예약하신 수업이 2시간 뒤에 시작합니다.\n\n■ 수업: #{수업명}\n■ 일시: #{수업일시}\n■ 강사: #{강사명}',
     variables: sessionVariables,
     sample: SESSION_SAMPLE,
   },
@@ -157,7 +165,7 @@ export const NOTIFICATION_TEMPLATES: Record<NotificationType, TemplateDefinition
       '#{이용권명}': str(payload.pass_name),
       '#{만료일}': formatKoreanDateKey(payload.end_date),
     }),
-    sample: { pass_name: '3개월 무제한', end_date: '2026-10-01', center_name: '짐찜 피트니스 강남점' },
+    sample: { pass_name: '3개월 무제한', end_date: '2026-10-01', center_name: '재키 피트니스 구미점' },
   },
   pass_remaining_one: {
     code: 'PASS_REMAINING_ONE',
@@ -181,7 +189,7 @@ export const NOTIFICATION_TEMPLATES: Record<NotificationType, TemplateDefinition
     sample: {
       invite_url: 'https://gymjjim.app/invite/abc123',
       expires_at: '2026-10-01T14:59:00Z',
-      center_name: '짐찜 피트니스 강남점',
+      center_name: '재키 피트니스 구미점',
       member_name: '홍길동',
     },
   },
@@ -217,7 +225,7 @@ export function renderNotification(
 export function previewNotification(type: NotificationType): RenderedNotification {
   const rendered = renderNotification(type, NOTIFICATION_TEMPLATES[type].sample, {
     memberName: '홍길동',
-    centerName: '짐찜 피트니스 강남점',
+    centerName: '재키 피트니스 구미점',
   });
   if (!rendered) throw new Error(`unknown notification type: ${type}`);
   return rendered;

@@ -50,7 +50,6 @@ export default async function SettingsPage({ searchParams }: PageProps<'/admin/s
                   name: center.name,
                   phone: data?.phone ?? '',
                   address: data?.address ?? '',
-                  timezone: center.timezone,
                 }}
               />
               <BookingRulesForm

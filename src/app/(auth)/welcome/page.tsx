@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation';
 import { getTranslations } from 'next-intl/server';
 
 import { OnboardingForm } from '@/components/member/onboarding-form';
+import { PrivacyPolicy } from '@/components/privacy/privacy-policy';
 import { requireMember } from '@/lib/auth/session';
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -22,7 +23,7 @@ export default async function WelcomePage() {
         <h1 className="text-2xl font-bold">{t('title', { center: membership.center_name })}</h1>
         <p className="text-muted-foreground">{t('subtitle')}</p>
       </header>
-      <OnboardingForm />
+      <OnboardingForm policy={<PrivacyPolicy center={membership.center_name} />} />
     </div>
   );
 }

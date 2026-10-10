@@ -11,6 +11,8 @@
     "dev": "next dev",
     "dev:local": "node --experimental-strip-types scripts/dev-stack/main.mts",
     "dev:stack": "node --experimental-strip-types scripts/dev-stack/main.mts --no-next",
+    "proto:dev": "next dev prototype --port 3100",
+    "proto:build": "next build prototype && node prototype/scripts/postexport.mjs",
     "build": "next build",
     "start": "next start",
     "typecheck": "next typegen && tsc --noEmit && tsc -p tsconfig.sw.json",

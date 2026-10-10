@@ -1,5 +1,7 @@
 import { z } from 'zod';
 
+import { publishAtField } from '@/features/sessions/schema';
+
 /** 캘린더 이벤트 배경으로 쓰는 프로그램 색상 후보 (연한 톤, 글자는 진하게) */
 export const PROGRAM_COLORS = [
   '#A7F3D0',
@@ -31,6 +33,8 @@ export const programFormSchema = z.object({
   defaultInstructorId: z.uuid().nullable(),
   description: z.string().trim().max(1000, { error: 'max' }),
   allowedProductIds: z.array(z.uuid()),
+  /** 공개 예약 `yyyy-MM-ddTHH:mm` (센터 시간대). 빈 값 = 바로 공개 */
+  publishAt: publishAtField,
 });
 export type ProgramFormValues = z.infer<typeof programFormSchema>;
 
@@ -49,4 +53,5 @@ export const EMPTY_PROGRAM: ProgramFormValues = {
   defaultInstructorId: null,
   description: '',
   allowedProductIds: [],
+  publishAt: '',
 };

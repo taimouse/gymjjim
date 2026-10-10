@@ -105,6 +105,8 @@ describe('전화번호', () => {
   it('010-1234-5678 형식으로 표시한다', () => {
     expect(formatPhone('01012345678')).toBe('010-1234-5678');
     expect(formatPhone('0111234567')).toBe('011-123-4567');
+    expect(formatPhone('050713743962')).toBe('0507-1374-3962');
+    expect(maskPhone('050713743962')).toBe('0507-****-3962');
     expect(formatPhone('0212345678')).toBe('02-1234-5678');
     expect(formatPhone('021234567')).toBe('02-123-4567');
     expect(formatPhone('0311234567')).toBe('031-123-4567');

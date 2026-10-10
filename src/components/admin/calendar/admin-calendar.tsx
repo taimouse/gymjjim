@@ -15,7 +15,7 @@ import interactionPlugin from '@fullcalendar/react/interaction';
 import koLocale from '@fullcalendar/react/locales/ko';
 import classicThemePlugin from '@fullcalendar/react/themes/classic';
 import timeGridPlugin from '@fullcalendar/react/timegrid';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { CalendarClock, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useMemo, useState } from 'react';
 
@@ -24,6 +24,7 @@ import '@fullcalendar/react/themes/classic/theme.css';
 
 import { Button } from '@/components/ui/button';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
+import { pendingPublishAt } from '@/features/sessions/publish';
 import type { CalendarSession } from '@/features/sessions/queries';
 import { cn } from '@/lib/utils';
 
@@ -39,7 +40,9 @@ export interface MoveRequest {
 
 function SessionEventContent({ session, compact }: { session: CalendarSession; compact: boolean }) {
   const t = useTranslations('calendar.event');
+  const tPublish = useTranslations('publish');
   const full = session.booked_count >= session.capacity;
+  const unpublished = session.status === 'scheduled' && pendingPublishAt(session) !== null;
   const counts =
     session.status === 'cancelled'
       ? t('cancelled')
@@ -51,10 +54,14 @@ function SessionEventContent({ session, compact }: { session: CalendarSession; c
       className={cn(
         'flex h-full min-w-0 flex-col overflow-hidden border-l-4 px-1.5 py-0.5 text-[13px] leading-snug',
         session.status === 'cancelled' && 'line-through opacity-60',
+        unpublished && 'border-dashed opacity-70',
       )}
       style={{ borderLeftColor: session.instructor?.color ?? 'transparent' }}
     >
-      <span className="truncate font-semibold">{session.program?.name}</span>
+      <span className="flex min-w-0 items-center gap-1 font-semibold">
+        {unpublished && <CalendarClock className="size-3 shrink-0" aria-label={tPublish('pending')} />}
+        <span className="truncate">{session.program?.name}</span>
+      </span>
       <span className={cn('truncate', full && session.status !== 'cancelled' && 'font-semibold text-danger')}>
         {counts}
         {session.waitlist_count > 0 && ` · ${t('waitlist', { count: session.waitlist_count })}`}

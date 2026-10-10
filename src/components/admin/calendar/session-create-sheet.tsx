@@ -9,15 +9,14 @@ import { toast } from 'sonner';
 
 import { useAdmin } from '@/components/admin/admin-context';
 import { EditSheet } from '@/components/admin/edit-sheet';
+import { PublishAtField } from '@/components/admin/publish-at-field';
 import { ErrorAlert, ValidationMessage } from '@/components/form-messages';
 import { Button } from '@/components/ui/button';
 import { Field, FieldGroup, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Spinner } from '@/components/ui/spinner';
-import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
-import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { useProgramsQuery } from '@/features/programs/queries';
 import { createSessions } from '@/features/sessions/actions';
 import { sessionKeys } from '@/features/sessions/queries';
@@ -26,10 +25,12 @@ import { sessionCreateSchema, type SessionCreateValues } from '@/features/sessio
 import { useStaffQuery } from '@/features/staff/queries';
 import type { AppErrorCode } from '@/lib/errors';
 import { numberInput } from '@/lib/form';
-import { addDaysToKey } from '@/lib/format';
+import { addDaysToKey, todayKey } from '@/lib/format';
+
+import { OccurrencePreview } from './occurrence-preview';
+import { RecurrenceFields } from './recurrence-fields';
 
 const NO_INSTRUCTOR = 'none';
-const WEEKDAYS = ['1', '2', '3', '4', '5', '6', '7'] as const;
 
 export interface CreateDefaults {
   date: string;
@@ -56,24 +57,47 @@ export function SessionCreateSheet({ defaults, onClose }: { defaults: CreateDefa
       durationMin: defaults.durationMin ?? 60,
       capacity: 10,
       repeat: false,
+      frequency: 'weekly',
+      interval: 1,
       weekdays: [],
+      monthlyMode: 'date',
+      monthWeeks: [],
+      endMode: 'until',
       until: addDaysToKey(defaults.date, 27),
+      count: 8,
+      excludeDates: [],
+      publishAt: '',
       note: '',
     },
   });
   const { errors } = form.formState;
   const values = useWatch({ control: form.control });
-  const count = sessionCreateSchema.safeParse(values).success
+  const excludeDates = values.excludeDates ?? [];
+  // 제외 전 전체 날짜 (미리보기에서 빼고 넣기 위해)
+  const allOccurrences = sessionCreateSchema.safeParse({ ...values, excludeDates: [] }).success
     ? expandRecurrence({
         date: values.date ?? '',
         startTime: values.startTime ?? '00:00',
         durationMin: values.durationMin ?? 60,
         repeat: values.repeat ?? false,
+        frequency: values.frequency,
+        interval: values.interval,
         weekdays: values.weekdays ?? [],
+        monthlyMode: values.monthlyMode,
+        monthWeeks: values.monthWeeks ?? [],
+        endMode: values.endMode,
         until: values.until ?? null,
+        count: values.count,
         timeZone: timezone,
-      }).length
-    : 0;
+      })
+    : [];
+  const count = allOccurrences.filter((item) => !excludeDates.includes(item.date)).length;
+
+  const toggleExclude = (date: string) =>
+    form.setValue(
+      'excludeDates',
+      excludeDates.includes(date) ? excludeDates.filter((item) => item !== date) : [...excludeDates, date],
+    );
 
   const onProgram = (programId: string) => {
     form.setValue('programId', programId, { shouldValidate: true });
@@ -192,53 +216,21 @@ export function SessionCreateSheet({ defaults, onClose }: { defaults: CreateDefa
               )}
             />
           </Field>
+          <RecurrenceFields form={form} />
+          <OccurrencePreview occurrences={allOccurrences} excluded={excludeDates} onToggle={toggleExclude} />
           <Controller
             control={form.control}
-            name="repeat"
-            render={({ field }) => (
-              <label className="flex min-h-11 cursor-pointer items-center justify-between gap-3 font-medium">
-                {t('create.repeat')}
-                <Switch checked={field.value} onCheckedChange={field.onChange} />
-              </label>
+            name="publishAt"
+            render={({ field, fieldState }) => (
+              <PublishAtField
+                id="create-publish"
+                value={field.value}
+                onChange={field.onChange}
+                defaultDate={todayKey(timezone)}
+                error={fieldState.error}
+              />
             )}
           />
-          {values.repeat && (
-            <>
-              <Field data-invalid={!!errors.weekdays}>
-                <FieldLabel>{t('create.weekdays')}</FieldLabel>
-                <Controller
-                  control={form.control}
-                  name="weekdays"
-                  render={({ field }) => (
-                    <ToggleGroup
-                      type="multiple"
-                      variant="outline"
-                      value={field.value.map(String)}
-                      onValueChange={(value) => field.onChange(value.map(Number).sort())}
-                      className="w-full"
-                    >
-                      {WEEKDAYS.map((day) => (
-                        <ToggleGroupItem
-                          key={day}
-                          value={day}
-                          className="h-11 flex-1"
-                          aria-label={t(`weekdayShort.${day}`)}
-                        >
-                          {t(`weekdayShort.${day}`)}
-                        </ToggleGroupItem>
-                      ))}
-                    </ToggleGroup>
-                  )}
-                />
-                <ValidationMessage error={errors.weekdays} />
-              </Field>
-              <Field data-invalid={!!errors.until}>
-                <FieldLabel htmlFor="create-until">{t('create.until')}</FieldLabel>
-                <Input id="create-until" type="date" min={values.date} {...form.register('until')} />
-                <ValidationMessage error={errors.until} />
-              </Field>
-            </>
-          )}
           <Field>
             <FieldLabel htmlFor="create-note">{t('create.note')}</FieldLabel>
             <Textarea id="create-note" rows={2} {...form.register('note')} />

@@ -15,6 +15,7 @@ import { AVAILABILITY_TONE, remainingSeats, sessionAvailability } from '@/lib/se
 
 import { CancelSessionDialog } from './cancel-session-dialog';
 import { SessionEditSheet } from './session-edit-sheet';
+import { SessionPublishBanner } from './session-publish-banner';
 import { SessionRoster } from './session-roster';
 import { StaffBookDialog } from './staff-book-dialog';
 import { useSessionDrawer } from './use-session-drawer';
@@ -108,6 +109,8 @@ export function SessionDrawer() {
                 {data.note && <span className="text-sm text-muted-foreground">{data.note}</span>}
               </div>
             )}
+
+            {data.status === 'scheduled' && <SessionPublishBanner session={data} now={now} />}
 
             {editable && (
               <div className="flex flex-wrap gap-2">

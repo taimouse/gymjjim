@@ -1,0 +1,55 @@
+# 정적 프로토타입(prototype/)을 GitHub Pages 로 배포한다 (데이터베이스 없이 브라우저 저장소로 동작)
+# 처음 한 번: 저장소 Settings → Pages → Build and deployment → Source 를 "GitHub Actions" 로 바꾼다
+name: Deploy prototype to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      # package.json 의 packageManager(pnpm 버전)를 따른다
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - id: pages
+        uses: actions/configure-pages@v5
+
+      - run: pnpm install --frozen-lockfile
+
+      # https://<owner>.github.io/<repo>/ 아래에서 열리도록 하위 경로를 넘긴다
+      - run: pnpm proto:build
+        env:
+          PAGES_BASE_PATH: ${{ steps.pages.outputs.base_path }}
+
+      - uses: actions/upload-pages-artifact@v4
+        with:
+          path: prototype/out
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

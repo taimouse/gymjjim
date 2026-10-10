@@ -40,6 +40,11 @@ export default async function MemberLoginPage({ searchParams }: PageProps<'/logi
           {t('adminAction')}
         </Link>
       </p>
+      <p className="text-sm">
+        <Link href="/privacy" className="text-muted-foreground underline underline-offset-4">
+          {t('privacyLink')}
+        </Link>
+      </p>
       <DevLoginPanel />
     </div>
   );

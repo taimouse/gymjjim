@@ -17,6 +17,8 @@ export interface ProgramItem {
   color: string;
   description: string | null;
   default_instructor_id: string | null;
+  /** 회원 공개 시각 (null = 공개됨) */
+  publish_at: string | null;
   allowedProductIds: string[];
 }
 
@@ -25,7 +27,7 @@ export async function fetchPrograms(centerId: string): Promise<ProgramItem[]> {
   const { data, error } = await supabase
     .from('programs')
     .select(
-      'id, name, type, default_capacity, duration_min, color, description, default_instructor_id, program_allowed_products(product_id)',
+      'id, name, type, default_capacity, duration_min, color, description, default_instructor_id, publish_at, program_allowed_products(product_id)',
     )
     .eq('center_id', centerId)
     .is('deleted_at', null)

@@ -2,6 +2,7 @@
 
 import { z } from 'zod';
 
+import { localToUtc } from '@/features/sessions/recurrence';
 import { staffActionContext } from '@/lib/auth/action-context';
 import { toAppErrorCode } from '@/lib/errors';
 import { fail, ok, type Result } from '@/lib/result';
@@ -29,6 +30,9 @@ export async function saveProgram(input: SaveProgramInput): Promise<Result<{ id:
     p_default_instructor_id: values.defaultInstructorId ?? undefined,
     p_description: values.description,
     p_allowed_product_ids: values.allowedProductIds,
+    p_publish_at: values.publishAt
+      ? localToUtc(values.publishAt.slice(0, 10), values.publishAt.slice(11), context.center.timezone)
+      : undefined,
   });
   if (error || !data) return fail(toAppErrorCode(error));
   return ok({ id: data });

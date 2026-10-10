@@ -47,14 +47,13 @@ const phoneField = z
   .string()
   .trim()
   .transform((value) => normalizePhone(value))
-  .refine((value) => value === '' || /^[0-9]{8,11}$/.test(value), { error: 'phone' });
+  .refine((value) => value === '' || /^[0-9]{8,12}$/.test(value), { error: 'phone' });
 
-/** 센터 정보 폼 */
+/** 센터 정보 폼 (시간대는 Asia/Seoul 고정이라 받지 않는다) */
 export const centerInfoFormSchema = z.object({
   name: z.string().trim().min(1, { error: 'required' }).max(100),
   phone: phoneField,
   address: z.string().trim().max(200),
-  timezone: z.string().min(1, { error: 'required' }),
 });
 export type CenterInfoFormValues = z.input<typeof centerInfoFormSchema>;
 

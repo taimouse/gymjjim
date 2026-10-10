@@ -114,7 +114,7 @@ describe('알림 발송 루프', () => {
     expect(result).toEqual({ sent: 2, failed: 0, pushed: 1, expired: ['https://push.example.com/old'] });
     expect(pushSend).toHaveBeenCalledTimes(1);
     expect(pushSend.mock.calls[0]![1]).toMatchObject({
-      title: '[강남점] 예약하신 수업이 2시간 뒤에 시작합니다.',
+      title: '[강남점] 홍길동님, 예약하신 수업이 2시간 뒤에 시작합니다.',
       url: '/m/my-bookings',
       tag: `reminder_2h:${first.id}`,
     });

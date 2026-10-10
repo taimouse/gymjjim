@@ -1,0 +1,5 @@
+/* 실제 앱의 디자인 토큰·Tailwind 설정을 그대로 쓴다 */
+@import '../../src/app/globals.css';
+
+@source '../../src';
+@source '..';

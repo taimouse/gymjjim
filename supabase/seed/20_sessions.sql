@@ -14,7 +14,8 @@ template(program_no, instructor_no, dows, start_time, minutes, capacity) as (
     (3, 2, '{2,4}'::int[], time '20:30', 50, 6),      -- 필라테스 저녁
     (4, 2, '{1,3,5}'::int[], time '20:30', 45, 20),   -- 저녁 스피닝
     (5, 2, '{2,4}'::int[], time '15:00', 50, 1),      -- 1:1 PT · 이코치
-    (5, 3, '{3}'::int[], time '16:00', 50, 1)         -- 1:1 PT · 박코치
+    (5, 3, '{3}'::int[], time '16:00', 50, 1),        -- 1:1 PT · 박코치
+    (6, 2, '{2,4}'::int[], time '10:00', 50, 8)       -- 번지피지오 · 이코치
 ),
 grouped as materialized (
   select t.*, gen_random_uuid() as recurrence_group_id from template t

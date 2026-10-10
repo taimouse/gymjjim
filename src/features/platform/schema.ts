@@ -16,7 +16,7 @@ const optionalLandline = z
   .string()
   .trim()
   .transform((value) => normalizePhone(value))
-  .refine((value) => value === '' || /^[0-9]{8,11}$/.test(value), { error: 'phone' });
+  .refine((value) => value === '' || /^[0-9]{8,12}$/.test(value), { error: 'phone' });
 
 /** 한도 입력: 비우면 무제한(null) */
 const optionalLimit = (max: number) =>

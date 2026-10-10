@@ -1,6 +1,6 @@
 'use client';
 
-import { Clock, Dumbbell, Plus, Ticket, User, Users } from 'lucide-react';
+import { CalendarClock, Clock, Dumbbell, Plus, Ticket, User, Users } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useMemo, useState } from 'react';
 
@@ -19,10 +19,12 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { type ProgramItem, useProgramsQuery } from '@/features/programs/queries';
 import { EMPTY_PROGRAM, type ProgramFormValues } from '@/features/programs/schema';
 import { useStaffQuery } from '@/features/staff/queries';
+import { formatDateTime, toDateKey, toTimeKey } from '@/lib/format';
+import { useNow } from '@/lib/use-now';
 
 import { ProgramSheet } from './program-sheet';
 
-function toFormValues(program: ProgramItem): ProgramFormValues {
+function toFormValues(program: ProgramItem, timeZone: string): ProgramFormValues {
   return {
     name: program.name,
     type: program.type,
@@ -32,14 +34,26 @@ function toFormValues(program: ProgramItem): ProgramFormValues {
     defaultInstructorId: program.default_instructor_id,
     description: program.description ?? '',
     allowedProductIds: program.allowedProductIds,
+    publishAt: program.publish_at
+      ? `${toDateKey(program.publish_at, timeZone)}T${toTimeKey(program.publish_at, timeZone)}`
+      : '',
   };
+}
+
+/** 아직 공개 전이면 공개 시각 */
+function pendingPublish(program: ProgramItem, now: Date): string | null {
+  return program.publish_at && new Date(program.publish_at).getTime() > now.getTime()
+    ? program.publish_at
+    : null;
 }
 
 /** 프로그램 카드 목록 + 생성/편집 드로어 */
 export function ProgramList() {
   const t = useTranslations('programs');
-  const { centerId, isOwner } = useAdmin();
+  const tPublish = useTranslations('publish');
+  const { centerId, isOwner, timezone } = useAdmin();
   const programs = useProgramsQuery(centerId);
+  const now = useNow();
   const staff = useStaffQuery(centerId);
   const [editing, setEditing] = useState<{ id?: string; values: ProgramFormValues } | null>(null);
 
@@ -86,11 +100,12 @@ export function ProgramList() {
             const instructor = program.default_instructor_id
               ? staffById.get(program.default_instructor_id)
               : undefined;
+            const publishAt = pendingPublish(program, now);
             return (
               <li key={program.id}>
                 <button
                   type="button"
-                  onClick={() => setEditing({ id: program.id, values: toFormValues(program) })}
+                  onClick={() => setEditing({ id: program.id, values: toFormValues(program, timezone) })}
                   className="flex h-full w-full flex-col gap-3 rounded-xl border bg-card p-4 text-left shadow-sm transition outline-none hover:border-primary/40 focus-visible:ring-3 focus-visible:ring-ring/50"
                 >
                   <div className="flex items-center gap-3">
@@ -129,6 +144,12 @@ export function ProgramList() {
                       </dd>
                     </div>
                   </dl>
+                  {publishAt && (
+                    <p className="flex items-center gap-1.5 rounded-lg bg-warning-soft px-2.5 py-1.5 text-sm text-warning-soft-foreground">
+                      <CalendarClock className="size-4 shrink-0" aria-hidden />
+                      {tPublish('scheduledAt', { when: formatDateTime(publishAt, timezone) })}
+                    </p>
+                  )}
                 </button>
               </li>
             );

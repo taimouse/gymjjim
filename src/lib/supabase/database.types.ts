@@ -792,6 +792,7 @@ export type Database = {
           id: string
           is_active: boolean
           name: string
+          publish_at: string | null
           sort_order: number
           type: Database["public"]["Enums"]["program_type"]
           updated_at: string
@@ -808,6 +809,7 @@ export type Database = {
           id?: string
           is_active?: boolean
           name: string
+          publish_at?: string | null
           sort_order?: number
           type?: Database["public"]["Enums"]["program_type"]
           updated_at?: string
@@ -824,6 +826,7 @@ export type Database = {
           id?: string
           is_active?: boolean
           name?: string
+          publish_at?: string | null
           sort_order?: number
           type?: Database["public"]["Enums"]["program_type"]
           updated_at?: string
@@ -908,6 +911,7 @@ export type Database = {
           instructor_id: string | null
           note: string | null
           program_id: string
+          publish_at: string | null
           recurrence_group_id: string | null
           starts_at: string
           status: Database["public"]["Enums"]["session_status"]
@@ -928,6 +932,7 @@ export type Database = {
           instructor_id?: string | null
           note?: string | null
           program_id: string
+          publish_at?: string | null
           recurrence_group_id?: string | null
           starts_at: string
           status?: Database["public"]["Enums"]["session_status"]
@@ -948,6 +953,7 @@ export type Database = {
           instructor_id?: string | null
           note?: string | null
           program_id?: string
+          publish_at?: string | null
           recurrence_group_id?: string | null
           starts_at?: string
           status?: Database["public"]["Enums"]["session_status"]
@@ -1309,6 +1315,7 @@ export type Database = {
           p_duration_min: number
           p_id?: string
           p_name: string
+          p_publish_at?: string
           p_type: Database["public"]["Enums"]["program_type"]
         }
         Returns: string
@@ -1355,6 +1362,10 @@ export type Database = {
           p_status: Database["public"]["Enums"]["booking_status"]
         }
         Returns: Json
+      }
+      set_session_publish_at: {
+        Args: { p_publish_at?: string; p_scope: string; p_session_id: string }
+        Returns: number
       }
       staff_book_for_member: {
         Args: {

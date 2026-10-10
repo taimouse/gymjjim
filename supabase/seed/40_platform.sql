@@ -1,7 +1,7 @@
 -- ─────────────────────────────────────────────────────────────
 -- 운영자 콘솔(/platform) 시드
 --   admin@gymjjim.test   운영자 (비밀번호 gymjjim1234!)
---   강남점               베이직 요금제 · 이용 중 · 지난달 입금 / 이번 달 미납
+--   구미점               베이직 요금제 · 이용 중 · 지난달 입금 / 이번 달 미납
 --   홍대점               체험 중 (5일 뒤 종료) · 대표 초대 전
 --   부산점               프로 요금제 · 정지 (지난달 연체)
 -- ─────────────────────────────────────────────────────────────
@@ -27,7 +27,7 @@ values (gen_random_uuid(), 'a0000000-0000-4000-8000-000000000900', 'a0000000-000
 insert into public.platform_admins (user_id, name)
 values ('a0000000-0000-4000-8000-000000000900', '운영자');
 
--- 강남점: 베이직
+-- 구미점: 베이직
 update public.centers
 set plan_id = (select id from public.plans where code = 'basic'), status_changed_at = now() - interval '200 days'
 where id = 'c0000000-0000-4000-8000-000000000001';
@@ -35,10 +35,10 @@ where id = 'c0000000-0000-4000-8000-000000000001';
 -- 홍대점: 체험 · 부산점: 정지
 insert into public.centers (id, name, timezone, phone, address, plan_id, status, trial_ends_at, status_changed_at)
 values
-  ('c0000000-0000-4000-8000-000000000002', '짐찜 요가 홍대점', 'Asia/Seoul', '0233334444',
+  ('c0000000-0000-4000-8000-000000000002', '재키짐 요가 홍대점', 'Asia/Seoul', '0233334444',
    '서울특별시 마포구 양화로 45', (select id from public.plans where code = 'trial'), 'trial',
    (now() at time zone 'Asia/Seoul')::date + 5, now() - interval '9 days'),
-  ('c0000000-0000-4000-8000-000000000003', '짐찜 크로스핏 부산점', 'Asia/Seoul', '0515556666',
+  ('c0000000-0000-4000-8000-000000000003', '재키짐 크로스핏 부산점', 'Asia/Seoul', '0515556666',
    '부산광역시 해운대구 센텀중앙로 78', (select id from public.plans where code = 'pro'), 'suspended',
    null, now() - interval '3 days');
 
@@ -51,7 +51,7 @@ insert into public.staff (id, center_id, role, name, email, phone, color, invite
 insert into public.platform_center_notes (center_id, memo) values
   ('c0000000-0000-4000-8000-000000000003', '지난달 요금 미납으로 정지. 입금 확인되면 재개');
 
--- 청구서: 강남점 지난달 입금 · 이번 달 미납, 부산점 지난달 연체 · 이번 달 미납
+-- 청구서: 구미점 지난달 입금 · 이번 달 미납, 부산점 지난달 연체 · 이번 달 미납
 insert into public.invoices (center_id, plan_id, period_start, period_end, amount, due_date, status, paid_at)
 select i.center_id::uuid, p.id, m.start, (m.start + interval '1 month - 1 day')::date, p.monthly_price,
   m.start + 9, i.status::public.invoice_status,

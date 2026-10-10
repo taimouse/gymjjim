@@ -22,12 +22,20 @@ export interface CalendarSession {
   note: string | null;
   recurrence_group_id: string | null;
   cancel_reason: string | null;
-  program: { id: string; name: string; color: string; duration_min: number } | null;
+  /** 회원 공개 시각 (null = 바로 공개). 프로그램 공개 시각도 함께 본다 */
+  publish_at: string | null;
+  program: {
+    id: string;
+    name: string;
+    color: string;
+    duration_min: number;
+    publish_at: string | null;
+  } | null;
   instructor: { id: string; name: string; color: string } | null;
 }
 
 const SESSION_FIELDS =
-  'id, starts_at, ends_at, capacity, booked_count, waitlist_count, status, note, recurrence_group_id, cancel_reason, program:programs(id, name, color, duration_min), instructor:staff!sessions_instructor_fk(id, name, color)';
+  'id, starts_at, ends_at, capacity, booked_count, waitlist_count, status, note, recurrence_group_id, cancel_reason, publish_at, program:programs(id, name, color, duration_min, publish_at), instructor:staff!sessions_instructor_fk(id, name, color)';
 
 /** [from, to) 범위의 수업 (캘린더 보이는 구간) */
 export async function fetchSessions(centerId: string, from: string, to: string): Promise<CalendarSession[]> {

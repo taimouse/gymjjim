@@ -37,6 +37,20 @@ describe('알림톡 템플릿', () => {
     }
   });
 
+  it('모든 알림에 받는 회원 이름이 들어간다', () => {
+    for (const type of NOTIFICATION_TYPES) {
+      expect(templateVariableNames(type)).toContain('#{회원명}');
+      const rendered = renderNotification(type, NOTIFICATION_TEMPLATES[type].sample, {
+        memberName: '김민지',
+        centerName: '강남점',
+      });
+      expect(rendered?.text).toContain('김민지님');
+    }
+    // 이름이 없으면 '회원님'
+    const unnamed = renderNotification('reminder_2h', {}, { memberName: null, centerName: null });
+    expect(unnamed?.text).toContain('회원님');
+  });
+
   it('정보성 문구만 쓴다', () => {
     for (const type of NOTIFICATION_TYPES) {
       for (const word of PROMOTIONAL) expect(NOTIFICATION_TEMPLATES[type].body).not.toContain(word);

@@ -15,7 +15,7 @@ import {
   type NotificationSettingsValues,
 } from './schema';
 
-/** 센터 정보·시간대 (대표) */
+/** 센터 정보 (대표) */
 export async function updateCenterInfo(values: CenterInfoFormValues): Promise<Result<null>> {
   const parsed = centerInfoFormSchema.safeParse(values);
   if (!parsed.success) return fail('VALIDATION');
@@ -29,7 +29,6 @@ export async function updateCenterInfo(values: CenterInfoFormValues): Promise<Re
         name: parsed.data.name,
         phone: parsed.data.phone || null,
         address: parsed.data.address || null,
-        timezone: parsed.data.timezone,
       },
       { count: 'exact' },
     )

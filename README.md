@@ -217,21 +217,41 @@ E2E_BROWSER_CHANNEL=msedge pnpm test:e2e         # 터미널 2: 설치된 Edge �
 - 설정 > 알림의 **최근 발송 내역**에 예약 확정 알림이 쌓이는지(`mock` 이면 "테스트 발송")
 - 휴대폰에서 홈 화면 추가, 내 정보에서 푸시 알림 켜기
 
+## 프로토타입 (GitHub Pages, DB 없이)
+
+`prototype/` 은 데이터베이스 연결 전에 화면과 흐름을 보여 주는 **정적 프로토타입**입니다. 실제 앱(`src/`)의 화면 컴포넌트·디자인 토큰·문구(`ko.json`)를 그대로 가져다 쓰고, 데이터만 브라우저 `localStorage` 에 저장합니다.
+
+- 둘러볼 수 있는 화면: 회원 가입 동의(처리방침 끝까지 읽기) · 수업 예약 · 내 예약 · 관리자 캘린더(반복 수업·공개 예약) · 프로그램 · 자동 메시지 미리보기 · 센터 정보
+- 서버 기능(로그인, 서버 액션, RLS, 알림 발송)은 없습니다. 맨 위 띠의 "처음 상태로" 로 데이터를 되돌립니다.
+
+```bash
+pnpm proto:dev     # http://localhost:3100
+pnpm proto:build   # prototype/out 에 정적 파일 (PAGES_BASE_PATH=/저장소이름 으로 하위 경로 지정)
+```
+
+**GitHub Pages 공개**
+
+1. 저장소를 Public 으로 바꿉니다 (무료 플랜은 Public 저장소만 Pages 를 쓸 수 있어요)
+2. Settings → Pages → Build and deployment → Source 를 **GitHub Actions** 로 바꿉니다
+3. `main` 에 push 하면 `.github/workflows/pages.yml` 이 빌드·배포합니다 (Actions 탭에서 수동 실행도 가능)
+4. 주소: `https://<계정>.github.io/<저장소>/` (예: https://taimouse.github.io/gymjjim/)
+
 ## 스크립트
 
-| 명령                        | 설명                                                                              |
-| --------------------------- | --------------------------------------------------------------------------------- |
-| `pnpm dev`                  | 개발 서버                                                                         |
-| `pnpm build` / `pnpm start` | 프로덕션 빌드 / 실행                                                              |
-| `pnpm typecheck`            | 라우트 타입 생성(`next typegen`) 후 `tsc --noEmit`                                |
-| `pnpm lint`                 | ESLint (any 금지, 300줄 제한, JSX 문자열 하드코딩 금지 포함)                      |
-| `pnpm format`               | Prettier                                                                          |
-| `pnpm test`                 | Vitest 전체 (unit + db)                                                           |
-| `pnpm test:unit`            | 순수 로직 테스트                                                                  |
-| `pnpm test:db`              | 마이그레이션·RPC·RLS 테스트 (embedded PostgreSQL, Docker 불필요)                  |
-| `pnpm test:e2e`             | Playwright E2E (로컬 Supabase 필요)                                               |
-| `pnpm db:types`             | 마이그레이션 기준으로 `src/lib/supabase/database.types.ts` 재생성 (Docker 불필요) |
-| `pnpm db:types:local`       | 실행 중인 로컬 Supabase에서 타입 생성 (Docker 필요)                               |
+| 명령                                  | 설명                                                                              |
+| ------------------------------------- | --------------------------------------------------------------------------------- |
+| `pnpm dev`                            | 개발 서버                                                                         |
+| `pnpm proto:dev` / `pnpm proto:build` | 정적 프로토타입 개발 서버 / GitHub Pages 용 빌드 (`prototype/out`)                |
+| `pnpm build` / `pnpm start`           | 프로덕션 빌드 / 실행                                                              |
+| `pnpm typecheck`                      | 라우트 타입 생성(`next typegen`) 후 `tsc --noEmit`                                |
+| `pnpm lint`                           | ESLint (any 금지, 300줄 제한, JSX 문자열 하드코딩 금지 포함)                      |
+| `pnpm format`                         | Prettier                                                                          |
+| `pnpm test`                           | Vitest 전체 (unit + db)                                                           |
+| `pnpm test:unit`                      | 순수 로직 테스트                                                                  |
+| `pnpm test:db`                        | 마이그레이션·RPC·RLS 테스트 (embedded PostgreSQL, Docker 불필요)                  |
+| `pnpm test:e2e`                       | Playwright E2E (로컬 Supabase 필요)                                               |
+| `pnpm db:types`                       | 마이그레이션 기준으로 `src/lib/supabase/database.types.ts` 재생성 (Docker 불필요) |
+| `pnpm db:types:local`                 | 실행 중인 로컬 Supabase에서 타입 생성 (Docker 필요)                               |
 
 작업을 마치면 `pnpm typecheck && pnpm lint && pnpm test`가 통과해야 합니다.
 

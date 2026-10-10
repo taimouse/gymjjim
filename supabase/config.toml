@@ -244,11 +244,11 @@ otp_expiry = 3600
 
 # 메일 링크는 token_hash 방식(/auth/confirm). 메일 앱 내장 브라우저에서 열어도 로그인된다.
 [auth.email.template.magic_link]
-subject = "[gymjjim] 로그인 링크"
+subject = "[재키짐] 로그인 링크"
 content_path = "./supabase/templates/magic_link.html"
 
 [auth.email.template.invite]
-subject = "[gymjjim] 직원 초대"
+subject = "[재키짐] 직원 초대"
 content_path = "./supabase/templates/invite.html"
 
 # Uncomment to customize notification email template

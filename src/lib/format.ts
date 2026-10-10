@@ -127,6 +127,8 @@ export function isMobilePhone(digits: string): boolean {
 
 function splitPhone(digits: string): string[] | null {
   if (/^(15|16|18)\d{6}$/.test(digits)) return [digits.slice(0, 4), digits.slice(4)];
+  // 050X 안심번호 `0507-1374-3962`
+  if (/^050\d{9}$/.test(digits)) return [digits.slice(0, 4), digits.slice(4, 8), digits.slice(8)];
   const areaLength = digits.startsWith('02') ? 2 : 3;
   const rest = digits.slice(areaLength);
   if (rest.length === 7) return [digits.slice(0, areaLength), rest.slice(0, 3), rest.slice(3)];

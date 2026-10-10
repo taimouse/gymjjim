@@ -6,6 +6,8 @@
 # next.js
 /.next/
 /out/
+/prototype/.next/
+/prototype/out/
 next-env.d.ts
 *.tsbuildinfo
 

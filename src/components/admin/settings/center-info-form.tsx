@@ -3,17 +3,16 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
-import { useMemo, useState, useTransition } from 'react';
-import { Controller, useForm } from 'react-hook-form';
+import { useState, useTransition } from 'react';
+import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 
 import { useAdmin } from '@/components/admin/admin-context';
 import { ErrorAlert, ValidationMessage } from '@/components/form-messages';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Field, FieldDescription, FieldGroup, FieldLabel } from '@/components/ui/field';
+import { Field, FieldGroup, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Spinner } from '@/components/ui/spinner';
 import { updateCenterInfo } from '@/features/centers/actions';
 import { centerInfoFormSchema, type CenterInfoFormValues } from '@/features/centers/schema';
@@ -32,7 +31,6 @@ export function CenterInfoForm({ initial }: { initial: CenterInfoFormValues }) {
     defaultValues: { ...initial, phone: formatPhone(initial.phone) },
   });
   const { errors } = form.formState;
-  const timezones = useMemo(() => Intl.supportedValuesOf('timeZone'), []);
 
   const onSubmit = form.handleSubmit((values) => {
     setError(null);
@@ -66,28 +64,6 @@ export function CenterInfoForm({ initial }: { initial: CenterInfoFormValues }) {
               <Field>
                 <FieldLabel htmlFor="center-address">{t('address')}</FieldLabel>
                 <Input id="center-address" {...form.register('address')} />
-              </Field>
-              <Field>
-                <FieldLabel>{t('timezone')}</FieldLabel>
-                <Controller
-                  control={form.control}
-                  name="timezone"
-                  render={({ field }) => (
-                    <Select value={field.value} onValueChange={field.onChange} disabled={!isOwner}>
-                      <SelectTrigger className="w-full">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent className="max-h-80">
-                        {timezones.map((zone) => (
-                          <SelectItem key={zone} value={zone}>
-                            {zone}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  )}
-                />
-                <FieldDescription>{t('timezoneHint')}</FieldDescription>
               </Field>
               <ErrorAlert code={error} />
             </FieldGroup>

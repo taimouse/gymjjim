@@ -41,6 +41,7 @@ describe('역할 클레임', () => {
     expect(areaOf('/admin-login')).toBe('public');
     expect(areaOf('/invite/abc')).toBe('public');
     expect(areaOf('/auth/callback')).toBe('public');
+    expect(areaOf('/privacy')).toBe('public');
     expect(areaOf('/m/book')).toBe('member');
     expect(areaOf('/welcome')).toBe('member');
   });

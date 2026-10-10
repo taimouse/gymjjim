@@ -37,7 +37,7 @@ export default defineConfig([
   },
   {
     // CLAUDE.md 6번: 화면 문자열 하드코딩 금지
-    files: ['src/app/**/*.tsx', 'src/components/**/*.tsx'],
+    files: ['src/app/**/*.tsx', 'src/components/**/*.tsx', 'prototype/**/*.tsx'],
     ignores: ['src/components/ui/**'],
     rules: {
       'react/jsx-no-literals': [
@@ -61,5 +61,7 @@ export default defineConfig([
     'playwright-report/**',
     'test-results/**',
     'supabase/functions/**',
+    'prototype/.next/**',
+    'prototype/out/**',
   ]),
 ]);

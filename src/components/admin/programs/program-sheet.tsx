@@ -12,6 +12,7 @@ import { useAdmin } from '@/components/admin/admin-context';
 import { ColorPicker } from '@/components/admin/color-picker';
 import { ConfirmDialog } from '@/components/admin/confirm-dialog';
 import { EditSheet } from '@/components/admin/edit-sheet';
+import { PublishAtField } from '@/components/admin/publish-at-field';
 import { ErrorAlert, useErrorText, ValidationMessage } from '@/components/form-messages';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -28,6 +29,7 @@ import { PROGRAM_COLORS, programFormSchema, type ProgramFormValues } from '@/fea
 import { useStaffQuery } from '@/features/staff/queries';
 import type { AppErrorCode } from '@/lib/errors';
 import { numberInput } from '@/lib/form';
+import { addDaysToKey, todayKey } from '@/lib/format';
 
 const NO_INSTRUCTOR = 'none';
 
@@ -46,7 +48,7 @@ export function ProgramSheet({
   const t = useTranslations('programs');
   const tCommon = useTranslations('common');
   const errorText = useErrorText();
-  const { centerId, isOwner } = useAdmin();
+  const { centerId, isOwner, timezone } = useAdmin();
   const queryClient = useQueryClient();
   const staff = useStaffQuery(centerId);
   const products = useProductsQuery(centerId);
@@ -245,6 +247,20 @@ export function ProgramSheet({
               <FieldLabel htmlFor="program-description">{t('fields.description')}</FieldLabel>
               <Textarea id="program-description" rows={3} {...form.register('description')} />
             </Field>
+            <Controller
+              control={form.control}
+              name="publishAt"
+              render={({ field, fieldState }) => (
+                <PublishAtField
+                  id="program-publish"
+                  value={field.value}
+                  onChange={field.onChange}
+                  defaultDate={addDaysToKey(todayKey(timezone), 1)}
+                  error={fieldState.error}
+                  disabled={readOnly}
+                />
+              )}
+            />
           </FieldGroup>
           <ErrorAlert code={error} />
         </fieldset>

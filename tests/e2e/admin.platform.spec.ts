@@ -13,7 +13,7 @@ test.describe('(7) 운영자 콘솔', () => {
     await page.goto('/platform?as=platform');
     await expect(page).toHaveURL(/\/platform$/);
     await expect(page.getByRole('heading', { name: t.dashboard.title })).toBeVisible();
-    await expect(page.getByRole('link', { name: /짐찜 요가 홍대점/ })).toBeVisible();
+    await expect(page.getByRole('link', { name: /재키짐 요가 홍대점/ })).toBeVisible();
 
     await page
       .getByRole('navigation', { name: t.nav.label })
@@ -26,9 +26,9 @@ test.describe('(7) 운영자 콘솔', () => {
     await page.getByRole('radio', { name: t.status.suspended }).click();
     await expect(page).toHaveURL(/status=suspended/);
     await expect(page.getByRole('row')).toHaveCount(2);
-    await page.getByRole('button', { name: '짐찜 크로스핏 부산점' }).click();
+    await page.getByRole('button', { name: '재키짐 크로스핏 부산점' }).click();
     const drawer = page.getByRole('dialog');
-    await expect(drawer.getByRole('heading', { name: '짐찜 크로스핏 부산점' })).toBeVisible();
+    await expect(drawer.getByRole('heading', { name: '재키짐 크로스핏 부산점' })).toBeVisible();
     await expect(drawer.getByLabel(t.centers.detail.memo)).toHaveValue(/미납으로 정지/);
     await expect(drawer.getByText(t.invoiceStatus.overdue)).toBeVisible();
     await page.keyboard.press('Escape');
@@ -42,12 +42,12 @@ test.describe('(7) 운영자 콘솔', () => {
 
   test('입금 확인은 바로 되고 되돌리기로 미납으로 돌아간다', async ({ page }) => {
     await page.goto('/platform/invoices?as=platform&status=pending');
-    const row = page.getByRole('row').filter({ hasText: '짐찜 피트니스 강남점' });
+    const row = page.getByRole('row').filter({ hasText: '재키 피트니스 구미점' });
     await expect(row).toHaveCount(1);
 
     await row.getByRole('button', { name: t.invoices.markPaid }).click();
     await expect(
-      page.getByText(fill(t.invoices.changed.paid, { name: '짐찜 피트니스 강남점' })),
+      page.getByText(fill(t.invoices.changed.paid, { name: '재키 피트니스 구미점' })),
     ).toBeVisible();
     // 미납 필터라 입금한 줄은 사라진다
     await expect(row).toHaveCount(0);
